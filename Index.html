@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Portfolio Engine</title>
+
+    <style>  
+      :root {
+    --orange: #FF6B00;
+    --black: #1A1A1A;
+    --gray-marble: #F0F0F0;
+    --radius: 12px;
+}
+
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+body {
+    background-color: var(--gray-marble);
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0);
+    background-size: 20px 20px;
+    font-family: 'Arial Black', 'Inter', sans-serif;
+    color: var(--black);
+    margin: 0;
+    padding: 5px 15px 15px 15px;
+}
+
+.container { max-width: 600px; margin: 0 auto; 
+    padding: 0px 12px 10pz 12px;
+}
+
+h1 {
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    border: 4px solid var(--black);
+    display: block;
+    text-align: center;
+    margin-bottom: 25px;
+    background: var(--orange);
+    padding: 10px 15px;
+    box-shadow: 6px 6px 0px #000;
+    border-radius: var(--radius);
+    line-height: 1.1;
+}
+
+.rebalance-panel {
+    background: white;
+    border: 4px solid var(--black);
+    padding: 15px;
+    margin-bottom: 30px;
+    box-shadow: 6px 6px 0px var(--black);
+    border-radius: var(--radius);
+}
+
+.grid { display: flex; flex-direction: column; gap: 25px; }
+
+.category-card {
+    background: #fff;
+    border: 4px solid var(--black);
+    padding: 15px;
+    box-shadow: 6px 6px 0px var(--black);
+    border-radius: var(--radius);
+}
+            .category-header {
+    background: var(--black);
+    color: var(--orange);
+    padding: 15px;
+    margin: -15px -15px 15px -15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+    border-radius: 8px 8px 0 0;
+}
+
+.target-input {
+    width: 45px;
+    background: var(--orange);
+    border: 1px solid #000;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 核心修改：5欄網格排版 [叉][名稱][%][金額][佔比] */
+.asset-item {
+    display: grid;
+    /* 將第一欄從 30px 縮減為 20px */
+    grid-template-columns: 15px 1.2fr 0.8fr 1.5fr 0.6fr; 
+    gap: 5px; /* 縮小間距讓排版更緊湊 */
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+
+/* 左側純紅叉叉 */
+.btn-delete-left {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent !important;
+    border: none !important;
+    color: #FF4444 !important;
+    
+    /* 縮小叉叉字體，18px 或 16px 會顯得更精緻 */
+    font-size: 16px; 
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    width: 100%; /* 確保在 20px 的網格內居中 */
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 2px solid var(--black);
+    text-align: center;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+}
+
+.edit-container { display: none; }
+
+.edit-input {
+    border: 2px solid var(--orange);
+    padding: 8px;
+    font-weight: bold;
+    width: 100%;
+    height: 40px;
+    font-size: 14px;
+    border-radius: var(--radius);
+    background: #fff;
+}
+
+.btn {
+    background: var(--orange);
+    border: 3px solid var(--black);
+    padding: 12px;
+    font-weight: bold;
+    box-shadow: 4px 4px 0px var(--black);
+    width: 100%;
+    margin-top: 10px;
+    border-radius: var(--radius);
+}
+
+.asset-ratio-tag {
+    font-size: 10px;
+    font-weight: 900;
+    text-align: right;
+}
+
+.card-footer {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 3px solid var(--black);
+}
+
+
+.status-tag {
+    margin-top: 5px;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    font-weight: 900;
+    background: rgba(255, 107, 0, 0.12);
+    color: #CC5500;
+}
+
+/* 強制修正 Debug Mode 的排版偏移 */
+.container {
+    width: 100vw !important; /* 100% 的螢幕寬度 */
+    max-width: 600px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 徹底修復右側被切掉的問題 */
+* {
+    box-sizing: border-box !important; /* 確保 padding 不會撐開寬度 */
+}
+
+html, body {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important; /* 禁止橫向滾動 */
+    background-color: var(--gray-marble);
+}
+
+.container {
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    padding: 15px !important; /* 在這裡給邊距，不會撐破寬度 */
+    display: block !important;
+}
+
+/* 網格比例微調：縮小名稱與金額的佔位，確保右側佔比不被切掉 */
+.asset-item {
+    display: grid;
+    /* 叉叉20px | 名稱1.1份 | %數0.8份 | 金額1.3份 | 佔比50px */
+    grid-template-columns: 20px 1.1fr 0.8fr 1.3fr 50px !important; 
+    gap: 4px !important;
+    width: 100% !important;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+/* 確保輸入框不會溢出 */
+.edit-input {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+/* 讓右側佔比欄位固定寬度，防止被擠壓 */
+.asset-ratio-tag {
+    min-width: 50px !important;
+    text-align: right;
+}
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            <span style="font-size: 0.9em; letter-spacing: 2px;">Portfolio Engine</span><br>
+            <span style="font-size: 0.7em;">資產組合計算器</span>
+        </h1>
+
+        <div class="rebalance-panel">
+            <h3 style="margin:0; font-size: 0.9rem; text-transform: uppercase; color: #666;">Total Assets | 總資產狀態</h3>
+            <div id="rebalanceSummary" style="margin-top:10px; font-size: 1.2rem; font-weight: 900;">$0</div>
+        </div>
+
+        <div class="grid">
+            <div id="growth" class="category-card"></div>
+            <div id="defense" class="category-card"></div>
+            <div id="dividend" class="category-card"></div>
+            <div id="savings" class="category-card"></div>
+        </div>
+
+        <button class="btn" style="background:#ddd; color:#666; margin-top:40px; margin-bottom:40px; box-shadow: 4px 4px 0px #999;" onclick="clearAll()">重置所有資料</button>
+    </div>
+
+    <script>
+        /* 4. 這裡貼上你原本在 CodePen JS 視窗裡的所有代碼 */
+        // 確保裡面包含 addCategory, clearAll 等 function
+         const categories = [
+    { id: 'growth', name: '成長型投資' },
+    { id: 'defense', name: '防守型投資' },
+    { id: 'dividend', name: '高股息投資' },
+    { id: 'savings', name: '安全存款' }
+];
+
+function formatCurrency(num) {
+    return "$" + Math.round(num || 0).toLocaleString('en-US');
+}
+
+// 進入編輯模式
+function editMode(el) {
+    const container = el.nextElementSibling;
+    if (!container) return;
+    el.style.display = 'none';
+    container.style.display = 'block';
+    const input = container.querySelector('input');
+    if (input) {
+        input.focus();
+        // 如果是金額輸入框且為 0，自動清空方便輸入
+        if (input.classList.contains('asset-value') && input.value == 0) {
+            input.value = '';
+        }
+    }
+}
+
+// 自動變回實心底 (加入延遲解決手機端衝突)
+function autoViewMode(inputEl) {
+    setTimeout(() => {
+        if (!inputEl || !inputEl.parentElement) return;
+        const container = inputEl.parentElement;
+        const view = container.previousElementSibling;
+        
+        if (container.style.display === 'block') {
+            container.style.display = 'none';
+            view.style.display = 'flex';
+            
+            if (inputEl.classList.contains('asset-value')) {
+                view.innerText = formatCurrency(inputEl.value);
+            } else if (inputEl.classList.contains('target-p-input')) {
+                view.innerText = (inputEl.value || 0) + "%";
+            } else {
+                view.innerText = inputEl.value || "名稱";
+            }
+            calculateAll();
+        }
+    }, 180);
+}
+      
+// 初始化頁面
+function init() {
+    const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
+    categories.forEach(cat => {
+        const container = document.getElementById(cat.id);
+        if (!container) return;
+        
+        const data = savedData[cat.id] || { target: 25, assets: [] };
+        
+        container.innerHTML = `
+            <div class="category-header">
+                <span style="padding-left:15px">${cat.name}</span>
+                <span style="padding-right:15px">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %</span>
+            </div>
+            <div class="asset-list" id="list-${cat.id}"></div>
+            <button class="btn" onclick="addAsset('${cat.id}')">+ 新增標的</button>
+            <div class="card-footer">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="color:var(--orange); font-size:0.85rem; font-weight:900;">當前總佔比</span>
+                    <span class="current-p" style="color:var(--orange); font-weight:900;">0%</span>
+                </div>
+                <div class="status-tag status-alert">✅ 比例理想</div>
+            </div>
+        `;
+        
+        if (data.assets && data.assets.length > 0) {
+            data.assets.forEach(asset => addAsset(cat.id, asset.name, asset.value, asset.targetP));
+        } else {
+            addAsset(cat.id);
+        }
+    });
+    calculateAll();
+}
+      // 新增資產標的
+function addAsset(catId, name = '', value = 0, targetP = 0) {
+    const list = document.getElementById(`list-${catId}`);
+    if (!list) return;
+    
+    const div = document.createElement('div');
+    div.className = 'asset-item';
+    div.innerHTML = `
+        <button class="btn-delete-left" onmousedown="if(confirm('確定刪除？')){this.closest('.asset-item').remove(); calculateAll();}">×</button>
+        
+        <div>
+            <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
+            <div class="edit-container">
+                <input type="text" class="edit-input asset-name" value="${name}" 
+                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
+            </div>
+        </div>
+
+        <div>
+            <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP}%</div>
+            <div class="edit-container" style="position:relative;">
+                      <input type="number" class="edit-input target-p-input" value="${targetP}" 
+                    onfocus="if(this.value==0)this.value=''" 
+                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
+                <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-weight:bold; color:var(--orange); pointer-events:none;">%</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="static-view" style="background:white; color:black;" onclick="editMode(this)">${formatCurrency(value)}</div>
+            <div class="edit-container">
+                <input type="number" class="edit-input asset-value" value="${value}" 
+                    onfocus="if(this.value==0)this.value=''" 
+                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
+            </div>
+        </div>
+
+        <div class="asset-ratio-tag">
+            <div class="ratio-val">0%</div>
+            <div class="diff-suggestion" style="font-size:9px; font-weight:bold;"></div>
+        </div>
+    `;
+    list.appendChild(div);
+}
+       function calculateAll() {
+    let totalGlobalValue = 0;
+    let catSums = {};
+
+    // 1. 算出全域總金額
+    categories.forEach(cat => {
+        const inputs = document.querySelectorAll(`#list-${cat.id} .asset-value`);
+        let sum = 0;
+        inputs.forEach(i => sum += parseFloat(i.value || 0));
+        catSums[cat.id] = sum;
+        totalGlobalValue += sum;
+    });
+
+    // 2. 更新每個卡片的詳細數據
+    categories.forEach(cat => {
+        const card = document.getElementById(cat.id);
+        if (!card) return;
+
+        const catTargetInput = card.querySelector('.target-input');
+        const catTargetP = parseFloat(catTargetInput.value || 0);
+        
+        // 該類別佔總資產比例
+        const catCurrentP = totalGlobalValue > 0 ? (catSums[cat.id] / totalGlobalValue * 100).toFixed(1) : 0;
+        card.querySelector('.current-p').innerText = catCurrentP + "%";
+                  const val = parseFloat(item.querySelector('.asset-value').value || 0);
+            const tP = parseFloat(item.querySelector('.target-p-input').value || 0);
+            const ratioTag = item.querySelector('.ratio-val');
+            const suggestTag = item.querySelector('.diff-suggestion');
+
+            // 標的佔該區域比例
+            const ratio = catSums[cat.id] > 0 ? (val / catSums[cat.id] * 100).toFixed(1) : 0;
+            ratioTag.innerText = ratio + '%';
+
+            // 標的再平衡建議
+            const idealItemAmount = catSums[cat.id] * (tP / 100);
+            const itemDiff = idealItemAmount - val;
+
+            if (tP > 0 && Math.abs(parseFloat(ratio) - tP) > 0.1) {
+                ratioTag.style.color = '#FF4444';
+                suggestTag.innerText = itemDiff > 0 ? `+${Math.round(itemDiff)}` : `${Math.round(itemDiff)}`;
+                suggestTag.style.color = itemDiff > 0 ? '#008800' : '#FF4444';
+            } else {
+                ratioTag.style.color = 'white';
+                suggestTag.innerText = '';
+            }
+        });
+            // 3. 區域大項再平衡建議 (類別 vs 全域)
+        const idealCatAmount = totalGlobalValue * (catTargetP / 100);
+        const catDiff = catSums[cat.id] - idealCatAmount;
+        const alert = card.querySelector('.status-alert');
+
+        if (totalGlobalValue > 0) {
+            if (catDiff > 10) {
+                alert.innerHTML = `⬆️ 建議移出 <span style="color:#FF4444; font-weight:900;">${formatCurrency(catDiff)}</span>`;
+            } else if (catDiff < -10) {
+                alert.innerHTML = `⬇️ 建議補入 <span style="color:#008800; font-weight:900;">${formatCurrency(Math.abs(catDiff))}</span>`;
+            } else {
+                alert.innerText = "✅ 比例理想";
+            }
+        } else {
+            alert.innerText = "請新增資產標的";
+        }
+    });
+
+    // 更新總資產顯示
+    const summaryEl = document.getElementById('rebalanceSummary');
+    if (summaryEl) summaryEl.innerHTML = `<strong>${formatCurrency(totalGlobalValue)}</strong>`;
+    
+    autoSave();
+}
+      
+function autoSave() {
+    const data = {};
+    categories.forEach(cat => {
+        const card = document.getElementById(cat.id);
+        if (!card) return;
+        const assets = [];
+        card.querySelectorAll('.asset-item').forEach(item => {
+            assets.push({
+                name: item.querySelector('.asset-name').value,
+                value: item.querySelector('.asset-value').value,
+                targetP: item.querySelector('.target-p-input').value
+            });
+        });
+        data[cat.id] = { target: card.querySelector('.target-input').value, assets: assets };
+    });
+    localStorage.setItem('myPortfolio', JSON.stringify(data));
+}
+
+function clearAll() {
+    if (confirm('確定清除資料嗎？')) {
+        localStorage.removeItem('myPortfolio');
+        location.reload();
+    }
+}
+
+// 啟動程式
+init();
+    </script>
+</body>
+</html>
