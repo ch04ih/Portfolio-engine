@@ -159,8 +159,10 @@
             localStorage.setItem('catConfig_v2', JSON.stringify(categories));
             
             const dot = document.getElementById('saveDot');
-            dot.classList.add('active');
-            setTimeout(() => dot.classList.remove('active'), 800);
+            if (dot) {
+                dot.classList.add('active');
+                setTimeout(() => dot.classList.remove('active'), 800);
+            }
         } catch(e) { console.error("Save failed", e); }
     }
 
@@ -383,7 +385,15 @@
         const card = document.getElementById(id); card.classList.toggle('collapsed'); forceSave(); 
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('確定重置？')) { localStorage.clear(); location.reload(); } }
+    
+    // 徹底修復重置按鈕
+    function clearAll() { 
+        if (confirm('確定重置所有資料嗎？這將刪除目前所有的輸入紀錄。')) { 
+            localStorage.clear(); // 清除本地存檔
+            categories = [];     // 清空當前變數
+            location.reload();   // 重新整理，觸發 onload 回到初始預設值
+        } 
+    }
 
     window.onload = () => {
         const savedCats = localStorage.getItem('catConfig_v2');
