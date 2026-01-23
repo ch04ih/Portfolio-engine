@@ -29,7 +29,7 @@
         h1 { text-transform: uppercase; font-size: 1.4rem; border: 4px solid #1A1A1A; text-align: center; margin: 0 0 25px 0; background: var(--theme-accent); padding: 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px 8px 0 0; }
@@ -98,7 +98,7 @@
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888;">總資產現值</div>
-            <button class="chart-btn" onclick="toggleChart()">📊 比例圖表</button>
+            <button class="chart-btn" onclick="toggleChart()">圖表</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
         <div id="target-sum-alert" style="margin-top:10px; font-size:12px; font-weight:bold; text-align:center; padding:5px; border-radius:6px; display:none;"></div>
@@ -190,9 +190,21 @@
             return;
         }
         inputEl.classList.remove('input-error');
+
+        // 同步顯示內容
+        const container = inputEl.parentElement;
+        const view = container.previousElementSibling;
+        const val = inputEl.value;
+
+        if (inputEl.classList.contains('asset-value')) {
+            view.innerText = val > 0 ? formatCurrency(val) : "$0";
+        } else if (inputEl.classList.contains('target-p-input')) {
+            view.innerText = val > 0 ? (val + "%") : "目標%";
+        } else {
+            view.innerText = val || "名稱";
+        }
+
         setTimeout(() => {
-            const container = inputEl.parentElement;
-            const view = container.previousElementSibling;
             container.style.display = 'none';
             view.style.display = 'flex';
             calculateAll();
@@ -310,6 +322,8 @@
                     const d = (total * (target/100) * (tP/100)) - val;
                     sug.innerText = d > 0 ? `+${Math.round(d).toLocaleString()}` : Math.round(d).toLocaleString();
                     sug.style.color = d > 0 ? "#008800" : "#FF4444";
+                } else {
+                    sug.innerText = "";
                 }
             });
         });
@@ -321,12 +335,14 @@
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
         const styles = getComputedStyle(document.documentElement);
+        const accent = styles.getPropertyValue('--theme-accent').trim();
+        const bg = styles.getPropertyValue('--theme-bg').trim();
         const data = {
             labels: categories.map(c => c.name),
-            datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: [styles.getPropertyValue('--theme-accent'), styles.getPropertyValue('--theme-bg'), '#888', '#AAA', '#CCC'], borderWidth: 0 }]
+            datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: [accent, bg, '#B4D355', '#80C5DE', '#F0A650', '#CCC'], borderWidth: 2, borderColor: '#fff' }]
         };
         if (myChart) { myChart.data = data; myChart.update(); }
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } }); }
+        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } }); }
     }
 
     function autoSave() {
