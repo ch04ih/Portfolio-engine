@@ -51,9 +51,6 @@
         .edit-container.prefix::before { content: '$'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
         .edit-container.suffix::after { content: '%'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
 
-        .input-error { border: 2px solid #FF4444 !important; animation: shake 0.2s ease-in-out 2; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-
         .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; display: block; }
         .footer-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .cat-sum-display { flex-grow: 1; text-align: center; font-size: 1.1rem; font-weight: 900; }
@@ -129,6 +126,7 @@
         localStorage.setItem('userTheme', themeName);
         const panel = document.getElementById('themePanel');
         if (panel) panel.classList.remove('active');
+        // 每次切換主題都要重新計算並更新圖表顏色
         calculateAll();
     }
 
@@ -185,25 +183,13 @@
     }
 
     function autoViewMode(inputEl) {
-        if (inputEl.type === 'number' && (inputEl.value === "" || inputEl.value < 0)) {
-            inputEl.classList.add('input-error');
-            return;
-        }
-        inputEl.classList.remove('input-error');
-
-        // 同步顯示內容
+        if (inputEl.type === 'number' && (inputEl.value === "" || inputEl.value < 0)) return;
         const container = inputEl.parentElement;
         const view = container.previousElementSibling;
         const val = inputEl.value;
-
-        if (inputEl.classList.contains('asset-value')) {
-            view.innerText = val > 0 ? formatCurrency(val) : "$0";
-        } else if (inputEl.classList.contains('target-p-input')) {
-            view.innerText = val > 0 ? (val + "%") : "目標%";
-        } else {
-            view.innerText = val || "名稱";
-        }
-
+        if (inputEl.classList.contains('asset-value')) view.innerText = val > 0 ? formatCurrency(val) : "$0";
+        else if (inputEl.classList.contains('target-p-input')) view.innerText = val > 0 ? (val + "%") : "目標%";
+        else view.innerText = val || "名稱";
         setTimeout(() => {
             container.style.display = 'none';
             view.style.display = 'flex';
@@ -217,7 +203,6 @@
         const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = '';
-
         categories.forEach(cat => {
             const data = savedData[cat.id] || { target: 25, assets: [], collapsed: false };
             const card = document.createElement('div');
@@ -246,11 +231,8 @@
                 </div>
             `;
             grid.appendChild(card);
-            if (data.assets && data.assets.length > 0) {
-                data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
-            } else {
-                addAsset(cat.id);
-            }
+            if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
+            else addAsset(cat.id);
         });
         calculateAll();
     }
@@ -283,20 +265,18 @@
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (card) {
-                const rawTarget = parseFloat(card.querySelector('.target-input').value) || 0;
-                totalTargetP += rawTarget;
+                totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
                 let sum = 0;
                 card.querySelectorAll('.asset-value').forEach(i => { sum += parseFloat(i.value) || 0; });
                 catSums[cat.id] = sum;
                 total += sum;
             }
         });
-
         const alertDiv = document.getElementById('target-sum-alert');
         if (Math.abs(totalTargetP - 100) > 0.1) {
             alertDiv.style.display = 'block'; alertDiv.style.background = '#FFE5E5'; alertDiv.style.color = '#D00000';
             alertDiv.innerText = `⚠️ 區域目標總和為 ${totalTargetP.toFixed(0)}% (應為 100%)`;
-        } else { alertDiv.style.display = 'none'; }
+        } else alertDiv.style.display = 'none';
 
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
@@ -305,7 +285,6 @@
             const currentP = total > 0 ? (catSums[cat.id] / total * 100) : 0;
             card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[cat.id]);
             card.querySelector('.current-p').innerText = currentP.toFixed(1) + "%";
-            
             const alertTag = card.querySelector('.status-alert');
             const diff = catSums[cat.id] - (total * target / 100);
             if (total === 0) alertTag.innerText = "✅ 請開始輸入資產";
@@ -322,9 +301,7 @@
                     const d = (total * (target/100) * (tP/100)) - val;
                     sug.innerText = d > 0 ? `+${Math.round(d).toLocaleString()}` : Math.round(d).toLocaleString();
                     sug.style.color = d > 0 ? "#008800" : "#FF4444";
-                } else {
-                    sug.innerText = "";
-                }
+                } else sug.innerText = "";
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
@@ -334,35 +311,33 @@
     function updateChart(catSums) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
-        
-        // 動態獲取當前主題的顏色
         const styles = getComputedStyle(document.documentElement);
         const accent = styles.getPropertyValue('--theme-accent').trim();
         const bg = styles.getPropertyValue('--theme-bg').trim();
         
-        // 定義一組與主題感相符的輔助色
-        const palette = [
-            accent, // 主色
-            bg,     // 背景色（深色對比）
-            '#95a5a6', // 中性灰
-            '#bdc3c7', // 淺灰
-            '#7f8c8d'  // 深灰
+        // 生成主題相關色系：主色、背景色、灰度色、以及主色的透明版
+        const themeColors = [
+            accent, 
+            bg, 
+            "#888888", 
+            accent + "CC", // 80% 透明度
+            bg + "AA",     // 60% 透明度
+            "#BBBBBB"
         ];
 
         const data = {
             labels: categories.map(c => c.name),
             datasets: [{ 
                 data: categories.map(c => catSums[c.id]), 
-                backgroundColor: palette, 
+                backgroundColor: themeColors, 
                 borderWidth: 2, 
                 borderColor: '#fff' 
             }]
         };
-
-        if (myChart) {
-            myChart.data = data;
-            myChart.update();
-        } else {
+        if (myChart) { 
+            myChart.data = data; 
+            myChart.update(); 
+        } else { 
             myChart = new Chart(ctx, { 
                 type: 'doughnut', 
                 data: data, 
@@ -370,13 +345,10 @@
                     maintainAspectRatio: false, 
                     cutout: '65%', 
                     plugins: { 
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { boxWidth: 10, font: { size: 11, weight: 'bold' }, padding: 15 } 
-                        } 
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } 
                     } 
                 } 
-            });
+            }); 
         }
     }
 
@@ -401,11 +373,8 @@
             autoSave(); 
         }
     }
-    
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    
     function clearAll() { if (confirm('確定重置嗎？')) { localStorage.clear(); location.reload(); } }
-
     document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
