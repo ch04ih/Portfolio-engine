@@ -334,15 +334,50 @@
     function updateChart(catSums) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        
+        // 動態獲取當前主題的顏色
         const styles = getComputedStyle(document.documentElement);
         const accent = styles.getPropertyValue('--theme-accent').trim();
         const bg = styles.getPropertyValue('--theme-bg').trim();
+        
+        // 定義一組與主題感相符的輔助色
+        const palette = [
+            accent, // 主色
+            bg,     // 背景色（深色對比）
+            '#95a5a6', // 中性灰
+            '#bdc3c7', // 淺灰
+            '#7f8c8d'  // 深灰
+        ];
+
         const data = {
             labels: categories.map(c => c.name),
-            datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: [accent, bg, '#B4D355', '#80C5DE', '#F0A650', '#CCC'], borderWidth: 2, borderColor: '#fff' }]
+            datasets: [{ 
+                data: categories.map(c => catSums[c.id]), 
+                backgroundColor: palette, 
+                borderWidth: 2, 
+                borderColor: '#fff' 
+            }]
         };
-        if (myChart) { myChart.data = data; myChart.update(); }
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } }); }
+
+        if (myChart) {
+            myChart.data = data;
+            myChart.update();
+        } else {
+            myChart = new Chart(ctx, { 
+                type: 'doughnut', 
+                data: data, 
+                options: { 
+                    maintainAspectRatio: false, 
+                    cutout: '65%', 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { boxWidth: 10, font: { size: 11, weight: 'bold' }, padding: 15 } 
+                        } 
+                    } 
+                } 
+            });
+        }
     }
 
     function autoSave() {
