@@ -10,6 +10,8 @@
     <meta name="apple-mobile-web-app-title" content="投資配比">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
     <style>
         :root {
             --theme-accent: #FF8C42;
@@ -43,15 +45,17 @@
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
-        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
-        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px 8px 0 0; }
+        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; cursor: grab; }
+        .category-card:active { cursor: grabbing; }
+        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
         .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
 
-        .asset-list { margin-bottom: 15px; }
-        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; }
+        .asset-list { margin-bottom: 15px; min-height: 20px; }
+        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; cursor: grab; padding: 4px; border-radius: 8px; }
+        .asset-item:active { cursor: grabbing; background: #f9f9f9; }
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; padding: 0; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
@@ -83,6 +87,10 @@
         .collapsed .asset-list, .collapsed .category-card > .btn { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
+        
+        /* 拖曳時的視覺效果 */
+        .sortable-ghost { opacity: 0.3; background: var(--theme-accent) !important; }
+        .sortable-chosen { box-shadow: 8px 8px 20px rgba(0,0,0,0.2) !important; }
     </style>
 </head>
 <body>
@@ -134,6 +142,17 @@
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
+    // 更新 categories 陣列的順序（根據 DOM 結構）
+    function syncOrder() {
+        const newOrder = [];
+        document.querySelectorAll('.category-card').forEach(card => {
+            const cat = categories.find(c => c.id === card.id);
+            if (cat) newOrder.push(cat);
+        });
+        categories = newOrder;
+        forceSave();
+    }
+
     function forceSave() {
         try {
             const data = {};
@@ -178,16 +197,16 @@
     function addCategory() {
         const newId = 'cat_' + Date.now();
         categories.push({ id: newId, name: '新投資區域' });
-        forceSave();
         renderUI();
+        forceSave();
     }
 
     function deleteCategory(id) {
         event.stopPropagation();
         if (confirm('確定刪除？')) {
             categories = categories.filter(c => c.id !== id);
-            forceSave();
             renderUI();
+            forceSave();
         }
     }
 
@@ -281,10 +300,27 @@
                 </div>
             `;
             grid.appendChild(card);
+            
+            // 初始化標的拖移排序
+            const listEl = card.querySelector('.asset-list');
+            new Sortable(listEl, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: () => { calculateAll(); }
+            });
+
             if (data.assets && data.assets.length > 0) {
                 data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
             } else addAsset(cat.id);
         });
+
+        // 初始化卡片拖移排序
+        new Sortable(grid, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: () => { syncOrder(); calculateAll(); }
+        });
+
         calculateAll();
     }
 
@@ -386,22 +422,18 @@
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     
-    // 重置按鈕：清除所有並還原四個預設卡片
     function clearAll() { 
         if (confirm('確定重置所有資料嗎？這將回到最初的四個分類。')) { 
-            localStorage.clear(); // 清除本地存檔
+            localStorage.clear();
             categories = [
                 { id: 'cat_1', name: '成長型投資' },
                 { id: 'cat_2', name: '防守型投資' },
                 { id: 'cat_3', name: '高股息投資' },
                 { id: 'cat_4', name: '安全存款' }
             ];
-            // 立即執行存檔與渲染，不用等 reload
             localStorage.setItem('catConfig_v2', JSON.stringify(categories));
             localStorage.removeItem('myPortfolio_v2'); 
             renderUI();
-            calculateAll();
-            location.reload(); // 雙重保險
         } 
     }
 
