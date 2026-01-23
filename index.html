@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portfolio Rebalance</title>
     
-    <link rel="apple-touch-icon" href="icon.png?v=2">
-    <link rel="icon" type="image/png" href="icon.png?v=2">
+    <link rel="apple-touch-icon" href="icon.png?v=3">
+    <link rel="icon" type="image/png" href="icon.png?v=3">
     <meta name="apple-mobile-web-app-title" content="投資配比">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,12 +26,15 @@
         [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0 !important; }
+        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
 
-        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; line-height: 1.4; }
-        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 24px 18px; }
-
-        h1 { text-transform: uppercase; font-size: 1.4rem; border: 4px solid #1A1A1A; text-align: center; margin: 0 0 25px 0; background: var(--theme-accent); padding: 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
+        h1 { text-transform: uppercase; font-size: 1.4rem; border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
+        
+        /* 儲存狀態列 */
+        .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
+        .status-dot.active { background: #00C853; box-shadow: 0 0 5px #00C853; }
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
@@ -41,46 +44,36 @@
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-        .category-title-wrap { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
-        .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; margin: 0 5px; }
+        .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
 
         .asset-list { margin-bottom: 15px; }
         .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; }
-        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; font-size: 10px; }
+        .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; }
+        .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
 
         .edit-container { position: relative; display: none; width: 100%; }
-        .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 14px; }
-        .edit-container.prefix::before { content: '$'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
-        .edit-container.suffix::after { content: '%'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
+        .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; }
 
-        .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; display: block; }
-        .footer-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .cat-sum-display { flex-grow: 1; text-align: center; font-size: 1.1rem; font-weight: 900; }
-        .footer-label, .current-p { font-size: 0.75rem; font-weight: 900; width: 60px; color: #888; }
-        .current-p { text-align: right; color: var(--theme-bg); }
+        .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; }
+        .footer-row { display: flex; justify-content: space-between; align-items: center; }
+        .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
 
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
 
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
 
-        .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 12px; }
+        .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
         
-        .theme-options button { 
-            width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; padding: 0; overflow: hidden; position: relative;
-        }
-        .theme-options button::after {
-            content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg);
-        }
+        .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; }
+        .theme-options button::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg); }
 
         .collapsed .asset-list, .collapsed .category-card > .btn { display: none; }
-        .collapsed .card-footer { display: block; margin-top: 10px; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
     </style>
@@ -100,14 +93,15 @@
         </div>
     </div>
 
-    <h1>
-        <span style="font-size: 0.9em; letter-spacing: 2px;">Portfolio Engine</span><br>
-        <span style="font-size: 0.7em;">資產組合計算器</span>
-    </h1>
+    <h1>Portfolio Rebalance</h1>
+    <div class="save-status">
+        <div class="status-dot" id="saveDot"></div>
+        <span id="saveText">正在載入本地存檔...</span>
+    </div>
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">Total Assets | 總資產現值</div>
+            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">總資產現值</div>
             <button class="chart-btn" onclick="toggleChart()">圖表</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
@@ -117,79 +111,72 @@
         </div>
     </div>
 
-    <div id="mainGrid" class="grid"></div>
+    <div id="mainGrid"></div>
 
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
     <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
 </div>
 
 <script>
-    // 預設分類，如果沒存過才用這個
-    const DEFAULT_CATS = [
-        { id: 'cat_1', name: '成長型投資' },
-        { id: 'cat_2', name: '防守型投資' },
-        { id: 'cat_3', name: '高股息投資' },
-        { id: 'cat_4', name: '安全存款' }
-    ];
-
-    let categories = JSON.parse(localStorage.getItem('catConfig')) || DEFAULT_CATS;
     let myChart = null;
+    let categories = [];
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
+
+    // 強制儲存邏輯
+    function forceSave() {
+        const data = {};
+        categories.forEach(cat => {
+            const card = document.getElementById(cat.id);
+            if (card) {
+                const assets = [];
+                card.querySelectorAll('.asset-item').forEach(item => {
+                    assets.push({
+                        name: item.querySelector('.asset-name').value || '',
+                        value: item.querySelector('.asset-value').value || 0,
+                        targetP: item.querySelector('.target-p-input').value || 0
+                    });
+                });
+                data[cat.id] = {
+                    target: card.querySelector('.target-input').value || 0,
+                    collapsed: card.classList.contains('collapsed'),
+                    assets: assets
+                };
+            }
+        });
+        localStorage.setItem('myPortfolio_v2', JSON.stringify(data));
+        localStorage.setItem('catConfig_v2', JSON.stringify(categories));
+        
+        const dot = document.getElementById('saveDot');
+        const txt = document.getElementById('saveText');
+        dot.classList.add('active');
+        txt.innerText = "資料已自動存至 Safari 本地儲存空間";
+        setTimeout(() => dot.classList.remove('active'), 1000);
+    }
 
     function setTheme(themeName) {
         document.documentElement.setAttribute('data-theme', themeName);
         localStorage.setItem('userTheme', themeName);
-        const panel = document.getElementById('themePanel');
-        if (panel) panel.classList.remove('active');
+        if (document.getElementById('themePanel')) document.getElementById('themePanel').classList.remove('active');
         calculateAll();
     }
 
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
-    function saveCatConfig() { 
-        localStorage.setItem('catConfig', JSON.stringify(categories)); 
-    }
-
     function addCategory() {
         const newId = 'cat_' + Date.now();
         categories.push({ id: newId, name: '新投資區域' });
-        saveCatConfig();
-        init();
+        forceSave();
+        renderUI();
     }
 
     function deleteCategory(id) {
         event.stopPropagation();
-        if (confirm('確定要刪除整個區域嗎？')) {
+        if (confirm('確定刪除？')) {
             categories = categories.filter(c => c.id !== id);
-            saveCatConfig();
-            init();
+            forceSave();
+            renderUI();
         }
-    }
-
-    function editCatName(id, el) {
-        event.stopPropagation();
-        const currentName = el.innerText;
-        const input = document.createElement('input');
-        input.style.cssText = `background: rgba(255, 255, 255, 0.2); border: 1px solid var(--theme-accent); color: white; font-size: 1rem; font-weight: bold; width: 140px; border-radius: 4px; padding: 2px 8px; outline: none;`;
-        input.value = currentName;
-        el.style.display = 'none';
-        el.parentElement.insertBefore(input, el);
-        input.focus();
-        input.select();
-        const finishEdit = () => {
-            const newName = input.value.trim() || currentName;
-            el.innerText = newName;
-            input.remove();
-            el.style.display = 'inline';
-            const cat = categories.find(c => c.id === id);
-            if (cat) cat.name = newName;
-            saveCatConfig();
-            autoSave(); 
-            calculateAll();
-        };
-        input.onblur = finishEdit;
-        input.onkeydown = (e) => { if (e.key === 'Enter') finishEdit(); };
     }
 
     function editMode(el) {
@@ -201,13 +188,13 @@
     }
 
     function autoViewMode(inputEl) {
-        if (inputEl.type === 'number' && (inputEl.value === "" || inputEl.value < 0)) return;
         const container = inputEl.parentElement;
         const view = container.previousElementSibling;
         const val = inputEl.value;
         if (inputEl.classList.contains('asset-value')) view.innerText = val > 0 ? formatCurrency(val) : "$0";
         else if (inputEl.classList.contains('target-p-input')) view.innerText = val > 0 ? (val + "%") : "目標%";
         else view.innerText = val || "名稱";
+        
         setTimeout(() => {
             container.style.display = 'none';
             view.style.display = 'flex';
@@ -215,12 +202,11 @@
         }, 150);
     }
 
-    function init() {
-        const savedTheme = localStorage.getItem('userTheme') || 'orange';
-        setTheme(savedTheme);
-        const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
+    function renderUI() {
+        const savedData = JSON.parse(localStorage.getItem('myPortfolio_v2')) || {};
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = '';
+        
         categories.forEach(cat => {
             const data = savedData[cat.id] || { target: 25, assets: [], collapsed: false };
             const card = document.createElement('div');
@@ -229,21 +215,20 @@
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
                 <div class="category-header" onclick="toggleCategory('${cat.id}')">
-                    <div class="category-title-wrap">
-                        <span class="chevron">▼</span> 
-                        <span class="cat-name-text" onclick="editCatName('${cat.id}', this)">${cat.name}</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="chevron">▼</span> <span>${cat.name}</span>
                     </div>
-                    <div onclick="event.stopPropagation()" style="display:flex; align-items:center;">
-                        目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()" onblur="autoSave()"> %
+                    <div onclick="event.stopPropagation()">
+                        目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %
                     </div>
                 </div>
                 <div class="asset-list" id="list-${cat.id}"></div>
                 <button class="btn" onclick="addAsset('${cat.id}')">+ 新增標的</button>
                 <div class="card-footer">
                     <div class="footer-row">
-                        <span class="footer-label">區域合計</span>
+                        <span style="font-size:0.75rem; color:#888;">區域合計</span>
                         <span class="cat-sum-display">$0</span>
-                        <span class="current-p">0%</span>
+                        <span class="current-p" style="font-size:0.75rem;">0%</span>
                     </div>
                     <div class="status-tag status-alert">✅ 比例理想</div>
                 </div>
@@ -251,9 +236,7 @@
             grid.appendChild(card);
             if (data.assets && data.assets.length > 0) {
                 data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
-            } else {
-                addAsset(cat.id);
-            }
+            } else addAsset(cat.id);
         });
         calculateAll();
     }
@@ -264,20 +247,22 @@
         const div = document.createElement('div');
         div.className = 'asset-item';
         div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll(); autoSave();">×</button>
+            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div>
                 <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
                 <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
                 <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '目標%'}</div>
-                <div class="edit-container suffix"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${value > 0 ? formatCurrency(value) : '$0'}</div>
-                <div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
             </div>
-            <div class="asset-ratio-tag"><div class="ratio-val" style="font-size:10px; font-weight:bold;">0%</div><div class="diff-suggestion" style="font-size:9px;"></div></div>
+            <div style="font-size:10px; font-weight:bold; text-align:right;">
+                <div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:9px;"></div>
+            </div>
         `;
         list.appendChild(div);
     }
@@ -294,11 +279,6 @@
                 total += sum;
             }
         });
-        const alertDiv = document.getElementById('target-sum-alert');
-        if (Math.abs(totalTargetP - 100) > 0.1) {
-            alertDiv.style.display = 'block'; alertDiv.style.background = '#FFE5E5'; alertDiv.style.color = '#D00000';
-            alertDiv.innerText = `⚠️ 區域目標總和為 ${totalTargetP.toFixed(0)}% (應為 100%)`;
-        } else alertDiv.style.display = 'none';
 
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
@@ -307,6 +287,7 @@
             const currentP = total > 0 ? (catSums[cat.id] / total * 100) : 0;
             card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[cat.id]);
             card.querySelector('.current-p').innerText = currentP.toFixed(1) + "%";
+            
             const alertTag = card.querySelector('.status-alert');
             const diff = catSums[cat.id] - (total * target / 100);
             if (total === 0) alertTag.innerText = "✅ 請開始輸入資產";
@@ -327,8 +308,8 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums); 
-        autoSave();
+        updateChart(catSums);
+        forceSave(); // 每次計算完立刻儲存
     }
 
     function updateChart(catSums) {
@@ -337,78 +318,38 @@
         const styles = getComputedStyle(document.documentElement);
         const accent = styles.getPropertyValue('--theme-accent').trim();
         const bg = styles.getPropertyValue('--theme-bg').trim();
-        
         const themeColors = [accent, bg, "#FFD700", "#40E0D0", "#FF69B4", "#32CD32", "#1A1A1A"];
-
         const data = {
             labels: categories.map(c => c.name),
-            datasets: [{ 
-                data: categories.map(c => catSums[c.id]), 
-                backgroundColor: themeColors, 
-                borderWidth: 2, 
-                borderColor: '#fff' 
-            }]
+            datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: themeColors, borderWidth: 2, borderColor: '#fff' }]
         };
-        if (myChart) { 
-            myChart.data = data; 
-            myChart.update(); 
-        } else { 
-            myChart = new Chart(ctx, { 
-                type: 'doughnut', 
-                data: data, 
-                options: { 
-                    maintainAspectRatio: false, 
-                    cutout: '65%', 
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } } 
-                    } 
-                } 
-            }); 
-        }
+        if (myChart) { myChart.data = data; myChart.update(); }
+        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } } } } }); }
     }
 
-    // 加強版儲存功能
-    function autoSave() {
-        try {
-            const data = {};
-            categories.forEach(cat => {
-                const card = document.getElementById(cat.id);
-                if (card) {
-                    const assets = [];
-                    card.querySelectorAll('.asset-item').forEach(item => {
-                        assets.push({ 
-                            name: item.querySelector('.asset-name').value || '', 
-                            value: item.querySelector('.asset-value').value || 0, 
-                            targetP: item.querySelector('.target-p-input').value || 0 
-                        });
-                    });
-                    data[cat.id] = { 
-                        target: card.querySelector('.target-input').value || 0, 
-                        collapsed: card.classList.contains('collapsed'), 
-                        assets: assets 
-                    };
-                }
-            });
-            localStorage.setItem('myPortfolio', JSON.stringify(data));
-            localStorage.setItem('catConfig', JSON.stringify(categories));
-            console.log("Saved at " + new Date().toLocaleTimeString());
-        } catch (e) {
-            console.error("Storage Error: ", e);
-        }
-    }
-
-    function toggleCategory(id) { 
-        const card = document.getElementById(id); 
-        if (event.target.tagName !== 'INPUT' && !event.target.classList.contains('cat-name-text')) {
-            card.classList.toggle('collapsed'); 
-            autoSave(); 
-        }
-    }
+    function toggleCategory(id) { const card = document.getElementById(id); card.classList.toggle('collapsed'); forceSave(); }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('確定重置嗎？')) { localStorage.clear(); location.reload(); } }
-    
-    // 初始化
-    document.addEventListener('DOMContentLoaded', init);
+    function clearAll() { if (confirm('確定重置？')) { localStorage.clear(); location.reload(); } }
+
+    window.onload = () => {
+        const savedCats = localStorage.getItem('catConfig_v2');
+        if (savedCats) {
+            categories = JSON.parse(savedCats);
+            document.getElementById('saveText').innerText = "已載入 Safari 本地存檔";
+        } else {
+            categories = [
+                { id: 'cat_1', name: '成長型投資' },
+                { id: 'cat_2', name: '防守型投資' },
+                { id: 'cat_3', name: '高股息投資' },
+                { id: 'cat_4', name: '安全存款' }
+            ];
+            document.getElementById('saveText').innerText = "第一次使用？資料將存在此手機";
+        }
+        renderUI();
+    };
+
+    // 滑掉瞬間強制儲存
+    window.onbeforeunload = forceSave;
 </script>
 </body>
 </html>
