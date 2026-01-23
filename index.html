@@ -33,7 +33,7 @@
         input::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0 !important; }
         input[type=number] { -moz-appearance: textfield !important; }
 
-        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
 
         h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
@@ -45,8 +45,7 @@
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
-        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; cursor: grab; }
-        .category-card:active { cursor: grabbing; }
+        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; touch-action: none; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
@@ -54,8 +53,7 @@
         .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
 
         .asset-list { margin-bottom: 15px; min-height: 20px; }
-        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; cursor: grab; padding: 4px; border-radius: 8px; }
-        .asset-item:active { cursor: grabbing; background: #f9f9f9; }
+        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; padding: 4px; border-radius: 8px; touch-action: none; }
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; padding: 0; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
@@ -88,9 +86,8 @@
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
         
-        /* 拖曳時的視覺效果 */
         .sortable-ghost { opacity: 0.3; background: var(--theme-accent) !important; }
-        .sortable-chosen { box-shadow: 8px 8px 20px rgba(0,0,0,0.2) !important; }
+        .sortable-chosen { box-shadow: 8px 8px 20px rgba(0,0,0,0.2) !important; scale: 1.02; }
     </style>
 </head>
 <body>
@@ -142,7 +139,6 @@
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
-    // 更新 categories 陣列的順序（根據 DOM 結構）
     function syncOrder() {
         const newOrder = [];
         document.querySelectorAll('.category-card').forEach(card => {
@@ -301,10 +297,12 @@
             `;
             grid.appendChild(card);
             
-            // 初始化標的拖移排序
+            // 標的拖移排序：加入 delay
             const listEl = card.querySelector('.asset-list');
             new Sortable(listEl, {
                 animation: 150,
+                delay: 200,            // 手機長按 200ms 才啟動
+                delayOnTouchOnly: true, // 只在手機端套用延遲，電腦端維持即時
                 ghostClass: 'sortable-ghost',
                 onEnd: () => { calculateAll(); }
             });
@@ -314,9 +312,11 @@
             } else addAsset(cat.id);
         });
 
-        // 初始化卡片拖移排序
+        // 卡片拖移排序：加入 delay
         new Sortable(grid, {
             animation: 150,
+            delay: 200,            // 手機長按 200ms 才啟動
+            delayOnTouchOnly: true,
             ghostClass: 'sortable-ghost',
             onEnd: () => { syncOrder(); calculateAll(); }
         });
