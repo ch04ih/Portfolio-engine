@@ -67,7 +67,6 @@
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
 
-        /* 主題切換按鈕樣式 */
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 12px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
@@ -76,7 +75,6 @@
         .theme-options button { 
             width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; padding: 0; overflow: hidden; position: relative;
         }
-        /* 製作一半一半的效果 */
         .theme-options button::after {
             content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg);
         }
@@ -126,12 +124,15 @@
 </div>
 
 <script>
-    let categories = JSON.parse(localStorage.getItem('catConfig')) || [
+    // 預設分類，如果沒存過才用這個
+    const DEFAULT_CATS = [
         { id: 'cat_1', name: '成長型投資' },
         { id: 'cat_2', name: '防守型投資' },
         { id: 'cat_3', name: '高股息投資' },
         { id: 'cat_4', name: '安全存款' }
     ];
+
+    let categories = JSON.parse(localStorage.getItem('catConfig')) || DEFAULT_CATS;
     let myChart = null;
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
@@ -146,7 +147,9 @@
 
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
-    function saveCatConfig() { localStorage.setItem('catConfig', JSON.stringify(categories)); }
+    function saveCatConfig() { 
+        localStorage.setItem('catConfig', JSON.stringify(categories)); 
+    }
 
     function addCategory() {
         const newId = 'cat_' + Date.now();
@@ -182,6 +185,7 @@
             const cat = categories.find(c => c.id === id);
             if (cat) cat.name = newName;
             saveCatConfig();
+            autoSave(); 
             calculateAll();
         };
         input.onblur = finishEdit;
@@ -230,7 +234,7 @@
                         <span class="cat-name-text" onclick="editCatName('${cat.id}', this)">${cat.name}</span>
                     </div>
                     <div onclick="event.stopPropagation()" style="display:flex; align-items:center;">
-                        目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %
+                        目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()" onblur="autoSave()"> %
                     </div>
                 </div>
                 <div class="asset-list" id="list-${cat.id}"></div>
@@ -245,18 +249,22 @@
                 </div>
             `;
             grid.appendChild(card);
-            if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
-            else addAsset(cat.id);
+            if (data.assets && data.assets.length > 0) {
+                data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
+            } else {
+                addAsset(cat.id);
+            }
         });
         calculateAll();
     }
 
     function addAsset(catId, name = '', value = 0, targetP = 0) {
         const list = document.getElementById(`list-${catId}`);
+        if(!list) return;
         const div = document.createElement('div');
         div.className = 'asset-item';
         div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
+            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll(); autoSave();">×</button>
             <div>
                 <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
                 <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
@@ -319,7 +327,8 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums); autoSave();
+        updateChart(catSums); 
+        autoSave();
     }
 
     function updateChart(catSums) {
@@ -329,16 +338,7 @@
         const accent = styles.getPropertyValue('--theme-accent').trim();
         const bg = styles.getPropertyValue('--theme-bg').trim();
         
-        // 更具辨識度的色盤：主色、背景色、加上高對比的輔助色
-        const themeColors = [
-            accent, 
-            bg, 
-            "#FFD700", // 金色
-            "#40E0D0", // 湖水綠
-            "#FF69B4", // 亮粉
-            "#32CD32", // 萊姆綠
-            "#1A1A1A"  // 黑色
-        ];
+        const themeColors = [accent, bg, "#FFD700", "#40E0D0", "#FF69B4", "#32CD32", "#1A1A1A"];
 
         const data = {
             labels: categories.map(c => c.name),
@@ -367,18 +367,34 @@
         }
     }
 
+    // 加強版儲存功能
     function autoSave() {
-        const data = {};
-        categories.forEach(cat => {
-            const card = document.getElementById(cat.id);
-            if (!card) return;
-            const assets = [];
-            card.querySelectorAll('.asset-item').forEach(item => {
-                assets.push({ name: item.querySelector('.asset-name').value, value: item.querySelector('.asset-value').value, targetP: item.querySelector('.target-p-input').value });
+        try {
+            const data = {};
+            categories.forEach(cat => {
+                const card = document.getElementById(cat.id);
+                if (card) {
+                    const assets = [];
+                    card.querySelectorAll('.asset-item').forEach(item => {
+                        assets.push({ 
+                            name: item.querySelector('.asset-name').value || '', 
+                            value: item.querySelector('.asset-value').value || 0, 
+                            targetP: item.querySelector('.target-p-input').value || 0 
+                        });
+                    });
+                    data[cat.id] = { 
+                        target: card.querySelector('.target-input').value || 0, 
+                        collapsed: card.classList.contains('collapsed'), 
+                        assets: assets 
+                    };
+                }
             });
-            data[cat.id] = { target: card.querySelector('.target-input').value, collapsed: card.classList.contains('collapsed'), assets: assets };
-        });
-        localStorage.setItem('myPortfolio', JSON.stringify(data));
+            localStorage.setItem('myPortfolio', JSON.stringify(data));
+            localStorage.setItem('catConfig', JSON.stringify(categories));
+            console.log("Saved at " + new Date().toLocaleTimeString());
+        } catch (e) {
+            console.error("Storage Error: ", e);
+        }
     }
 
     function toggleCategory(id) { 
@@ -390,6 +406,8 @@
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     function clearAll() { if (confirm('確定重置嗎？')) { localStorage.clear(); location.reload(); } }
+    
+    // 初始化
     document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
