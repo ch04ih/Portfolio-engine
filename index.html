@@ -3,484 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Portfolio Engine</title>
+    <title>再平衡投資組合計算器</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS 內容 */
+        :root {
+            --theme-accent: #FF8C42;
+            --theme-bg: #3D2B1F;
+            --theme-accent-rgb: 255, 140, 66;
+            --gray-marble: #F0F0F0;
+            --radius: 12px;
+        }
 
-    <style>  
-      :root {
-    --orange: #FF6B00;
-    --black: #1A1A1A;
-    --gray-marble: #F0F0F0;
-    --radius: 12px;
-}
+        [data-theme="orange"] { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; }
+        [data-theme="forest"] { --theme-accent: #dac4fc; --theme-bg: #293d0b; --theme-accent-rgb: 218, 196, 252; }
+        [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; --theme-accent-rgb: 128, 197, 222; }
+        [data-theme="purple"] { --theme-accent: #B4D355; --theme-bg: #6245b7; --theme-accent-rgb: 180, 211, 85; }
+        [data-theme="navy"]   { --theme-accent: #e4d9c4; --theme-bg: #1b2941; --theme-accent-rgb: 228, 217, 196; }
+        [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
 
-* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0 !important; }
 
-body {
-    background-color: var(--gray-marble);
-    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0);
-    background-size: 20px 20px;
-    font-family: 'Arial Black', 'Inter', sans-serif;
-    color: var(--black);
-    margin: 0;
-    padding: 5px 15px 15px 15px;
-}
+        html, body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, sans-serif; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 24px 18px; }
 
-.container { max-width: 600px; margin: 0 auto; 
-    padding: 0px 12px 10pz 12px;
-}
+        h1 { text-transform: uppercase; font-size: 1.4rem; border: 4px solid #1A1A1A; text-align: center; margin-bottom: 25px; background: var(--theme-accent); padding: 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); }
 
-h1 {
-    text-transform: uppercase;
-    font-size: 1.6rem;
-    border: 4px solid var(--black);
-    display: block;
-    text-align: center;
-    margin-bottom: 25px;
-    background: var(--orange);
-    padding: 10px 15px;
-    box-shadow: 6px 6px 0px #000;
-    border-radius: var(--radius);
-    line-height: 1.1;
-}
+        .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
 
-.rebalance-panel {
-    background: white;
-    border: 4px solid var(--black);
-    padding: 15px;
-    margin-bottom: 30px;
-    box-shadow: 6px 6px 0px var(--black);
-    border-radius: var(--radius);
-}
+        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
+        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 8px 8px 0 0; }
 
-.grid { display: flex; flex-direction: column; gap: 25px; }
+        .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-.category-card {
-    background: #fff;
-    border: 4px solid var(--black);
-    padding: 15px;
-    box-shadow: 6px 6px 0px var(--black);
-    border-radius: var(--radius);
-}
-            .category-header {
-    background: var(--black);
-    color: var(--orange);
-    padding: 15px;
-    margin: -15px -15px 15px -15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.1rem;
-    font-weight: 900;
-    border-radius: 8px 8px 0 0;
-}
+        .category-title-wrap { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
+        .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; margin: 0 5px; }
 
-.target-input {
-    width: 45px;
-    background: var(--orange);
-    border: 1px solid #000;
-    font-weight: bold;
-    text-align: center;
-}
+        .asset-list { margin-bottom: 15px; }
+        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; }
+        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-/* 核心修改：5欄網格排版 [叉][名稱][%][金額][佔比] */
-.asset-item {
-    display: grid;
-    /* 將第一欄從 30px 縮減為 20px */
-    grid-template-columns: 15px 1.2fr 0.8fr 1.5fr 0.6fr; 
-    gap: 5px; /* 縮小間距讓排版更緊湊 */
-    margin-bottom: 12px;
-    align-items: center;
-}
+        .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; }
+        .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; font-size: 10px; }
 
+        .edit-container { position: relative; display: none; width: 100%; }
+        .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; }
+        .edit-container.prefix::before { content: '$'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
+        .edit-container.suffix::after { content: '%'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 11px; z-index: 2; }
 
-/* 左側純紅叉叉 */
-.btn-delete-left {
-    appearance: none;
-    -webkit-appearance: none;
-    background: transparent !important;
-    border: none !important;
-    color: #FF4444 !important;
-    
-    /* 縮小叉叉字體，18px 或 16px 會顯得更精緻 */
-    font-size: 16px; 
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    width: 100%; /* 確保在 20px 的網格內居中 */
-    padding: 8px;
-    font-size: 12px;
-    font-weight: 900;
-    border: 2px solid var(--black);
-    text-align: center;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius);
-}
+        .input-error { border: 2px solid #FF4444 !important; animation: shake 0.2s ease-in-out 2; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 
-.edit-container { display: none; }
+        .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; display: block; }
+        .footer-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .cat-sum-display { flex-grow: 1; text-align: center; font-size: 1.1rem; font-weight: 900; }
+        .footer-label, .current-p { font-size: 0.75rem; font-weight: 900; width: 60px; }
+        .current-p { text-align: right; }
 
-.edit-input {
-    border: 2px solid var(--orange);
-    padding: 8px;
-    font-weight: bold;
-    width: 100%;
-    height: 40px;
-    font-size: 14px;
-    border-radius: var(--radius);
-    background: #fff;
-}
+        .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15) !important; color: var(--theme-bg) !important; border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
 
-.btn {
-    background: var(--orange);
-    border: 3px solid var(--black);
-    padding: 12px;
-    font-weight: bold;
-    box-shadow: 4px 4px 0px var(--black);
-    width: 100%;
-    margin-top: 10px;
-    border-radius: var(--radius);
-}
+        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; }
+        .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin: 20px 0; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
-.asset-ratio-tag {
-    font-size: 10px;
-    font-weight: 900;
-    text-align: right;
-}
+        .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 12px; }
+        .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
+        .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
+        .theme-panel.active .theme-options { display: flex; }
+        .theme-options button { width: 24px !important; height: 24px !important; border-radius: 50% !important; border: 2px solid #fff !important; cursor: pointer; padding: 0 !important; box-shadow: none !important; }
 
-.card-footer {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 3px solid var(--black);
-}
+        .collapsed .asset-list, 
+        .collapsed .category-card > .btn { 
+            display: none; 
+        }
+        .collapsed .card-footer { display: block; margin-top: 10px; }
 
-
-.status-tag {
-    margin-top: 5px;
-    padding: 8px;
-    text-align: center;
-    font-size: 0.8rem;
-    border-radius: 8px;
-    font-weight: 900;
-    background: rgba(255, 107, 0, 0.12);
-    color: #CC5500;
-}
-
-/* 強制修正 Debug Mode 的排版偏移 */
-.container {
-    width: 100vw !important; /* 100% 的螢幕寬度 */
-    max-width: 600px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-}
-
-/* 徹底修復右側被切掉的問題 */
-* {
-    box-sizing: border-box !important; /* 確保 padding 不會撐開寬度 */
-}
-
-html, body {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: hidden !important; /* 禁止橫向滾動 */
-    background-color: var(--gray-marble);
-}
-
-.container {
-    width: 100% !important;
-    max-width: 600px !important;
-    margin: 0 auto !important;
-    padding: 15px !important; /* 在這裡給邊距，不會撐破寬度 */
-    display: block !important;
-}
-
-/* 網格比例微調：縮小名稱與金額的佔位，確保右側佔比不被切掉 */
-.asset-item {
-    display: grid;
-    /* 叉叉20px | 名稱1.1份 | %數0.8份 | 金額1.3份 | 佔比50px */
-    grid-template-columns: 20px 1.1fr 0.8fr 1.3fr 50px !important; 
-    gap: 4px !important;
-    width: 100% !important;
-    margin-bottom: 12px;
-    align-items: center;
-}
-
-/* 確保輸入框不會溢出 */
-.edit-input {
-    width: 100% !important;
-    max-width: 100%;
-}
-
-/* 讓右側佔比欄位固定寬度，防止被擠壓 */
-.asset-ratio-tag {
-    min-width: 50px !important;
-    text-align: right;
-}
-
-
+        .chevron { transition: 0.3s; font-size: 0.8rem; }
+        .collapsed .chevron { transform: rotate(-90deg); }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>
-            <span style="font-size: 0.9em; letter-spacing: 2px;">Portfolio Engine</span><br>
-            <span style="font-size: 0.7em;">資產組合計算器</span>
-        </h1>
 
-        <div class="rebalance-panel">
-            <h3 style="margin:0; font-size: 0.9rem; text-transform: uppercase; color: #666;">Total Assets | 總資產狀態</h3>
-            <div id="rebalanceSummary" style="margin-top:10px; font-size: 1.2rem; font-weight: 900;">$0</div>
+<div class="container">
+    <div class="theme-panel" id="themePanel">
+        <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 主題配色</div>
+        <div class="theme-options">
+            <button style="background: #FF8C42" onclick="setTheme('orange')"></button>
+            <button style="background: #293d0b" onclick="setTheme('forest')"></button>
+            <button style="background: #6e0000" onclick="setTheme('wine')"></button>
+            <button style="background: #6245b7" onclick="setTheme('purple')"></button>
+            <button style="background: #1b2941" onclick="setTheme('navy')"></button>
+            <button style="background: #0045c6" onclick="setTheme('amber')"></button>
         </div>
-
-        <div class="grid">
-            <div id="growth" class="category-card"></div>
-            <div id="defense" class="category-card"></div>
-            <div id="dividend" class="category-card"></div>
-            <div id="savings" class="category-card"></div>
-        </div>
-
-        <button class="btn" style="background:#ddd; color:#666; margin-top:40px; margin-bottom:40px; box-shadow: 4px 4px 0px #999;" onclick="clearAll()">重置所有資料</button>
     </div>
 
-    <script>
-        /* 4. 這裡貼上你原本在 CodePen JS 視窗裡的所有代碼 */
-        // 確保裡面包含 addCategory, clearAll 等 function
-         const categories = [
-    { id: 'growth', name: '成長型投資' },
-    { id: 'defense', name: '防守型投資' },
-    { id: 'dividend', name: '高股息投資' },
-    { id: 'savings', name: '安全存款' }
-];
+    <h1>Portfolio Rebalance</h1>
 
-function formatCurrency(num) {
-    return "$" + Math.round(num || 0).toLocaleString('en-US');
-}
+    <div class="rebalance-panel">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">總資產現值</div>
+            <button class="chart-btn" onclick="toggleChart()">📊 比例圖表</button>
+        </div>
+        <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
+        
+        <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;">
+            <canvas id="portfolioChart"></canvas>
+        </div>
+    </div>
 
-// 進入編輯模式
-function editMode(el) {
-    const container = el.nextElementSibling;
-    if (!container) return;
-    el.style.display = 'none';
-    container.style.display = 'block';
-    const input = container.querySelector('input');
-    if (input) {
-        input.focus();
-        // 如果是金額輸入框且為 0，自動清空方便輸入
-        if (input.classList.contains('asset-value') && input.value == 0) {
-            input.value = '';
+    <div class="grid"></div>
+
+    <button class="btn" style="margin-top: 10px;" onclick="addCategory()">+ 新增投資區域</button>
+    <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
+</div>
+
+<script>
+    /* JavaScript 內容 */
+    let categories = JSON.parse(localStorage.getItem('catConfig')) || [
+        { id: 'cat_1', name: '成長型投資' },
+        { id: 'cat_2', name: '防守型投資' },
+        { id: 'cat_3', name: '高股息投資' },
+        { id: 'cat_4', name: '安全存款' }
+    ];
+    let myChart = null;
+
+    function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
+
+    function setTheme(themeName) {
+        document.documentElement.setAttribute('data-theme', themeName);
+        localStorage.setItem('userTheme', themeName);
+        const panel = document.getElementById('themePanel');
+        if (panel) panel.classList.remove('active');
+        calculateAll();
+    }
+
+    function toggleThemePanel() { const panel = document.getElementById('themePanel'); if (panel) panel.classList.toggle('active'); }
+
+    function addCategory() {
+        const newId = 'cat_' + Date.now();
+        categories.push({ id: newId, name: '新投資區域' });
+        saveCatConfig();
+        init();
+    }
+
+    function deleteCategory(id) {
+        event.stopPropagation();
+        if (confirm('確定要刪除整個區域嗎？')) {
+            categories = categories.filter(c => c.id !== id);
+            saveCatConfig();
+            const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
+            delete savedData[id];
+            localStorage.setItem('myPortfolio', JSON.stringify(savedData));
+            init();
         }
     }
-}
 
-// 自動變回實心底 (加入延遲解決手機端衝突)
-function autoViewMode(inputEl) {
-    setTimeout(() => {
-        if (!inputEl || !inputEl.parentElement) return;
-        const container = inputEl.parentElement;
-        const view = container.previousElementSibling;
-        
-        if (container.style.display === 'block') {
+    function editCatName(id, el) {
+        event.stopPropagation();
+        const currentName = el.innerText;
+        const input = document.createElement('input');
+        input.style.cssText = `background: rgba(255, 255, 255, 0.2); border: 1px solid var(--theme-accent); color: white; font-size: 1rem; font-weight: bold; width: 140px; border-radius: 4px; padding: 2px 8px; outline: none;`;
+        input.value = currentName;
+        el.style.display = 'none';
+        el.parentElement.insertBefore(input, el);
+        input.focus();
+        input.select();
+        const finishEdit = () => {
+            const newName = input.value.trim() || currentName;
+            el.innerText = newName;
+            input.remove();
+            el.style.display = 'inline';
+            const cat = categories.find(c => c.id === id);
+            if (cat) cat.name = newName;
+            saveCatConfig();
+            calculateAll();
+        };
+        input.onblur = finishEdit;
+        input.onkeydown = (e) => { if (e.key === 'Enter') finishEdit(); };
+        input.onclick = (e) => e.stopPropagation();
+    }
+
+    function saveCatConfig() { localStorage.setItem('catConfig', JSON.stringify(categories)); }
+
+    function editMode(el) {
+        const container = el.nextElementSibling;
+        el.style.display = 'none';
+        container.style.display = 'block';
+        const input = container.querySelector('input');
+        if (input) { input.classList.remove('input-error'); input.focus(); if (input.type === 'number') input.select(); }
+    }
+
+    function autoViewMode(inputEl) {
+        if (inputEl.type === 'number') {
+            const val = inputEl.value;
+            if (val === "" || isNaN(val) || parseFloat(val) < 0) {
+                inputEl.classList.add('input-error');
+                return; 
+            } else {
+                inputEl.classList.remove('input-error');
+            }
+        }
+        setTimeout(() => {
+            const container = inputEl.parentElement;
+            const view = container.previousElementSibling;
+            if (!container || !view || inputEl.classList.contains('input-error')) return;
             container.style.display = 'none';
             view.style.display = 'flex';
-            
-            if (inputEl.classList.contains('asset-value')) {
-                view.innerText = formatCurrency(inputEl.value);
-            } else if (inputEl.classList.contains('target-p-input')) {
-                view.innerText = (inputEl.value || 0) + "%";
-            } else {
-                view.innerText = inputEl.value || "名稱";
-            }
+            const val = inputEl.value;
+            if (inputEl.classList.contains('asset-value')) view.innerText = val > 0 ? formatCurrency(val) : "$0";
+            else if (inputEl.classList.contains('target-p-input')) view.innerText = val > 0 ? (val + "%") : "目標%";
+            else view.innerText = val || "名稱";
             calculateAll();
-        }
-    }, 180);
-}
-      
-// 初始化頁面
-function init() {
-    const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
-    categories.forEach(cat => {
-        const container = document.getElementById(cat.id);
-        if (!container) return;
-        
-        const data = savedData[cat.id] || { target: 25, assets: [] };
-        
-        container.innerHTML = `
-            <div class="category-header">
-                <span style="padding-left:15px">${cat.name}</span>
-                <span style="padding-right:15px">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %</span>
-            </div>
-            <div class="asset-list" id="list-${cat.id}"></div>
-            <button class="btn" onclick="addAsset('${cat.id}')">+ 新增標的</button>
-            <div class="card-footer">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span style="color:var(--orange); font-size:0.85rem; font-weight:900;">當前總佔比</span>
-                    <span class="current-p" style="color:var(--orange); font-weight:900;">0%</span>
+        }, 150);
+    }
+
+    function init() {
+        const savedTheme = localStorage.getItem('userTheme') || 'orange';
+        setTheme(savedTheme);
+        const savedData = JSON.parse(localStorage.getItem('myPortfolio')) || {};
+        const grid = document.querySelector('.grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        categories.forEach(cat => {
+            const data = savedData[cat.id] || { target: 25, assets: [], collapsed: false };
+            const card = document.createElement('div');
+            card.id = cat.id;
+            card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
+            card.innerHTML = `
+                <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
+                <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                    <div class="category-title-wrap">
+                        <span class="chevron">▼</span> 
+                        <span class="cat-name-text" onclick="editCatName('${cat.id}', this)">${cat.name}</span>
+                    </div>
+                    <div onclick="event.stopPropagation()" style="display:flex; align-items:center;">
+                        目標 <input type="number" min="0" class="target-input" value="${data.target}" oninput="calculateAll()"> %
+                    </div>
                 </div>
-                <div class="status-tag status-alert">✅ 比例理想</div>
-            </div>
-        `;
+                <div class="asset-list" id="list-${cat.id}"></div>
+                <button class="btn" onclick="addAsset('${cat.id}')">+ 新增標的</button>
+                <div class="card-footer">
+                    <div class="footer-row">
+                        <span class="footer-label">區域合計</span>
+                        <span class="cat-sum-display">$0</span>
+                        <span class="current-p">0%</span>
+                    </div>
+                    <div class="status-tag status-alert">✅ 比例理想</div>
+                </div>
+            `;
+            grid.appendChild(card);
+            if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
+            else addAsset(cat.id);
+        });
         
-        if (data.assets && data.assets.length > 0) {
-            data.assets.forEach(asset => addAsset(cat.id, asset.name, asset.value, asset.targetP));
-        } else {
-            addAsset(cat.id);
+        const panel = document.querySelector('.rebalance-panel');
+        if (panel && !document.getElementById('target-sum-alert')) {
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'target-sum-alert';
+            alertDiv.style.cssText = "margin-top:10px; font-size:12px; font-weight:bold; text-align:center; padding:5px; border-radius:6px; display:none;";
+            panel.appendChild(alertDiv);
         }
-    });
-    calculateAll();
-}
-      // 新增資產標的
-function addAsset(catId, name = '', value = 0, targetP = 0) {
-    const list = document.getElementById(`list-${catId}`);
-    if (!list) return;
-    
-    const div = document.createElement('div');
-    div.className = 'asset-item';
-    div.innerHTML = `
-        <button class="btn-delete-left" onmousedown="if(confirm('確定刪除？')){this.closest('.asset-item').remove(); calculateAll();}">×</button>
-        
-        <div>
-            <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
-            <div class="edit-container">
-                <input type="text" class="edit-input asset-name" value="${name}" 
-                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
+        calculateAll();
+    }
+
+    function addAsset(catId, name = '', value = 0, targetP = 0) {
+        const list = document.getElementById(`list-${catId}`);
+        if (!list) return;
+        const div = document.createElement('div');
+        div.className = 'asset-item';
+        div.innerHTML = `
+            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
+            <div>
+                <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
+                <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
             </div>
-        </div>
-
-        <div>
-            <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP}%</div>
-            <div class="edit-container" style="position:relative;">
-                      <input type="number" class="edit-input target-p-input" value="${targetP}" 
-                    onfocus="if(this.value==0)this.value=''" 
-                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
-                <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-weight:bold; color:var(--orange); pointer-events:none;">%</span>
+            <div>
+                <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '目標%'}</div>
+                <div class="edit-container suffix"><input type="number" min="0" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
             </div>
-        </div>
-
-        <div>
-            <div class="static-view" style="background:white; color:black;" onclick="editMode(this)">${formatCurrency(value)}</div>
-            <div class="edit-container">
-                <input type="number" class="edit-input asset-value" value="${value}" 
-                    onfocus="if(this.value==0)this.value=''" 
-                    onblur="autoViewMode(this)" onkeyup="if(event.key==='Enter') this.blur()">
+            <div>
+                <div class="static-view" onclick="editMode(this)">${value > 0 ? formatCurrency(value) : '$0'}</div>
+                <div class="edit-container prefix"><input type="number" min="0" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
             </div>
-        </div>
+            <div class="asset-ratio-tag"><div class="ratio-val" style="font-size:10px; font-weight:bold;">0%</div><div class="diff-suggestion" style="font-size:9px;"></div></div>
+        `;
+        list.appendChild(div);
+    }
 
-        <div class="asset-ratio-tag">
-            <div class="ratio-val">0%</div>
-            <div class="diff-suggestion" style="font-size:9px; font-weight:bold;"></div>
-        </div>
-    `;
-    list.appendChild(div);
-}
-       function calculateAll() {
-    let totalGlobalValue = 0;
-    let catSums = {};
-
-    // 1. 算出全域總金額
-    categories.forEach(cat => {
-        const inputs = document.querySelectorAll(`#list-${cat.id} .asset-value`);
-        let sum = 0;
-        inputs.forEach(i => sum += parseFloat(i.value || 0));
-        catSums[cat.id] = sum;
-        totalGlobalValue += sum;
-    });
-
-    // 2. 更新每個卡片的詳細數據
-    categories.forEach(cat => {
-        const card = document.getElementById(cat.id);
-        if (!card) return;
-
-        const catTargetInput = card.querySelector('.target-input');
-        const catTargetP = parseFloat(catTargetInput.value || 0);
-        
-        // 該類別佔總資產比例
-        const catCurrentP = totalGlobalValue > 0 ? (catSums[cat.id] / totalGlobalValue * 100).toFixed(1) : 0;
-        card.querySelector('.current-p').innerText = catCurrentP + "%";
-                  const val = parseFloat(item.querySelector('.asset-value').value || 0);
-            const tP = parseFloat(item.querySelector('.target-p-input').value || 0);
-            const ratioTag = item.querySelector('.ratio-val');
-            const suggestTag = item.querySelector('.diff-suggestion');
-
-            // 標的佔該區域比例
-            const ratio = catSums[cat.id] > 0 ? (val / catSums[cat.id] * 100).toFixed(1) : 0;
-            ratioTag.innerText = ratio + '%';
-
-            // 標的再平衡建議
-            const idealItemAmount = catSums[cat.id] * (tP / 100);
-            const itemDiff = idealItemAmount - val;
-
-            if (tP > 0 && Math.abs(parseFloat(ratio) - tP) > 0.1) {
-                ratioTag.style.color = '#FF4444';
-                suggestTag.innerText = itemDiff > 0 ? `+${Math.round(itemDiff)}` : `${Math.round(itemDiff)}`;
-                suggestTag.style.color = itemDiff > 0 ? '#008800' : '#FF4444';
-            } else {
-                ratioTag.style.color = 'white';
-                suggestTag.innerText = '';
+    function calculateAll() {
+        let total = 0, catSums = {}, totalTargetP = 0;
+        categories.forEach(cat => {
+            const card = document.getElementById(cat.id);
+            if (card) {
+                const rawTarget = parseFloat(card.querySelector('.target-input').value) || 0;
+                totalTargetP += Math.max(0, rawTarget);
+                let sum = 0;
+                const list = document.getElementById(`list-${cat.id}`);
+                if (list) list.querySelectorAll('.asset-value').forEach(i => { sum += Math.max(0, parseFloat(i.value) || 0); });
+                catSums[cat.id] = sum; total += sum;
             }
         });
-            // 3. 區域大項再平衡建議 (類別 vs 全域)
-        const idealCatAmount = totalGlobalValue * (catTargetP / 100);
-        const catDiff = catSums[cat.id] - idealCatAmount;
-        const alert = card.querySelector('.status-alert');
 
-        if (totalGlobalValue > 0) {
-            if (catDiff > 10) {
-                alert.innerHTML = `⬆️ 建議移出 <span style="color:#FF4444; font-weight:900;">${formatCurrency(catDiff)}</span>`;
-            } else if (catDiff < -10) {
-                alert.innerHTML = `⬇️ 建議補入 <span style="color:#008800; font-weight:900;">${formatCurrency(Math.abs(catDiff))}</span>`;
-            } else {
-                alert.innerText = "✅ 比例理想";
-            }
-        } else {
-            alert.innerText = "請新增資產標的";
+        const sumAlert = document.getElementById('target-sum-alert');
+        if (sumAlert) {
+            if (Math.abs(totalTargetP - 100) > 0.01) {
+                sumAlert.style.display = 'block'; sumAlert.style.background = '#FFE5E5'; sumAlert.style.color = '#D00000';
+                sumAlert.innerText = `⚠️ 區域目標總和為 ${totalTargetP.toFixed(0)}% (應為 100%)`;
+            } else { sumAlert.style.display = 'none'; }
         }
-    });
 
-    // 更新總資產顯示
-    const summaryEl = document.getElementById('rebalanceSummary');
-    if (summaryEl) summaryEl.innerHTML = `<strong>${formatCurrency(totalGlobalValue)}</strong>`;
-    
-    autoSave();
-}
-      
-function autoSave() {
-    const data = {};
-    categories.forEach(cat => {
-        const card = document.getElementById(cat.id);
-        if (!card) return;
-        const assets = [];
-        card.querySelectorAll('.asset-item').forEach(item => {
-            assets.push({
-                name: item.querySelector('.asset-name').value,
-                value: item.querySelector('.asset-value').value,
-                targetP: item.querySelector('.target-p-input').value
+        categories.forEach(cat => {
+            const card = document.getElementById(cat.id);
+            if (!card) return;
+            const target = Math.max(0, parseFloat(card.querySelector('.target-input').value) || 0);
+            const currentP = total > 0 ? (catSums[cat.id] / total * 100) : 0;
+            card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[cat.id]);
+            card.querySelector('.current-p').innerText = currentP.toFixed(1) + "%";
+            const alert = card.querySelector('.status-alert');
+            const diff = catSums[cat.id] - (total * target / 100);
+            
+            if (total === 0) { alert.innerText = "✅ 請開始輸入資產"; }
+            else if (Math.abs(currentP - target) <= 1) { alert.innerText = "✅ 比例理想"; }
+            else { alert.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`; }
+
+            card.querySelectorAll('.asset-item').forEach(item => {
+                const val = Math.max(0, parseFloat(item.querySelector('.asset-value').value) || 0);
+                const tP = Math.max(0, parseFloat(item.querySelector('.target-p-input').value) || 0);
+                const itemP = catSums[cat.id] > 0 ? (val / catSums[cat.id] * 100) : 0;
+                item.querySelector('.ratio-val').innerText = itemP.toFixed(1) + '%';
+                const sug = item.querySelector('.diff-suggestion');
+                if (total > 0 && catSums[cat.id] > 0 && tP > 0 && Math.abs(itemP - tP) > 1) {
+                    const d = (total * (target/100) * (tP/100)) - val;
+                    sug.innerText = d > 0 ? `+${Math.round(d).toLocaleString()}` : Math.round(d).toLocaleString();
+                    sug.style.color = d > 0 ? "#008800" : "#FF4444";
+                } else { sug.innerText = total === 0 ? '-' : '合理'; sug.style.color = "#888"; }
             });
         });
-        data[cat.id] = { target: card.querySelector('.target-input').value, assets: assets };
-    });
-    localStorage.setItem('myPortfolio', JSON.stringify(data));
-}
-
-function clearAll() {
-    if (confirm('確定清除資料嗎？')) {
-        localStorage.removeItem('myPortfolio');
-        location.reload();
+        document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
+        updateChart(catSums, total); autoSave();
     }
-}
 
-// 啟動程式
-init();
-    </script>
+    function updateChart(catSums, total) {
+        const ctx = document.getElementById('portfolioChart');
+        if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        const styles = getComputedStyle(document.documentElement);
+        const accent = styles.getPropertyValue('--theme-accent').trim();
+        const bg = styles.getPropertyValue('--theme-bg').trim();
+        const chartColors = [accent, bg, accent + 'CC', bg + '99', '#888888', '#1A1A1A'];
+        const data = { 
+            labels: categories.map(c => c.name), 
+            datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: chartColors, borderColor: '#FFFFFF', borderWidth: 2, hoverOffset: 10 }] 
+        };
+        if (myChart) { myChart.data = data; myChart.update(); } 
+        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' }, padding: 15 } } } } }); }
+    }
+
+    function autoSave() {
+        const data = {};
+        categories.forEach(cat => {
+            const card = document.getElementById(cat.id);
+            if (!card) return;
+            const assets = [];
+            card.querySelectorAll('.asset-item').forEach(item => {
+                assets.push({ name: item.querySelector('.asset-name').value, value: Math.max(0, item.querySelector('.asset-value').value || 0), targetP: Math.max(0, item.querySelector('.target-p-input').value || 0) });
+            });
+            data[cat.id] = { target: card.querySelector('.target-input').value, collapsed: card.classList.contains('collapsed'), assets: assets };
+        });
+        localStorage.setItem('myPortfolio', JSON.stringify(data));
+    }
+
+    function clearAll() { 
+        if (confirm('⚠️ 注意：這將永久刪除所有設定與資料，確定重置嗎？')) { 
+            localStorage.clear(); window.location.replace(window.location.href); setTimeout(() => window.location.reload(true), 100);
+        } 
+    }
+    function toggleCategory(id) { const card = document.getElementById(id); if (card) { card.classList.toggle('collapsed'); autoSave(); } }
+    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
 </body>
 </html>
