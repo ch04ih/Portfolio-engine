@@ -386,12 +386,22 @@
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     
-    // 徹底修復重置按鈕
+    // 重置按鈕：清除所有並還原四個預設卡片
     function clearAll() { 
-        if (confirm('確定重置所有資料嗎？這將刪除目前所有的輸入紀錄。')) { 
+        if (confirm('確定重置所有資料嗎？這將回到最初的四個分類。')) { 
             localStorage.clear(); // 清除本地存檔
-            categories = [];     // 清空當前變數
-            location.reload();   // 重新整理，觸發 onload 回到初始預設值
+            categories = [
+                { id: 'cat_1', name: '成長型投資' },
+                { id: 'cat_2', name: '防守型投資' },
+                { id: 'cat_3', name: '高股息投資' },
+                { id: 'cat_4', name: '安全存款' }
+            ];
+            // 立即執行存檔與渲染，不用等 reload
+            localStorage.setItem('catConfig_v2', JSON.stringify(categories));
+            localStorage.removeItem('myPortfolio_v2'); 
+            renderUI();
+            calculateAll();
+            location.reload(); // 雙重保險
         } 
     }
 
