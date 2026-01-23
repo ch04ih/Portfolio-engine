@@ -26,15 +26,20 @@
         [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        
+        /* 徹底隱藏輸入框小箭頭 */
+        input::-webkit-outer-spin-button, 
+        input::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0 !important; }
+        input[type=number] { -moz-appearance: textfield !important; }
+
         body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
         .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
 
         h1 { text-transform: uppercase; font-size: 1.4rem; border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
         
-        /* 儲存狀態列 */
         .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
-        .status-dot.active { background: #00C853; box-shadow: 0 0 5px #00C853; }
+        .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
@@ -48,13 +53,17 @@
 
         .asset-list { margin-bottom: 15px; }
         .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; }
-        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; }
+        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; padding: 0; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; }
-        .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
+        .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
+        .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; font-size: 10px; }
 
         .edit-container { position: relative; display: none; width: 100%; }
-        .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; }
+        .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 14px; outline: none; }
+        
+        /* 裝飾符號回歸 */
+        .edit-container.prefix::before { content: '$'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
+        .edit-container.suffix::after { content: '%'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
 
         .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; }
         .footer-row { display: flex; justify-content: space-between; align-items: center; }
@@ -70,7 +79,7 @@
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
         
-        .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; }
+        .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-options button::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg); }
 
         .collapsed .asset-list, .collapsed .category-card > .btn { display: none; }
@@ -105,7 +114,7 @@
             <button class="chart-btn" onclick="toggleChart()">圖表</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
-        <div id="target-sum-alert" style="margin-top:10px; font-size:12px; font-weight:bold; text-align:center; padding:5px; border-radius:6px; display:none;"></div>
+        <div id="target-sum-alert" style="margin-top:10px; font-size:11px; font-weight:bold; text-align:center; padding:5px; border-radius:6px; display:none;"></div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;">
             <canvas id="portfolioChart"></canvas>
         </div>
@@ -123,35 +132,34 @@
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
-    // 強制儲存邏輯
     function forceSave() {
-        const data = {};
-        categories.forEach(cat => {
-            const card = document.getElementById(cat.id);
-            if (card) {
-                const assets = [];
-                card.querySelectorAll('.asset-item').forEach(item => {
-                    assets.push({
-                        name: item.querySelector('.asset-name').value || '',
-                        value: item.querySelector('.asset-value').value || 0,
-                        targetP: item.querySelector('.target-p-input').value || 0
+        try {
+            const data = {};
+            categories.forEach(cat => {
+                const card = document.getElementById(cat.id);
+                if (card) {
+                    const assets = [];
+                    card.querySelectorAll('.asset-item').forEach(item => {
+                        assets.push({
+                            name: item.querySelector('.asset-name').value || '',
+                            value: parseFloat(item.querySelector('.asset-value').value) || 0,
+                            targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
+                        });
                     });
-                });
-                data[cat.id] = {
-                    target: card.querySelector('.target-input').value || 0,
-                    collapsed: card.classList.contains('collapsed'),
-                    assets: assets
-                };
-            }
-        });
-        localStorage.setItem('myPortfolio_v2', JSON.stringify(data));
-        localStorage.setItem('catConfig_v2', JSON.stringify(categories));
-        
-        const dot = document.getElementById('saveDot');
-        const txt = document.getElementById('saveText');
-        dot.classList.add('active');
-        txt.innerText = "資料已自動存至 Safari 本地儲存空間";
-        setTimeout(() => dot.classList.remove('active'), 1000);
+                    data[cat.id] = {
+                        target: parseFloat(card.querySelector('.target-input').value) || 0,
+                        collapsed: card.classList.contains('collapsed'),
+                        assets: assets
+                    };
+                }
+            });
+            localStorage.setItem('myPortfolio_v2', JSON.stringify(data));
+            localStorage.setItem('catConfig_v2', JSON.stringify(categories));
+            
+            const dot = document.getElementById('saveDot');
+            dot.classList.add('active');
+            setTimeout(() => dot.classList.remove('active'), 800);
+        } catch(e) { console.error("Save failed", e); }
     }
 
     function setTheme(themeName) {
@@ -187,13 +195,28 @@
         if (input) { input.focus(); input.select(); }
     }
 
+    // 加強版數字辨識與校正
     function autoViewMode(inputEl) {
         const container = inputEl.parentElement;
         const view = container.previousElementSibling;
-        const val = inputEl.value;
-        if (inputEl.classList.contains('asset-value')) view.innerText = val > 0 ? formatCurrency(val) : "$0";
-        else if (inputEl.classList.contains('target-p-input')) view.innerText = val > 0 ? (val + "%") : "目標%";
-        else view.innerText = val || "名稱";
+        let val = inputEl.value;
+
+        // 數字合法性檢查
+        if (inputEl.type === 'number') {
+            if (val === "" || isNaN(val) || val < 0) {
+                val = 0;
+                inputEl.value = 0;
+            }
+        } else {
+            if (val.trim() === "") {
+                val = "未命名標的";
+                inputEl.value = val;
+            }
+        }
+
+        if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(val);
+        else if (inputEl.classList.contains('target-p-input')) view.innerText = val + "%";
+        else view.innerText = val;
         
         setTimeout(() => {
             container.style.display = 'none';
@@ -253,12 +276,12 @@
                 <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
-                <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '目標%'}</div>
-                <div class="edit-container"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
+                <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '0%'}</div>
+                <div class="edit-container suffix"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
-                <div class="static-view" onclick="editMode(this)">${value > 0 ? formatCurrency(value) : '$0'}</div>
-                <div class="edit-container"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
+                <div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div>
+                <div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
             </div>
             <div style="font-size:10px; font-weight:bold; text-align:right;">
                 <div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:9px;"></div>
@@ -272,13 +295,21 @@
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (card) {
-                totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
+                const tInput = parseFloat(card.querySelector('.target-input').value) || 0;
+                totalTargetP += tInput;
                 let sum = 0;
                 card.querySelectorAll('.asset-value').forEach(i => { sum += parseFloat(i.value) || 0; });
                 catSums[cat.id] = sum;
                 total += sum;
             }
         });
+
+        // 目標百分比警示
+        const alertDiv = document.getElementById('target-sum-alert');
+        if (Math.abs(totalTargetP - 100) > 0.1) {
+            alertDiv.style.display = 'block'; alertDiv.style.background = '#FFE5E5'; alertDiv.style.color = '#D00000';
+            alertDiv.innerText = `⚠️ 區域目標總和為 ${totalTargetP.toFixed(0)}% (應為 100%)`;
+        } else alertDiv.style.display = 'none';
 
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
@@ -309,7 +340,7 @@
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
         updateChart(catSums);
-        forceSave(); // 每次計算完立刻儲存
+        forceSave();
     }
 
     function updateChart(catSums) {
@@ -343,12 +374,13 @@
                 { id: 'cat_3', name: '高股息投資' },
                 { id: 'cat_4', name: '安全存款' }
             ];
-            document.getElementById('saveText').innerText = "第一次使用？資料將存在此手機";
+            document.getElementById('saveText').innerText = "資料將存在此手機瀏覽器";
         }
         renderUI();
+        const savedTheme = localStorage.getItem('userTheme') || 'orange';
+        setTheme(savedTheme);
     };
 
-    // 滑掉瞬間強制儲存
     window.onbeforeunload = forceSave;
 </script>
 </body>
