@@ -46,11 +46,13 @@
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
-        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
+        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 15px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-        .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
+        .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
+        /* 新增：目標金額樣式 */
+        .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
         .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; padding: 4px; border-radius: 8px; }
@@ -82,10 +84,7 @@
         .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-options button::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg); }
 
-        /* 修正收合邏輯：隱藏清單與按鈕 */
-        .collapsed .asset-list, 
-        .collapsed .btn-add-asset { display: none; }
-        
+        .collapsed .asset-list, .collapsed .btn-add-asset { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
         
@@ -284,7 +283,10 @@
                         <span class="cat-name-text" onclick="editCatName('${cat.id}', this)">${cat.name}</span>
                     </div>
                     <div onclick="event.stopPropagation()">
-                        目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %
+                        <div style="display:flex; align-items:center; justify-content: flex-end; gap:4px; font-weight:bold; font-size:14px;">
+                            目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %
+                        </div>
+                        <div class="target-amount-label">$0</div>
                     </div>
                 </div>
                 <div class="asset-list" id="list-${cat.id}"></div>
@@ -302,10 +304,7 @@
             
             const listEl = card.querySelector('.asset-list');
             new Sortable(listEl, {
-                animation: 150,
-                delay: 200,
-                delayOnTouchOnly: true,
-                forceFallback: true, // 修正手機捲動問題
+                animation: 150, delay: 200, delayOnTouchOnly: true, forceFallback: true,
                 ghostClass: 'sortable-ghost',
                 onEnd: () => { calculateAll(); }
             });
@@ -316,10 +315,7 @@
         });
 
         new Sortable(grid, {
-            animation: 150,
-            delay: 200,
-            delayOnTouchOnly: true,
-            forceFallback: true, // 修正手機捲動問題
+            animation: 150, delay: 200, delayOnTouchOnly: true, forceFallback: true,
             ghostClass: 'sortable-ghost',
             onEnd: () => { syncOrder(); calculateAll(); }
         });
@@ -377,11 +373,16 @@
             if (!card) return;
             const target = parseFloat(card.querySelector('.target-input').value) || 0;
             const currentP = total > 0 ? (catSums[cat.id] / total * 100) : 0;
+            
+            // 更新目標金額
+            const targetAmount = total * (target / 100);
+            card.querySelector('.target-amount-label').innerText = formatCurrency(targetAmount);
+
             card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[cat.id]);
             card.querySelector('.current-p').innerText = currentP.toFixed(1) + "%";
             
             const alertTag = card.querySelector('.status-alert');
-            const diff = catSums[cat.id] - (total * target / 100);
+            const diff = catSums[cat.id] - targetAmount;
             if (total === 0) alertTag.innerText = "✅ 請開始輸入資產";
             else if (Math.abs(currentP - target) <= 1) alertTag.innerText = "✅ 比例理想";
             else alertTag.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`;
