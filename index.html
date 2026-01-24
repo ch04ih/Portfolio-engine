@@ -55,7 +55,31 @@
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
       
-.asset-item { display: grid; grid-template-columns: 25px 1fr 0.6fr 0.6fr 1.1fr 0.6fr 55px; gap: 6px;margin-bottom: 12px; align-items: center;padding: 4px; border-radius: 8px; cursor: grab; }
+
+/* 修改後的欄位比例：刪除(25px) 名稱(1.2fr) 股數(0.5fr) 單價(0.5fr) 總值(1fr) 目標(0.5fr) 狀態(55px) */
+.asset-item { 
+    display: grid; 
+    grid-template-columns: 25px 1.2fr 0.5fr 0.5fr 1fr 0.5fr 55px; 
+    gap: 4px; /* 縮小間距 */
+    margin-bottom: 12px; 
+    align-items: center; 
+    padding: 4px 0; 
+    border-radius: 8px; 
+    cursor: grab;
+    width: 100%;
+}
+
+/* 確保內部文字不會撐開格子 */
+.asset-item > div {
+    min-width: 0; 
+    overflow: hidden;
+}
+
+.static-view {
+    padding: 8px 2px; /* 稍微減少左右內距 */
+    font-size: 10px; /* 稍微縮小字體以符合 7 欄版型 */
+}
+
 
 
         .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
@@ -250,20 +274,18 @@
         if (input) { input.focus(); input.select(); }
     }
 
-    function autoViewMode(inputEl) {
+   function autoViewMode(inputEl) {
     const container = inputEl.parentElement;
     const item = inputEl.closest('.asset-item');
     const view = container.previousElementSibling;
     
-    // 自動計算總現值邏輯
     if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
         const qty = parseFloat(item.querySelector('.asset-qty').value) || 0;
         const price = parseFloat(item.querySelector('.asset-price').value) || 0;
-        const totalValInput = item.querySelector('.asset-value');
-        const totalValView = totalValInput.parentElement.previousElementSibling;
-        
-        const calculatedTotal = qty * price;
-        if (calculatedTotal > 0) {
+        if (qty > 0 && price > 0) {
+            const totalValInput = item.querySelector('.asset-value');
+            const totalValView = totalValInput.parentElement.previousElementSibling;
+            const calculatedTotal = qty * price;
             totalValInput.value = calculatedTotal;
             totalValView.innerText = formatCurrency(calculatedTotal);
         }
@@ -277,8 +299,13 @@
     else if (inputEl.classList.contains('target-p-input')) view.innerText = val + "%";
     else view.innerText = val;
     
-    setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+    setTimeout(() => { 
+        container.style.display = 'none'; 
+        view.style.display = 'flex'; 
+        calculateAll(); 
+    }, 150);
 }
+
 
     function renderUI() {
         const savedData = JSON.parse(localStorage.getItem('myPortfolio_v2')) || {};
@@ -355,12 +382,12 @@ if (data.assets && data.assets.length > 0) {
             <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
         </div>
         <div>
-            <div class="static-view" style="background:#888;" onclick="editMode(this)">${qty || '股數'}</div>
+            <div class="static-view" style="background:#888; color:white;" onclick="editMode(this)">${qty || '股數'}</div>
             <div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div>
         </div>
         <div>
-            <div class="static-view" style="background:#888;" onclick="editMode(this)">${price || '單價'}</div>
-            <div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div>
+            <div class="static-view" style="background:#888; color:white;" onclick="editMode(this)">${price || '單價'}</div>
+            <div class="edit-container"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div>
         </div>
         <div>
             <div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div>
@@ -376,6 +403,7 @@ if (data.assets && data.assets.length > 0) {
     `;
     list.appendChild(div);
 }
+
 
 
     function calculateAll() {
