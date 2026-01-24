@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portfolio Engine</title>
+    <title>Portfolio Engine Pro</title>
     
     <link rel="apple-touch-icon" href="icon.png?v=3">
     <link rel="icon" type="image/png" href="icon.png?v=3">
@@ -39,7 +39,7 @@
         .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; margin-left: 5px; }
 
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
@@ -57,8 +57,6 @@
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; z-index: 2; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid transparent; }
-        
-        /* 核心修改：當標的非股票時的淺灰色樣式 */
         .static-view.empty-placeholder { background: transparent; color: #CCC; border: none; font-weight: 400; }
 
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
@@ -126,7 +124,10 @@
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888;">Total Assets | 資產總現值</div>
-            <button class="chart-btn" onclick="toggleChart()">圖表</button>
+            <div>
+                <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步報價</button>
+                <button class="chart-btn" onclick="toggleChart()">圖表</button>
+            </div>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
         <div id="target-sum-alert"></div>
@@ -144,6 +145,9 @@
 <datalist id="stockList"></datalist>
 
 <script>
+    // 配置你的 GAS URL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec";
+
     let myChart = null;
     let categories = [];
     let stockData = [];
@@ -172,6 +176,64 @@
         } catch (e) {
             console.error("Stock JSON load failed", e);
             document.getElementById('saveText').innerText = "股票數據載入失敗";
+        }
+    }
+
+    async function syncPrices() {
+        const btn = document.getElementById('syncBtn');
+        const originalText = btn.innerText;
+        let symbolList = [];
+
+        categories.forEach(cat => {
+            const card = document.getElementById(cat.id);
+            if (!card) return;
+            card.querySelectorAll('.asset-name').forEach(input => {
+                const s = input.value.trim();
+                if (s && s !== '名稱') {
+                    const stock = stockData.find(item => item.s == s);
+                    if (stock && stock.m) {
+                        symbolList.push(`${stock.m}:${s}`);
+                    } else {
+                        symbolList.push(s);
+                    }
+                }
+            });
+        });
+
+        if (symbolList.length === 0) return alert("請先輸入標的代號");
+
+        try {
+            btn.innerText = "⏳ 同步中...";
+            btn.disabled = true;
+
+            const response = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`);
+            const cloudPrices = await response.json();
+
+            let updatedCount = 0;
+            categories.forEach(cat => {
+                const card = document.getElementById(cat.id);
+                if (!card) return;
+                card.querySelectorAll('.asset-item').forEach(item => {
+                    const nameInput = item.querySelector('.asset-name');
+                    const priceInput = item.querySelector('.asset-price');
+                    const s = nameInput.value.trim();
+                    const stock = stockData.find(i => i.s == s);
+                    const fullKey = (stock && stock.m) ? `${stock.m}:${s}` : s;
+
+                    if (cloudPrices[fullKey] && typeof cloudPrices[fullKey] === 'number') {
+                        priceInput.value = cloudPrices[fullKey];
+                        autoViewMode(priceInput);
+                        updatedCount++;
+                    }
+                });
+            });
+            alert(`✅ 同步完成！共更新 ${updatedCount} 筆報價。`);
+        } catch (e) {
+            alert("❌ 同步失敗，請確認 GAS 權限。");
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            calculateAll();
         }
     }
 
@@ -287,9 +349,8 @@
                     val = 0; inputEl.value = 0;
                 } else { val = ""; }
             } 
-        } else { if (val.trim() === "") { val = "未命名"; inputEl.value = val; } }
+        } else { if (val.trim() === "") { val = "名稱"; inputEl.value = val; } }
         
-        // 核心修改：判斷是否顯示 "-" 以及移除外框
         if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
             if (val === "" || val == 0) {
                 view.innerText = "-";
@@ -379,7 +440,6 @@
         const div = document.createElement('div');
         div.className = 'asset-item';
         
-        // 判斷初始顯示
         const qtyDisplay = (qty === '' || qty == 0) ? '-' : qty;
         const priceDisplay = (price === '' || price == 0) ? '-' : price;
         const qtyClass = (qty === '' || qty == 0) ? 'static-view empty-placeholder' : 'static-view';
