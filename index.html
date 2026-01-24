@@ -71,6 +71,10 @@
 
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid transparent; }
 
+/* 只要這一段：讓 empty-placeholder 維持淺灰色底、有邊框、不透明 */
+.static-view.empty-placeholder { background: #EEE !important; border: 1px solid #DDD !important; color: #BBB !important; }
+
+
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view:not(.empty-placeholder), 
         .asset-item div:nth-child(4) .static-view:not(.empty-placeholder) { background: #EEE; color: #888; border: 1px solid #DDD; }
