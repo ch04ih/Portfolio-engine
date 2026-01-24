@@ -46,7 +46,6 @@
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-        /* 修正：右上角輸入框寬度 */
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
@@ -60,7 +59,6 @@
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
         .static-view:empty::before { content: '-'; opacity: 0.2; }
         
-        /* 修正：名稱顏色改回全深色，股數單價淺色，現值白，比例灰 */
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { background: #EEE; color: #888; border: 1px solid #DDD; }
         .asset-item div:nth-child(5) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
@@ -116,7 +114,7 @@
 
     <div class="save-status">
         <div class="status-dot" id="saveDot"></div>
-        <span id="saveText">正在載入本地存檔...</span>
+        <span id="saveText">正在載入數據...</span>
     </div>
 
     <div class="rebalance-panel">
@@ -137,9 +135,12 @@
     <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
 </div>
 
+<datalist id="stockList"></datalist>
+
 <script>
     let myChart = null;
     let categories = [];
+    let stockData = [];
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
@@ -150,6 +151,24 @@
         { id: 'cat_4', name: '高股息投資', target: 20 },
         { id: 'cat_5', name: '安全存款', target: 10 }
     ];
+
+    // 初始化：載入股票資料 JSON
+    async function loadStockData() {
+        try {
+            const response = await fetch('csvjson.json');
+            stockData = await response.json();
+            const datalist = document.getElementById('stockList');
+            stockData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = `${item.s} ${item.n}`; // 格式：2330 台積電
+                datalist.appendChild(option);
+            });
+            document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
+        } catch (e) {
+            console.error("Stock JSON load failed", e);
+            document.getElementById('saveText').innerText = "股票數據載入失敗";
+        }
+    }
 
     function forceSave() {
         try {
@@ -241,6 +260,16 @@
         const item = inputEl.closest('.asset-item');
         const view = container.previousElementSibling;
         
+        // 名稱欄位的特殊處理：若是從建議清單選取，只保留代號
+        if (inputEl.classList.contains('asset-name')) {
+            let val = inputEl.value;
+            // 如果輸入的內容包含空白（例如 "2330 台積電"），則取前面那一段
+            if (val.includes(' ')) {
+                inputEl.value = val.split(' ')[0];
+            }
+        }
+
+        // 股數與單價連動
         if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
             const q = parseFloat(item.querySelector('.asset-qty').value);
             const p = parseFloat(item.querySelector('.asset-price').value);
@@ -340,7 +369,9 @@
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div>
                 <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
-                <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container">
+                    <input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)">
+                </div>
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${qty}</div>
@@ -438,12 +469,12 @@
     }
 
     window.onload = () => {
+        loadStockData(); // 同步加載股票清單
         const savedCats = localStorage.getItem('catConfig_v5');
         if (savedCats) categories = JSON.parse(savedCats);
         else categories = DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
         renderUI();
         setTheme(localStorage.getItem('userTheme') || 'orange');
-        document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
     };
 </script>
 </body>
