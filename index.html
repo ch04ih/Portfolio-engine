@@ -379,7 +379,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '0%'}</div>
-                <div class="edit-container suffix"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container suffix"><input type="number" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div>
             </div>
             <div style="font-size:10px; font-weight:bold; text-align:right;">
                 <div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div>
@@ -388,19 +388,14 @@
         list.appendChild(div);
     }
 
-    // 新增：輔助函數，產生同色系色階
     function generateMonochromeScale(baseHex, steps = 7) {
-        // 去掉 #
         let hex = baseHex.replace('#', '');
         let r = parseInt(hex.substring(0, 2), 16);
         let g = parseInt(hex.substring(2, 4), 16);
         let b = parseInt(hex.substring(4, 6), 16);
-
         let colors = [];
         for (let i = 0; i < steps; i++) {
-            // 透過調整透明度或混合白色/黑色來產生色階
-            // 這裡採用降低不透明度的方式，最能保留原色調且區別明顯
-            let opacity = 1 - (i * 0.12); // 每階減少 12% 亮度
+            let opacity = 1 - (i * 0.12);
             colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
         }
         return colors;
@@ -461,45 +456,12 @@
     function updateChart(catSums) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
-        
-        // 修改處：根據當前主題色動態產生色階
         const styles = getComputedStyle(document.documentElement);
         const accentColor = styles.getPropertyValue('--theme-accent').trim();
         const themeColors = generateMonochromeScale(accentColor, categories.length + 1);
-
-        const data = { 
-            labels: categories.map(c => c.name), 
-            datasets: [{ 
-                data: categories.map(c => catSums[c.id]), 
-                backgroundColor: themeColors, 
-                borderWidth: 2, 
-                borderColor: '#fff' 
-            }] 
-        };
-
-        if (myChart) { 
-            myChart.data = data; 
-            myChart.update(); 
-        } else { 
-            myChart = new Chart(ctx, { 
-                type: 'doughnut', 
-                data: data, 
-                options: { 
-                    maintainAspectRatio: false, 
-                    cutout: '65%', 
-                    plugins: { 
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { 
-                                boxWidth: 10, 
-                                font: { size: 10 },
-                                color: '#333' // 確保文字在淺色背景下清楚
-                            } 
-                        } 
-                    } 
-                } 
-            }); 
-        }
+        const data = { labels: categories.map(c => c.name), datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: themeColors, borderWidth: 2, borderColor: '#fff' }] };
+        if (myChart) { myChart.data = data; myChart.update(); }
+        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } }); }
     }
 
     function toggleCategory(id) { 
