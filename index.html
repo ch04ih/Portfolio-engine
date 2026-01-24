@@ -36,7 +36,6 @@
 
         .btn-delete-card { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; background: var(--theme-accent); border: 3px solid #1A1A1A; border-radius: 50%; color: var(--theme-bg); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #000; z-index: 10; }
 
-        /* 六欄佈局：刪除 | 標的 | 股數 | 單價 | 目標% | 總現值 | 區域比 */
         .grid-row { display: grid; grid-template-columns: 20px 1fr 0.6fr 0.7fr 0.6fr 1.1fr 0.5fr; gap: 4px; align-items: center; margin-bottom: 10px; }
         .label-text { font-size: 8px; font-weight: 900; color: #bbb; text-align: center; margin-bottom: 2px; }
 
@@ -64,7 +63,7 @@
 
 <div class="container">
     <div style="text-align:right;">
-        <span onclick="document.querySelector('.theme-options').style.display='flex'" style="cursor:pointer; font-size:12px; font-weight:bold; background:#FFF; padding:4px 10px; border:2px solid #000; border-radius:20px;">主題配色</span>
+        <span onclick="document.querySelector('.theme-options').style.display='flex'" style="cursor:pointer; font-size:12px; font-weight:bold; background:#FFF; padding:4px 10px; border:2px solid #000; border-radius:20px;">🎨 主題配色</span>
         <div class="theme-options">
             <button class="theme-btn" onclick="setTheme('orange')"><span style="left:0; background:#3D2B1F"></span><span style="right:0; background:#FF8C42"></span></button>
             <button class="theme-btn" onclick="setTheme('forest')"><span style="left:0; background:#293d0b"></span><span style="right:0; background:#dac4fc"></span></button>
@@ -80,7 +79,7 @@
     <div class="category-card" style="padding:20px; border-width: 4px;">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888;">TOTAL ASSETS | 總現值</div>
-            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">圖表</button>
+            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">圖表分析</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.4rem; font-weight: 900;">$0</div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 200px;"><canvas id="portfolioChart"></canvas></div>
@@ -108,17 +107,19 @@
         const row = el.closest('.grid-row');
         row.querySelector('.asset-name').value = s;
         row.querySelector('.asset-market').value = m;
-        row.querySelector('.view-price').innerText = "載入中";
+        const priceDisplay = row.querySelector('.view-price');
+        priceDisplay.innerText = "載入中...";
         
         try {
             const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
             const data = await res.json();
             const price = parseFloat(data.price) || 0;
+            // 重要：同步更新隱藏欄位與顯示
             row.querySelector('.asset-price').value = price;
-            row.querySelector('.view-price').innerText = (m === 'US' ? '🇺🇸' : '') + price;
-            calculateAll(); // 抓到價後立刻計算
+            priceDisplay.innerText = (m === 'US' ? '🇺🇸' : '') + price;
+            calculateAll(); 
         } catch (e) { 
-            row.querySelector('.view-price').innerText = "錯誤";
+            priceDisplay.innerText = "讀取失敗";
         }
         autoViewMode(row.querySelector('.asset-name'));
     }
@@ -163,7 +164,6 @@
     function calculateAll() {
         let grandTotal = 0, catSums = {};
         
-        // 核心計算循環
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (!card) return;
@@ -172,19 +172,15 @@
                 const q = parseFloat(row.querySelector('.asset-qty').value) || 0;
                 const p = parseFloat(row.querySelector('.asset-price').value) || 0;
                 const m = row.querySelector('.asset-market').value;
-                
-                // 股數 * 單價 = 總價 (若美股則乘匯率)
                 const subtotal = (m === 'US' ? p * EX_RATE : p) * q;
                 row._subtotal = subtotal;
                 sum += subtotal;
-                
                 row.querySelector('.item-total').innerText = formatCurrency(subtotal);
             });
             catSums[cat.id] = sum;
             grandTotal += sum;
         });
 
-        // 二次循環：更新區域比例與再平衡建議
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             const sum = catSums[cat.id];
@@ -193,20 +189,14 @@
             
             card.querySelectorAll('.grid-row').forEach(row => {
                 const targetP = parseFloat(row.querySelector('.asset-target').value) || 0;
-                const rowRatio = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) : 0;
-                row.querySelector('.item-ratio').innerText = rowRatio + "%";
+                row.querySelector('.item-ratio').innerText = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) + "%" : "0%";
                 
-                // 補回平衡功能：(區域總值 * 目標%) - 當前值
                 const tip = row.querySelector('.rebalance-tip');
                 if (sum > 0 && targetP > 0) {
-                    const idealAmt = sum * (targetP / 100);
-                    const diff = row._subtotal - idealAmt;
-                    if (Math.abs(diff) < 10) {
-                        tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
-                    } else {
-                        tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
-                                        `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
-                    }
+                    const diff = row._subtotal - (sum * (targetP / 100));
+                    if (Math.abs(diff) < 10) tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
+                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
+                                                    `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
                 } else { tip.innerText = "--"; }
             });
         });
@@ -226,7 +216,7 @@
                 <div class="category-header" onclick="toggleCollapse('${cat.id}')">
                     <span class="arrow-icon">▼</span>
                     <span onclick="event.stopPropagation(); editCatName('${cat.id}')" style="font-weight:900; flex:1;">${cat.name}</span>
-                    <div style="font-size:11px; font-weight:900;">目標 ${cat.target}%</div>
+                    <div style="font-size:11px; font-weight:900; cursor:pointer;" onclick="event.stopPropagation(); editCatTarget('${cat.id}')">目標 ${cat.target}%</div>
                 </div>
                 <div class="category-content">
                     <div class="grid-row" style="opacity:0.4;"><div class="label-text"></div><div class="label-text">標的</div><div class="label-text">股數</div><div class="label-text">單價</div><div class="label-text">目標%</div><div class="label-text">總現值</div><div class="label-text">區域比</div></div>
@@ -256,8 +246,19 @@
         document.getElementById(id).classList.toggle('collapsed');
         saveData();
     }
-    function editCatName(id) { const n = prompt("修改區域名稱："); if(n) { categories.find(c => c.id === id).name = n; calculateAll(); renderUI(); } }
-    function deleteCategory(id) { if(confirm("確定刪除此投資區域？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } }
+    
+    // 修正：區域目標與名稱編輯功能
+    function editCatName(id) { 
+        const n = prompt("修改區域名稱："); 
+        if(n) { categories.find(c => c.id === id).name = n; renderUI(); calculateAll(); } 
+    }
+    function editCatTarget(id) { 
+        const t = prompt("修改該區域之組合占比 (%)：", categories.find(c => c.id === id).target); 
+        if(t !== null) { categories.find(c => c.id === id).target = parseInt(t) || 0; renderUI(); calculateAll(); } 
+    }
+    function deleteCategory(id) { 
+        if(confirm("確定刪除此投資區域？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } 
+    }
 
     function initSortable() {
         new Sortable(document.getElementById('mainGrid'), { delay: 400, delayOnTouchOnly: true, animation: 150, onEnd: () => {
@@ -298,12 +299,12 @@
             rows.forEach(row => list.push({ name: row.querySelector('.asset-name').value, qty: row.querySelector('.asset-qty').value, value: row.querySelector('.asset-price').value, targetP: row.querySelector('.asset-target').value, market: row.querySelector('.asset-market').value }));
             data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v5', JSON.stringify({ categories, details: data }));
+        localStorage.setItem('myPortfolio_v6', JSON.stringify({ categories, details: data }));
     }
 
     window.onload = () => {
-        fetch('csvjson.json').then(res => res.json()).then(data => STOCK_DB = data);
-        const saved = JSON.parse(localStorage.getItem('myPortfolio_v5'));
+        fetch('uploaded:csvjson.json').then(res => res.json()).then(data => STOCK_DB = data).catch(() => {});
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v6'));
         if (saved) {
             categories = saved.categories;
             renderUI();
