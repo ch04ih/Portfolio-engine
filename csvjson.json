@@ -1,0 +1,707 @@
+[
+  {
+    "s": 2330,
+    "n": "台積電",
+    "m": "TPE"
+  },
+  {
+    "s": 2317,
+    "n": "鴻海",
+    "m": "TPE"
+  },
+  {
+    "s": 2454,
+    "n": "聯發科",
+    "m": "TPE"
+  },
+  {
+    "s": 2881,
+    "n": "富邦金",
+    "m": "TPE"
+  },
+  {
+    "s": 2882,
+    "n": "國泰金",
+    "m": "TPE"
+  },
+  {
+    "s": 2308,
+    "n": "台達電",
+    "m": "TPE"
+  },
+  {
+    "s": 2382,
+    "n": "廣達",
+    "m": "TPE"
+  },
+  {
+    "s": 2891,
+    "n": "中信金",
+    "m": "TPE"
+  },
+  {
+    "s": 2303,
+    "n": "聯電",
+    "m": "TPE"
+  },
+  {
+    "s": 3008,
+    "n": "大立光",
+    "m": "TPE"
+  },
+  {
+    "s": 2886,
+    "n": "兆豐金",
+    "m": "TPE"
+  },
+  {
+    "s": 2884,
+    "n": "玉山金",
+    "m": "TPE"
+  },
+  {
+    "s": 5880,
+    "n": "合庫金",
+    "m": "TPE"
+  },
+  {
+    "s": 2892,
+    "n": "第一金",
+    "m": "TPE"
+  },
+  {
+    "s": 1301,
+    "n": "台塑",
+    "m": "TPE"
+  },
+  {
+    "s": 1303,
+    "n": "南亞",
+    "m": "TPE"
+  },
+  {
+    "s": 2002,
+    "n": "中鋼",
+    "m": "TPE"
+  },
+  {
+    "s": 2357,
+    "n": "華碩",
+    "m": "TPE"
+  },
+  {
+    "s": 3711,
+    "n": "日月光投控",
+    "m": "TPE"
+  },
+  {
+    "s": 3231,
+    "n": "緯創",
+    "m": "TPE"
+  },
+  {
+    "s": 2379,
+    "n": "瑞昱",
+    "m": "TPE"
+  },
+  {
+    "s": 3034,
+    "n": "聯詠",
+    "m": "TPE"
+  },
+  {
+    "s": 2603,
+    "n": "長榮",
+    "m": "TPE"
+  },
+  {
+    "s": 2609,
+    "n": "陽明",
+    "m": "TPE"
+  },
+  {
+    "s": 2615,
+    "n": "萬海",
+    "m": "TPE"
+  },
+  {
+    "s": 1503,
+    "n": "士電",
+    "m": "TPE"
+  },
+  {
+    "s": 1504,
+    "n": "東元",
+    "m": "TPE"
+  },
+  {
+    "s": 1513,
+    "n": "中興電",
+    "m": "TPE"
+  },
+  {
+    "s": 1519,
+    "n": "華城",
+    "m": "TPE"
+  },
+  {
+    "s": 2327,
+    "n": "國巨",
+    "m": "TPE"
+  },
+  {
+    "s": 2356,
+    "n": "英業達",
+    "m": "TPE"
+  },
+  {
+    "s": 2377,
+    "n": "微星",
+    "m": "TPE"
+  },
+  {
+    "s": 2395,
+    "n": "研華",
+    "m": "TPE"
+  },
+  {
+    "s": 3017,
+    "n": "奇鋐",
+    "m": "TPE"
+  },
+  {
+    "s": 3037,
+    "n": "欣興",
+    "m": "TPE"
+  },
+  {
+    "s": 3443,
+    "n": "創意",
+    "m": "TPE"
+  },
+  {
+    "s": 3661,
+    "n": "世芯-KY",
+    "m": "TPE"
+  },
+  {
+    "s": 4966,
+    "n": "譜瑞-KY",
+    "m": "TPE"
+  },
+  {
+    "s": 6415,
+    "n": "矽力*-KY",
+    "m": "TPE"
+  },
+  {
+    "s": 6669,
+    "n": "緯穎",
+    "m": "TPE"
+  },
+  {
+    "s": 8046,
+    "n": "南電",
+    "m": "TPE"
+  },
+  {
+    "s": 9904,
+    "n": "寶成",
+    "m": "TPE"
+  },
+  {
+    "s": 9910,
+    "n": "豐泰",
+    "m": "TPE"
+  },
+  {
+    "s": "0050",
+    "n": "元大台灣50",
+    "m": "TPE"
+  },
+  {
+    "s": "0051",
+    "n": "元大中型100",
+    "m": "TPE"
+  },
+  {
+    "s": "0056",
+    "n": "元大高股息",
+    "m": "TPE"
+  },
+  {
+    "s": "00878",
+    "n": "國泰永續高股息",
+    "m": "TPE"
+  },
+  {
+    "s": "00919",
+    "n": "群益台灣精選高息",
+    "m": "TPE"
+  },
+  {
+    "s": "00929",
+    "n": "復華台灣科技優息",
+    "m": "TPE"
+  },
+  {
+    "s": "00940",
+    "n": "元大台灣價值高息",
+    "m": "TPE"
+  },
+  {
+    "s": "006208",
+    "n": "富邦台50",
+    "m": "TPE"
+  },
+  {
+    "s": "00713",
+    "n": "元大台灣高息低波",
+    "m": "TPE"
+  },
+  {
+    "s": "00692",
+    "n": "富邦公司治理",
+    "m": "TPE"
+  },
+  {
+    "s": "00850",
+    "n": "元大臺灣ESG永續",
+    "m": "TPE"
+  },
+  {
+    "s": "00915",
+    "n": "凱基優選高股息30",
+    "m": "TPE"
+  },
+  {
+    "s": "00918",
+    "n": "大華優利高填息30",
+    "m": "TPE"
+  },
+  {
+    "s": "00881",
+    "n": "國泰台灣5G+",
+    "m": "TPE"
+  },
+  {
+    "s": "00891",
+    "n": "中信關鍵半導體",
+    "m": "TPE"
+  },
+  {
+    "s": "00892",
+    "n": "富邦台灣半導體",
+    "m": "TPE"
+  },
+  {
+    "s": "00934",
+    "n": "中信成長高股息",
+    "m": "TPE"
+  },
+  {
+    "s": "00936",
+    "n": "台新臺灣IC設計",
+    "m": "TPE"
+  },
+  {
+    "s": "00679B",
+    "n": "元大美債20年",
+    "m": "TPE"
+  },
+  {
+    "s": "00687B",
+    "n": "國泰美債20年",
+    "m": "TPE"
+  },
+  {
+    "s": "00751B",
+    "n": "元大AAA至A級公司債",
+    "m": "TPE"
+  },
+  {
+    "s": "00720B",
+    "n": "元大投資級公司債",
+    "m": "TPE"
+  },
+  {
+    "s": "00937B",
+    "n": "群益ESG投等債20+",
+    "m": "TPE"
+  },
+  {
+    "s": "AAPL",
+    "n": "Apple Inc.",
+    "m": "US"
+  },
+  {
+    "s": "NVDA",
+    "n": "NVIDIA Corp.",
+    "m": "US"
+  },
+  {
+    "s": "MSFT",
+    "n": "Microsoft Corp.",
+    "m": "US"
+  },
+  {
+    "s": "AMZN",
+    "n": "Amazon.com Inc.",
+    "m": "US"
+  },
+  {
+    "s": "GOOGL",
+    "n": "Alphabet Inc. (Class A)",
+    "m": "US"
+  },
+  {
+    "s": "GOOG",
+    "n": "Alphabet Inc. (Class C)",
+    "m": "US"
+  },
+  {
+    "s": "META",
+    "n": "Meta Platforms, Inc.",
+    "m": "US"
+  },
+  {
+    "s": "TSLA",
+    "n": "Tesla, Inc.",
+    "m": "US"
+  },
+  {
+    "s": "BRK.B",
+    "n": "Berkshire Hathaway Inc.",
+    "m": "US"
+  },
+  {
+    "s": "LLY",
+    "n": "Eli Lilly and Company",
+    "m": "US"
+  },
+  {
+    "s": "AVGO",
+    "n": "Broadcom Inc.",
+    "m": "US"
+  },
+  {
+    "s": "V",
+    "n": "Visa Inc.",
+    "m": "US"
+  },
+  {
+    "s": "JPM",
+    "n": "JPMorgan Chase & Co.",
+    "m": "US"
+  },
+  {
+    "s": "WMT",
+    "n": "Walmart Inc.",
+    "m": "US"
+  },
+  {
+    "s": "UNH",
+    "n": "UnitedHealth Group Inc.",
+    "m": "US"
+  },
+  {
+    "s": "MA",
+    "n": "Mastercard Inc.",
+    "m": "US"
+  },
+  {
+    "s": "XOM",
+    "n": "Exxon Mobil Corp.",
+    "m": "US"
+  },
+  {
+    "s": "PFE",
+    "n": "Pfizer Inc.",
+    "m": "US"
+  },
+  {
+    "s": "COST",
+    "n": "Costco Wholesale Corp.",
+    "m": "US"
+  },
+  {
+    "s": "PG",
+    "n": "Procter & Gamble Co.",
+    "m": "US"
+  },
+  {
+    "s": "ORCL",
+    "n": "Oracle Corp.",
+    "m": "US"
+  },
+  {
+    "s": "HD",
+    "n": "Home Depot Inc.",
+    "m": "US"
+  },
+  {
+    "s": "NFLX",
+    "n": "Netflix Inc.",
+    "m": "US"
+  },
+  {
+    "s": "KO",
+    "n": "Coca-Cola Co.",
+    "m": "US"
+  },
+  {
+    "s": "PEP",
+    "n": "PepsiCo Inc.",
+    "m": "US"
+  },
+  {
+    "s": "CVX",
+    "n": "Chevron Corp.",
+    "m": "US"
+  },
+  {
+    "s": "MRK",
+    "n": "Merck & Co. Inc.",
+    "m": "US"
+  },
+  {
+    "s": "ABBV",
+    "n": "AbbVie Inc.",
+    "m": "US"
+  },
+  {
+    "s": "CRM",
+    "n": "Salesforce, Inc.",
+    "m": "US"
+  },
+  {
+    "s": "AMD",
+    "n": "Advanced Micro Devices",
+    "m": "US"
+  },
+  {
+    "s": "BAC",
+    "n": "Bank of America Corp.",
+    "m": "US"
+  },
+  {
+    "s": "NKE",
+    "n": "NIKE, Inc.",
+    "m": "US"
+  },
+  {
+    "s": "DIS",
+    "n": "Walt Disney Co.",
+    "m": "US"
+  },
+  {
+    "s": "MCD",
+    "n": "McDonald's Corp.",
+    "m": "US"
+  },
+  {
+    "s": "CSCO",
+    "n": "Cisco Systems Inc.",
+    "m": "US"
+  },
+  {
+    "s": "INTC",
+    "n": "Intel Corp.",
+    "m": "US"
+  },
+  {
+    "s": "QCOM",
+    "n": "Qualcomm Inc.",
+    "m": "US"
+  },
+  {
+    "s": "TXN",
+    "n": "Texas Instruments Inc.",
+    "m": "US"
+  },
+  {
+    "s": "TMO",
+    "n": "Thermo Fisher Scientific",
+    "m": "US"
+  },
+  {
+    "s": "AMAT",
+    "n": "Applied Materials Inc.",
+    "m": "US"
+  },
+  {
+    "s": "GE",
+    "n": "General Electric Co.",
+    "m": "US"
+  },
+  {
+    "s": "IBM",
+    "n": "IBM Corp.",
+    "m": "US"
+  },
+  {
+    "s": "CAT",
+    "n": "Caterpillar Inc.",
+    "m": "US"
+  },
+  {
+    "s": "GS",
+    "n": "Goldman Sachs Group",
+    "m": "US"
+  },
+  {
+    "s": "BA",
+    "n": "Boeing Co.",
+    "m": "US"
+  },
+  {
+    "s": "PDD",
+    "n": "PDD Holdings Inc. (Pinduoduo)",
+    "m": "US"
+  },
+  {
+    "s": "VOO",
+    "n": "Vanguard S&P 500 ETF",
+    "m": "US"
+  },
+  {
+    "s": "IVV",
+    "n": "iShares Core S&P 500 ETF",
+    "m": "US"
+  },
+  {
+    "s": "SPY",
+    "n": "SPDR S&P 500 ETF Trust",
+    "m": "US"
+  },
+  {
+    "s": "QQQ",
+    "n": "Invesco QQQ Trust",
+    "m": "US"
+  },
+  {
+    "s": "VTI",
+    "n": "Vanguard Total Stock Market",
+    "m": "US"
+  },
+  {
+    "s": "VXUS",
+    "n": "Vanguard Total International",
+    "m": "US"
+  },
+  {
+    "s": "VEA",
+    "n": "Vanguard FTSE Developed",
+    "m": "US"
+  },
+  {
+    "s": "VUG",
+    "n": "Vanguard Growth ETF",
+    "m": "US"
+  },
+  {
+    "s": "VTV",
+    "n": "Vanguard Value ETF",
+    "m": "US"
+  },
+  {
+    "s": "SCHD",
+    "n": "Schwab US Dividend Equity",
+    "m": "US"
+  },
+  {
+    "s": "VIG",
+    "n": "Vanguard Div Apprec ETF",
+    "m": "US"
+  },
+  {
+    "s": "VYM",
+    "n": "Vanguard High Div Yield",
+    "m": "US"
+  },
+  {
+    "s": "BND",
+    "n": "Vanguard Total Bond Market",
+    "m": "US"
+  },
+  {
+    "s": "AGG",
+    "n": "iShares Core US Aggregate Bond",
+    "m": "US"
+  },
+  {
+    "s": "TLT",
+    "n": "iShares 20+ Year Treasury Bond",
+    "m": "US"
+  },
+  {
+    "s": "IEF",
+    "n": "iShares 7-10 Year Treasury Bond",
+    "m": "US"
+  },
+  {
+    "s": "GLD",
+    "n": "SPDR Gold Shares",
+    "m": "US"
+  },
+  {
+    "s": "IAU",
+    "n": "iShares Gold Trust",
+    "m": "US"
+  },
+  {
+    "s": "VNQ",
+    "n": "Vanguard Real Estate ETF",
+    "m": "US"
+  },
+  {
+    "s": "SMH",
+    "n": "VanEck Semiconductor ETF",
+    "m": "US"
+  },
+  {
+    "s": "SOXX",
+    "n": "iShares Semiconductor ETF",
+    "m": "US"
+  },
+  {
+    "s": "ARKK",
+    "n": "ARK Innovation ETF",
+    "m": "US"
+  },
+  {
+    "s": "VT",
+    "n": "Vanguard Total World Stock",
+    "m": "US"
+  },
+  {
+    "s": "00757",
+    "n": "統一 FANG+",
+    "m": "TPE"
+  },
+  {
+    "s": "00935",
+    "n": "野村臺灣新科技",
+    "m": "TPE"
+  },
+  {
+    "s": "00830",
+    "n": "國泰費城半導體",
+    "m": "TPE"
+  },
+  {
+    "s": "00891",
+    "n": "中信關鍵半導體",
+    "m": "TPE"
+  },
+  {
+    "s": "BRK.B",
+    "n": "波克夏 B 股",
+    "m": "US"
+  },
+  {
+    "s": "TSM",
+    "n": "台積電 ADR",
+    "m": "US"
+  }
+]
