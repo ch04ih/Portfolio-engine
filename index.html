@@ -46,7 +46,10 @@
 
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-        /* 欄位標題樣式 */
+        /* 修正：右上角輸入框寬度 */
+        .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
+        .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
+
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1fr 0.6fr 55px; gap: 4px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #EEE; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #BBB; text-align: center; letter-spacing: 1px; }
 
@@ -57,11 +60,11 @@
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
         .static-view:empty::before { content: '-'; opacity: 0.2; }
         
-        /* 特別顏色區分 */
-        .asset-item div:nth-child(2) .static-view { background: var(--theme-bg); color: var(--theme-accent); }
+        /* 修正：名稱顏色改回全深色，股數單價淺色，現值白，比例灰 */
+        .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { background: #EEE; color: #888; border: 1px solid #DDD; }
         .asset-item div:nth-child(5) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
-        .asset-item div:nth-child(6) .static-view { background: #666; }
+        .asset-item div:nth-child(6) .static-view { background: #666; color: white; }
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; padding: 0 4px; }
@@ -171,8 +174,8 @@
                     };
                 }
             });
-            localStorage.setItem('myPortfolio_v4', JSON.stringify(data));
-            localStorage.setItem('catConfig_v4', JSON.stringify(categories));
+            localStorage.setItem('myPortfolio_v5', JSON.stringify(data));
+            localStorage.setItem('catConfig_v5', JSON.stringify(categories));
             const dot = document.getElementById('saveDot');
             if (dot) { dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800); }
         } catch(e) { console.error("Save failed", e); }
@@ -265,7 +268,7 @@
     }
 
     function renderUI() {
-        const savedData = JSON.parse(localStorage.getItem('myPortfolio_v4')) || {};
+        const savedData = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {};
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = '';
         
@@ -435,12 +438,12 @@
     }
 
     window.onload = () => {
-        const savedCats = localStorage.getItem('catConfig_v4');
+        const savedCats = localStorage.getItem('catConfig_v5');
         if (savedCats) categories = JSON.parse(savedCats);
         else categories = DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
         renderUI();
         setTheme(localStorage.getItem('userTheme') || 'orange');
-        document.getElementById('saveText').innerText = "已啟用自動存檔";
+        document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
     };
 </script>
 </body>
