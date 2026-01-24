@@ -14,7 +14,7 @@
         [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; }
         [data-theme="purple"] { --theme-accent: #B4D355; --theme-bg: #6245b7; }
         [data-theme="navy"]   { --theme-accent: #e4d9c4; --theme-bg: #1b2941; }
-        [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; }
+        [data-theme="amber"]  { --theme-accent: #0045c6; --theme-bg: #F0A650; }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -85,39 +85,22 @@
 
 <script>
     let categories = [], STOCK_DB = [], EX_RATE = 32.5;
+    // 請確認此網址是否正確且已發佈為「任何人」皆可存取
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSEPMNB8ApKn9N5fFjKjpTblkgvjOcJ1TE8r5SGC_rj2gNG8N2uKNCX92TxtJy9BL/exec";
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    // 1. 強化的搜尋函數
     function handleSearch(inputEl) {
         const query = inputEl.value.toString().toUpperCase();
         const resEl = inputEl.parentElement.querySelector('.search-results');
-        
-        if (!query || STOCK_DB.length === 0) { 
-            resEl.style.display = 'none'; 
-            return; 
-        }
-        
-        const filtered = STOCK_DB.filter(item => 
-            item.s.toString().includes(query) || 
-            (item.n && item.n.includes(query))
-        ).slice(0, 10);
-
+        if (!query || STOCK_DB.length === 0) { resEl.style.display = 'none'; return; }
+        const filtered = STOCK_DB.filter(item => item.s.toString().includes(query) || (item.n && item.n.includes(query))).slice(0, 10);
         if (filtered.length > 0) {
-            resEl.innerHTML = filtered.map(item => `
-                <div class="search-item" onmousedown="pickStock(this, '${item.s}', '${item.m}', '${item.n}')">
-                    <span>${item.s}</span>
-                    <span style="color:#888; font-size:9px;">${item.n || ''}</span>
-                </div>
-            `).join('');
+            resEl.innerHTML = filtered.map(item => `<div class="search-item" onmousedown="pickStock(this, '${item.s}', '${item.m}', '${item.n}')"><span>${item.s}</span><span style="color:#888; font-size:9px;">${item.n || ''}</span></div>`).join('');
             resEl.style.display = 'block';
-        } else {
-            resEl.style.display = 'none';
-        }
+        } else { resEl.style.display = 'none'; }
     }
 
-    // 2. 選擇標的後的處理
     async function pickStock(el, s, m, n) {
         const row = el.closest('.grid-row');
         const nameInput = row.querySelector('.asset-name');
@@ -127,20 +110,26 @@
 
         nameInput.value = s;
         marketHidden.value = m;
-        priceView.innerText = "...";
+        priceView.innerText = "讀取中...";
         
         try {
-            const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
-            const data = await res.json();
-            const price = parseFloat(data.price) || 0;
-            priceHidden.value = price;
-            priceView.innerText = (m === 'US' ? '🇺🇸' : '') + price;
-            calculateAll();
+            // 強制使用 JSONP 或確保伺服器允許 CORS
+            const response = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
+            const data = await response.json();
+            const price = parseFloat(data.price);
+            
+            if (!isNaN(price)) {
+                priceHidden.value = price;
+                priceView.innerText = (m === 'US' ? '🇺🇸' : '') + price;
+                calculateAll(); // 成功讀取後立刻重算總價
+            } else {
+                priceView.innerText = "無報價";
+            }
         } catch (e) {
-            priceView.innerText = "Error";
+            console.error("Fetch Error:", e);
+            priceView.innerText = "失敗";
         }
         
-        // 關閉搜尋選單並切換回靜態視圖
         el.parentElement.style.display = 'none';
         autoViewMode(nameInput);
     }
@@ -208,14 +197,13 @@
             card.querySelector('.cat-ratio').innerText = grandTotal > 0 ? (sum / grandTotal * 100).toFixed(1) + "%" : "0%";
             
             card.querySelectorAll('.grid-row').forEach(row => {
-                const targetP = parseFloat(row.querySelector('.edit-input.asset-target')?.value) || 0;
+                const targetP = parseFloat(row.querySelector('.edit-input.asset-target')?.value || row.querySelector('.asset-target')?.innerText) || 0;
                 row.querySelector('.item-ratio').innerText = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) + "%" : "0%";
                 const tip = row.querySelector('.rebalance-tip');
                 if (sum > 0 && targetP > 0) {
                     const diff = row._subtotal - (sum * (targetP / 100));
                     if (Math.abs(diff) < 10) tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
-                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
-                                                    `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
+                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
                 }
             });
         });
@@ -296,7 +284,7 @@
                 if(name) {
                     list.push({ 
                         name: name, 
-                        qty: row.querySelector('.asset-qty').value, 
+                        qty: row.querySelector('.asset-qty').value || row.querySelector('.edit-input.asset-qty')?.value, 
                         value: row.querySelector('.asset-price').value, 
                         targetP: row.querySelector('.edit-input.asset-target')?.value || 0, 
                         market: row.querySelector('.asset-market').value 
@@ -305,20 +293,16 @@
             });
             data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v8', JSON.stringify({ categories, details: data }));
+        localStorage.setItem('myPortfolio_v9', JSON.stringify({ categories, details: data }));
     }
 
     window.onload = async () => {
-        // 優先加載資料庫
         try {
             const response = await fetch('csvjson.json');
             STOCK_DB = await response.json();
-            console.log("Database loaded, size:", STOCK_DB.length);
-        } catch (e) {
-            console.error("Database failed to load:", e);
-        }
+        } catch (e) { console.error("Database failed:", e); }
 
-        const saved = JSON.parse(localStorage.getItem('myPortfolio_v8'));
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v9'));
         if (saved) {
             categories = saved.categories;
             renderUI();
@@ -326,9 +310,7 @@
                 const details = saved.details[cat.id];
                 if (details) details.assets.forEach(a => addAsset(cat.id, a.name, a.qty, a.value, a.targetP, a.market));
             });
-        } else {
-            addCategory();
-        }
+        } else { addCategory(); }
         setTheme(localStorage.getItem('userTheme') || 'orange');
     };
 
