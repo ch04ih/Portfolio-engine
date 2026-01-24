@@ -57,7 +57,6 @@
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; z-index: 2; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
-        .static-view:empty::before { content: '-'; opacity: 0.2; }
         
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { background: #EEE; color: #888; border: 1px solid #DDD; }
@@ -388,6 +387,7 @@
         list.appendChild(div);
     }
 
+    // 核心修改：大幅增加色階差別
     function generateMonochromeScale(baseHex, steps = 7) {
         let hex = baseHex.replace('#', '');
         let r = parseInt(hex.substring(0, 2), 16);
@@ -395,7 +395,8 @@
         let b = parseInt(hex.substring(4, 6), 16);
         let colors = [];
         for (let i = 0; i < steps; i++) {
-            let opacity = 1 - (i * 0.12);
+            // 大幅調整透明度區間從 1.0 到 0.1
+            let opacity = Math.max(0.1, 1 - (i * 0.2)); 
             colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
         }
         return colors;
