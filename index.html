@@ -54,19 +54,9 @@
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        /* 修改後的欄位比例：刪除(25px) 名稱(1fr) 股數(0.7fr) 單價(0.7fr) 總值(1.1fr) 目標(0.7fr) 狀態(55px) */
-.asset-item { 
-    display: grid; 
-    grid-template-columns: 25px 1fr 0.6fr 0.6fr 1.1fr 0.6fr 55px; 
-    gap: 6px; 
-    margin-bottom: 12px; 
-    align-items: center; 
-    padding: 4px; 
-    border-radius: 8px; 
-    cursor: grab; 
-}
+      
+.asset-item { display: grid; grid-template-columns: 25px 1fr 0.6fr 0.6fr 1.1fr 0.6fr 55px; gap: 6px;margin-bottom: 12px; align-items: center;padding: 4px; border-radius: 8px; cursor: grab; }
 
-        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; padding: 0; z-index: 2; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
         .asset-item div:nth-child(4) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; font-size: 10px; }
@@ -178,14 +168,14 @@
                 if (card) {
                     const assets = [];
                     card.querySelectorAll('.asset-item').forEach(item => {
-                        assets.push({
+                       assets.push({
     name: item.querySelector('.asset-name').value || '',
     qty: parseFloat(item.querySelector('.asset-qty').value) || 0, // 新增
     price: parseFloat(item.querySelector('.asset-price').value) || 0, // 新增
     value: parseFloat(item.querySelector('.asset-value').value) || 0,
     targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
 });
-                
+                    });
                     data[cat.id] = {
                         target: parseFloat(card.querySelector('.target-input').value) || 0,
                         collapsed: card.classList.contains('collapsed'),
@@ -260,7 +250,7 @@
         if (input) { input.focus(); input.select(); }
     }
 
-     function autoViewMode(inputEl) {
+    function autoViewMode(inputEl) {
     const container = inputEl.parentElement;
     const item = inputEl.closest('.asset-item');
     const view = container.previousElementSibling;
@@ -289,7 +279,6 @@
     
     setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
 }
-
 
     function renderUI() {
         const savedData = JSON.parse(localStorage.getItem('myPortfolio_v2')) || {};
@@ -339,10 +328,11 @@
                 onEnd: () => { calculateAll(); }
             });
 
-            if (data.assets && data.assets.length > 0) {
-                data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
-            } else addAsset(cat.id);
-        });
+if (data.assets && data.assets.length > 0) {
+    data.assets.forEach(a => addAsset(catId, a.name, a.value, a.targetP, a.qty, a.price)); // 增加參數
+} else addAsset(catId); 
+
+                   });
 
         new Sortable(grid, {
             animation: 200, delay: 200, delayOnTouchOnly: true,
@@ -353,7 +343,7 @@
         calculateAll();
     }
 
-    function addAsset(catId, name = '', value = 0, targetP = 0, qty = 0, price = 0) {
+   function addAsset(catId, name = '', value = 0, targetP = 0, qty = 0, price = 0) {
     const list = document.getElementById(`list-${catId}`);
     if(!list) return;
     const div = document.createElement('div');
