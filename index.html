@@ -307,22 +307,18 @@ if (/^[A-Za-z]+$/.test(name)) {
     const originalText = btn.innerText;
     let symbolList = [];
 
-    // 1. 收集並依照你的新規則判斷代號
+    // 1. 依照你的新規則收集代號
     document.querySelectorAll('.asset-item').forEach(item => {
         const s = item.querySelector('.asset-name').value.trim().toUpperCase();
         if (s && s !== '名稱') {
-            let fullSymbol;
-
-// 修改後：美股直接傳代號，讓 Google 自己找，成功率最高
-if (/^[A-Z]+$/.test(s)) {
-    fullSymbol = s; 
-} else if (/^\d+$/.test(s)) {
-    fullSymbol = `TPE:${s}`;
-} else if (/^\d{5}B$/i.test(s)) {
-    fullSymbol = `TWO:${s}`;
-}
-
-            symbolList.push(fullSymbol);
+            if (/^[A-Z]+$/.test(s)) {
+                // 規則：純英文直接用代號 (VOO)
+                symbolList.push(s);
+            } else {
+                // 規則：不是純英文，同時請求 TPE 和 TWO 做為保險
+                symbolList.push(`TPE:${s}`);
+                symbolList.push(`TWO:${s}`);
+            }
         }
     });
 
@@ -331,7 +327,6 @@ if (/^[A-Z]+$/.test(s)) {
     try {
         btn.innerText = "⏳ 同步中...";
         btn.disabled = true;
-        
         const finalUrl = `${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`;
         const response = await fetch(finalUrl);
         const cloudPrices = await response.json();
@@ -344,31 +339,28 @@ if (/^[A-Z]+$/.test(s)) {
             const priceInput = item.querySelector('.asset-price');
             const s = nameInput.value.trim().toUpperCase();
             
+            let price = null;
+            if (/^[A-Z]+$/.test(s)) {
+                price = cloudPrices[s];
+            } else {
+                // 優先用 TPE，找不到就用 TWO
+                price = (cloudPrices[`TPE:${s}`] && cloudPrices[`TPE:${s}`] > 0) 
+                        ? cloudPrices[`TPE:${s}`] 
+                        : cloudPrices[`TWO:${s}`];
+            }
 
-// 修改後：
-let key;
-if (/^[A-Z]+$/.test(s)) key = s; // VOO 就直接用 "VOO" 當 Key
-else if (/^\d+$/.test(s)) key = `TPE:${s}`;
-else if (/^\d{5}B$/i.test(s)) key = `TWO:${s}`;
-
-            else key = `TPE:${s}`;
-
-            if (cloudPrices[key] && typeof cloudPrices[key] === 'number') {
-                priceInput.value = cloudPrices[key];
+            if (price && typeof price === 'number' && price > 0) {
+                priceInput.value = price;
                 autoViewMode(priceInput);
                 updatedCount++;
             }
         });
         
-        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
-    } catch (e) { 
-        alert("同步失敗，請確認網路或 GAS 設定。"); 
-    } finally { 
-        btn.innerText = originalText; 
-        btn.disabled = false; 
-        calculateAll(); 
-    }
+        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。`);
+    } catch (e) { alert("同步失敗"); }
+    finally { btn.innerText = originalText; btn.disabled = false; calculateAll(); }
 }
+
 
 
 
