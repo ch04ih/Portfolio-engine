@@ -152,7 +152,6 @@
         { id: 'cat_5', name: '安全存款', target: 10 }
     ];
 
-    // 初始化：載入股票資料 JSON
     async function loadStockData() {
         try {
             const response = await fetch('csvjson.json');
@@ -160,7 +159,7 @@
             const datalist = document.getElementById('stockList');
             stockData.forEach(item => {
                 const option = document.createElement('option');
-                option.value = `${item.s} ${item.n}`; // 格式：2330 台積電
+                option.value = `${item.s} ${item.n}`;
                 datalist.appendChild(option);
             });
             document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
@@ -260,16 +259,11 @@
         const item = inputEl.closest('.asset-item');
         const view = container.previousElementSibling;
         
-        // 名稱欄位的特殊處理：若是從建議清單選取，只保留代號
         if (inputEl.classList.contains('asset-name')) {
             let val = inputEl.value;
-            // 如果輸入的內容包含空白（例如 "2330 台積電"），則取前面那一段
-            if (val.includes(' ')) {
-                inputEl.value = val.split(' ')[0];
-            }
+            if (val.includes(' ')) inputEl.value = val.split(' ')[0];
         }
 
-        // 股數與單價連動
         if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
             const q = parseFloat(item.querySelector('.asset-qty').value);
             const p = parseFloat(item.querySelector('.asset-price').value);
@@ -369,9 +363,7 @@
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div>
                 <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
-                <div class="edit-container">
-                    <input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)">
-                </div>
+                <div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${qty}</div>
@@ -394,6 +386,24 @@
             </div>
         `;
         list.appendChild(div);
+    }
+
+    // 新增：輔助函數，產生同色系色階
+    function generateMonochromeScale(baseHex, steps = 7) {
+        // 去掉 #
+        let hex = baseHex.replace('#', '');
+        let r = parseInt(hex.substring(0, 2), 16);
+        let g = parseInt(hex.substring(2, 4), 16);
+        let b = parseInt(hex.substring(4, 6), 16);
+
+        let colors = [];
+        for (let i = 0; i < steps; i++) {
+            // 透過調整透明度或混合白色/黑色來產生色階
+            // 這裡採用降低不透明度的方式，最能保留原色調且區別明顯
+            let opacity = 1 - (i * 0.12); // 每階減少 12% 亮度
+            colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
+        }
+        return colors;
     }
 
     function calculateAll() {
@@ -451,11 +461,45 @@
     function updateChart(catSums) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        
+        // 修改處：根據當前主題色動態產生色階
         const styles = getComputedStyle(document.documentElement);
-        const themeColors = [styles.getPropertyValue('--theme-accent').trim(), styles.getPropertyValue('--theme-bg').trim(), "#FFD700", "#40E0D0", "#FF69B4", "#32CD32", "#1A1A1A"];
-        const data = { labels: categories.map(c => c.name), datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: themeColors, borderWidth: 2, borderColor: '#fff' }] };
-        if (myChart) { myChart.data = data; myChart.update(); }
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } }); }
+        const accentColor = styles.getPropertyValue('--theme-accent').trim();
+        const themeColors = generateMonochromeScale(accentColor, categories.length + 1);
+
+        const data = { 
+            labels: categories.map(c => c.name), 
+            datasets: [{ 
+                data: categories.map(c => catSums[c.id]), 
+                backgroundColor: themeColors, 
+                borderWidth: 2, 
+                borderColor: '#fff' 
+            }] 
+        };
+
+        if (myChart) { 
+            myChart.data = data; 
+            myChart.update(); 
+        } else { 
+            myChart = new Chart(ctx, { 
+                type: 'doughnut', 
+                data: data, 
+                options: { 
+                    maintainAspectRatio: false, 
+                    cutout: '65%', 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                boxWidth: 10, 
+                                font: { size: 10 },
+                                color: '#333' // 確保文字在淺色背景下清楚
+                            } 
+                        } 
+                    } 
+                } 
+            }); 
+        }
     }
 
     function toggleCategory(id) { 
@@ -469,7 +513,7 @@
     }
 
     window.onload = () => {
-        loadStockData(); // 同步加載股票清單
+        loadStockData();
         const savedCats = localStorage.getItem('catConfig_v5');
         if (savedCats) categories = JSON.parse(savedCats);
         else categories = DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
