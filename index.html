@@ -78,6 +78,10 @@
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
 
+        /* 核心修改：警告橫幅樣式 */
+        #target-sum-alert { margin-top:10px; font-size:12px; font-weight:900; text-align:center; padding:8px; border-radius:8px; display:none; border: 2px solid #FF4444; }
+        .alert-red { background-color: #FFE5E5 !important; color: #B30000 !important; }
+
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
@@ -122,7 +126,7 @@
             <button class="chart-btn" onclick="toggleChart()">圖表</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
-        <div id="target-sum-alert" style="margin-top:10px; font-size:11px; font-weight:bold; text-align:center; padding:5px; border-radius:6px; display:none;"></div>
+        <div id="target-sum-alert"></div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;">
             <canvas id="portfolioChart"></canvas>
         </div>
@@ -387,7 +391,6 @@
         list.appendChild(div);
     }
 
-    // 輔助函數：解析 HEX 為 RGB
     function hexToRgb(hex) {
         let r = parseInt(hex.slice(1, 3), 16);
         let g = parseInt(hex.slice(3, 5), 16);
@@ -395,21 +398,15 @@
         return [r, g, b];
     }
 
-    // 核心修改：在主題的 Accent (亮色) 與 BG (深色) 之間做線性漸層
     function generateThemeGradientScale(steps) {
         const styles = getComputedStyle(document.documentElement);
         const startHex = styles.getPropertyValue('--theme-accent').trim();
         const endHex = styles.getPropertyValue('--theme-bg').trim();
-        
         const startRgb = hexToRgb(startHex);
         const endRgb = hexToRgb(endHex);
-        
         let colors = [];
-        // 如果只有一個分類，就給主色
         if (steps <= 1) return [`rgb(${startRgb[0]}, ${startRgb[1]}, ${startRgb[2]})`];
-
         for (let i = 0; i < steps; i++) {
-            // 計算比例 ratio 從 0 到 1
             let ratio = i / (steps - 1);
             let r = Math.round(startRgb[0] + (endRgb[0] - startRgb[0]) * ratio);
             let g = Math.round(startRgb[1] + (endRgb[1] - startRgb[1]) * ratio);
@@ -432,10 +429,15 @@
             }
         });
 
+        // 修改：警告文字與邏輯
         const alertDiv = document.getElementById('target-sum-alert');
-        if (Math.abs(totalTargetP - 100) > 0.1) {
-            alertDiv.style.display = 'block'; alertDiv.innerText = `⚠️ 區域目標總和: ${totalTargetP.toFixed(0)}%`;
-        } else alertDiv.style.display = 'none';
+        if (Math.abs(totalTargetP - 100) > 0.01) {
+            alertDiv.style.display = 'block';
+            alertDiv.classList.add('alert-red');
+            alertDiv.innerText = totalTargetP > 100 ? `⚠️區域目標總和 > 100% (${totalTargetP}%)` : `⚠️區域目標總和 < 100% (${totalTargetP}%)`;
+        } else {
+            alertDiv.style.display = 'none';
+        }
 
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
@@ -467,17 +469,15 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums);
+        updateChart(catSums, total);
         forceSave();
     }
 
-    function updateChart(catSums) {
+    function updateChart(catSums, grandTotal) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
         
-        // 核心調用：根據當前分類數量生成雙色漸層色階
         const themeColors = generateThemeGradientScale(categories.length);
-        
         const data = { 
             labels: categories.map(c => c.name), 
             datasets: [{ 
@@ -497,12 +497,21 @@
                 data: data, 
                 options: { 
                     maintainAspectRatio: false, 
-                    cutout: '65%', 
+                    cutout: '50%', // 修改：圖表加寬
                     plugins: { 
                         legend: { 
                             position: 'bottom', 
-                            labels: { boxWidth: 10, font: { size: 10 } } 
-                        } 
+                            labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } 
+                        },
+                        tooltip: { // 修改：點擊顯示內容優化
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percentage = grandTotal > 0 ? ((value / grandTotal) * 100).toFixed(1) : 0;
+                                    return ` 現值: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
                     } 
                 } 
             }); 
