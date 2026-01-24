@@ -54,7 +54,18 @@
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        .asset-item { display: grid; grid-template-columns: 25px 1.1fr 0.8fr 1.3fr 55px; gap: 6px; margin-bottom: 12px; align-items: center; padding: 4px; border-radius: 8px; cursor: grab; }
+        /* 修改後的欄位比例：刪除(25px) 名稱(1fr) 股數(0.7fr) 單價(0.7fr) 總值(1.1fr) 目標(0.7fr) 狀態(55px) */
+.asset-item { 
+    display: grid; 
+    grid-template-columns: 25px 1fr 0.6fr 0.6fr 1.1fr 0.6fr 55px; 
+    gap: 6px; 
+    margin-bottom: 12px; 
+    align-items: center; 
+    padding: 4px; 
+    border-radius: 8px; 
+    cursor: grab; 
+}
+
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 20px; cursor: pointer; padding: 0; z-index: 2; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px; font-size: 11px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
@@ -168,11 +179,13 @@
                     const assets = [];
                     card.querySelectorAll('.asset-item').forEach(item => {
                         assets.push({
-                            name: item.querySelector('.asset-name').value || '',
-                            value: parseFloat(item.querySelector('.asset-value').value) || 0,
-                            targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
-                        });
-                    });
+    name: item.querySelector('.asset-name').value || '',
+    qty: parseFloat(item.querySelector('.asset-qty').value) || 0, // 新增
+    price: parseFloat(item.querySelector('.asset-price').value) || 0, // 新增
+    value: parseFloat(item.querySelector('.asset-value').value) || 0,
+    targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
+});
+                
                     data[cat.id] = {
                         target: parseFloat(card.querySelector('.target-input').value) || 0,
                         collapsed: card.classList.contains('collapsed'),
@@ -247,17 +260,36 @@
         if (input) { input.focus(); input.select(); }
     }
 
-    function autoViewMode(inputEl) {
-        const container = inputEl.parentElement;
-        const view = container.previousElementSibling;
-        let val = inputEl.value;
-        if (inputEl.type === 'number') { if (val === "" || isNaN(val) || val < 0) { val = 0; inputEl.value = 0; } }
-        else { if (val.trim() === "") { val = "未命名標的"; inputEl.value = val; } }
-        if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(val);
-        else if (inputEl.classList.contains('target-p-input')) view.innerText = val + "%";
-        else view.innerText = val;
-        setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+     function autoViewMode(inputEl) {
+    const container = inputEl.parentElement;
+    const item = inputEl.closest('.asset-item');
+    const view = container.previousElementSibling;
+    
+    // 自動計算總現值邏輯
+    if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
+        const qty = parseFloat(item.querySelector('.asset-qty').value) || 0;
+        const price = parseFloat(item.querySelector('.asset-price').value) || 0;
+        const totalValInput = item.querySelector('.asset-value');
+        const totalValView = totalValInput.parentElement.previousElementSibling;
+        
+        const calculatedTotal = qty * price;
+        if (calculatedTotal > 0) {
+            totalValInput.value = calculatedTotal;
+            totalValView.innerText = formatCurrency(calculatedTotal);
+        }
     }
+
+    let val = inputEl.value;
+    if (inputEl.type === 'number') { if (val === "" || isNaN(val) || val < 0) { val = 0; inputEl.value = 0; } }
+    else { if (val.trim() === "") { val = "未命名標的"; inputEl.value = val; } }
+    
+    if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(val);
+    else if (inputEl.classList.contains('target-p-input')) view.innerText = val + "%";
+    else view.innerText = val;
+    
+    setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+}
+
 
     function renderUI() {
         const savedData = JSON.parse(localStorage.getItem('myPortfolio_v2')) || {};
@@ -308,7 +340,7 @@
             });
 
             if (data.assets && data.assets.length > 0) {
-                data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP));
+                data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             } else addAsset(cat.id);
         });
 
@@ -321,31 +353,40 @@
         calculateAll();
     }
 
-    function addAsset(catId, name = '', value = 0, targetP = 0) {
-        const list = document.getElementById(`list-${catId}`);
-        if(!list) return;
-        const div = document.createElement('div');
-        div.className = 'asset-item';
-        div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
-                <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
-            </div>
-            <div>
-                <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '0%'}</div>
-                <div class="edit-container suffix"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
-            </div>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div>
-                <div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
-            </div>
-            <div style="font-size:10px; font-weight:bold; text-align:right;">
-                <div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:9px;"></div>
-            </div>
-        `;
-        list.appendChild(div);
-    }
+    function addAsset(catId, name = '', value = 0, targetP = 0, qty = 0, price = 0) {
+    const list = document.getElementById(`list-${catId}`);
+    if(!list) return;
+    const div = document.createElement('div');
+    div.className = 'asset-item';
+    div.innerHTML = `
+        <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
+        <div>
+            <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
+            <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
+        </div>
+        <div>
+            <div class="static-view" style="background:#888;" onclick="editMode(this)">${qty || '股數'}</div>
+            <div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div>
+        </div>
+        <div>
+            <div class="static-view" style="background:#888;" onclick="editMode(this)">${price || '單價'}</div>
+            <div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div>
+        </div>
+        <div>
+            <div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div>
+            <div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div>
+        </div>
+        <div>
+            <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '0%'}</div>
+            <div class="edit-container suffix"><input type="number" class="edit-input target-p-input" value="${targetP}" onblur="autoViewMode(this)"></div>
+        </div>
+        <div style="font-size:10px; font-weight:bold; text-align:right;">
+            <div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:9px;"></div>
+        </div>
+    `;
+    list.appendChild(div);
+}
+
 
     function calculateAll() {
         let total = 0, catSums = {}, totalTargetP = 0;
