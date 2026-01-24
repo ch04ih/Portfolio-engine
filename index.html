@@ -39,15 +39,14 @@
         .grid-row { display: grid; grid-template-columns: 20px 1fr 0.6fr 0.7fr 0.6fr 1.1fr 0.5fr; gap: 4px; align-items: center; margin-bottom: 10px; }
         .label-text { font-size: 8px; font-weight: 900; color: #bbb; text-align: center; margin-bottom: 2px; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 6px 2px; font-size: 10px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; }
+        .static-view { background: #1A1A1A; color: white; padding: 6px 2px; font-size: 10px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; }
         .view-price { background: #F0F0F0; color: #1A1A1A; border: 1px solid #DDD; cursor: default; } 
-        .view-target { background: #666; }
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 34px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; font-size: 11px; outline: none; background: #FFF; }
         
         .search-results { position: absolute; top: 36px; left: 0; right: 0; background: white; border: 3px solid #1A1A1A; border-radius: 8px; z-index: 1000; max-height: 150px; overflow-y: auto; display: none; box-shadow: 4px 4px 0px #000; }
-        .search-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 10px; display: flex; justify-content: space-between; font-weight: bold; }
+        .search-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 10px; display: flex; justify-content: space-between; font-weight: bold; color: #333; }
 
         .item-total { font-size: 10px; font-weight: 900; text-align: right; }
         .rebalance-tip { font-size: 8px; font-weight: bold; display: block; text-align: right; margin-top: 1px; }
@@ -82,7 +81,6 @@
             <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">圖表分析</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.4rem; font-weight: 900;">$0</div>
-        <div id="chartContainer" style="display:none; margin-top: 20px; height: 200px;"><canvas id="portfolioChart"></canvas></div>
     </div>
 
     <div id="mainGrid"></div>
@@ -90,38 +88,55 @@
 </div>
 
 <script>
-    let myChart = null, categories = [], STOCK_DB = [], EX_RATE = 32.5;
+    let categories = [], STOCK_DB = [], EX_RATE = 32.5;
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSEPMNB8ApKn9N5fFjKjpTblkgvjOcJ1TE8r5SGC_rj2gNG8N2uKNCX92TxtJy9BL/exec";
-
-    const DEFAULT_CONFIG = [
-        { id: 'cat_1', name: '成長型投資', target: 40, collapsed: false },
-        { id: 'cat_2', name: '進攻型投資', target: 10, collapsed: false },
-        { id: 'cat_3', name: '防守型投資', target: 20, collapsed: false },
-        { id: 'cat_4', name: '高股息投資', target: 20, collapsed: false },
-        { id: 'cat_5', name: '安全存款', target: 10, collapsed: false }
-    ];
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    async function pickStock(el, s, m) {
+    // 搜尋功能核心
+    function handleSearch(inputEl) {
+        const query = inputEl.value.toString().toUpperCase();
+        const resEl = inputEl.parentElement.querySelector('.search-results');
+        if (!query) { resEl.style.display = 'none'; return; }
+        
+        const filtered = STOCK_DB.filter(item => 
+            item.s.toString().toUpperCase().includes(query) || 
+            item.n.includes(query)
+        ).slice(0, 8);
+
+        if (filtered.length > 0) {
+            resEl.innerHTML = filtered.map(item => `
+                <div class="search-item" onclick="pickStock(this, '${item.s}', '${item.m}', '${item.n}')">
+                    <span>${item.s}</span>
+                    <span style="color:#888; font-size:9px;">${item.n}</span>
+                </div>
+            `).join('');
+            resEl.style.display = 'block';
+        } else {
+            resEl.style.display = 'none';
+        }
+    }
+
+    async function pickStock(el, s, m, n) {
         const row = el.closest('.grid-row');
-        row.querySelector('.asset-name').value = s;
+        const nameInput = row.querySelector('.asset-name');
+        nameInput.value = s;
         row.querySelector('.asset-market').value = m;
-        const priceDisplay = row.querySelector('.view-price');
-        priceDisplay.innerText = "載入中...";
+        
+        const priceView = row.querySelector('.view-price');
+        priceView.innerText = "...";
         
         try {
             const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
             const data = await res.json();
             const price = parseFloat(data.price) || 0;
-            // 重要：同步更新隱藏欄位與顯示
             row.querySelector('.asset-price').value = price;
-            priceDisplay.innerText = (m === 'US' ? '🇺🇸' : '') + price;
-            calculateAll(); 
-        } catch (e) { 
-            priceDisplay.innerText = "讀取失敗";
+            priceView.innerText = (m === 'US' ? '🇺🇸' : '') + price;
+            calculateAll();
+        } catch (e) {
+            priceView.innerText = "Error";
         }
-        autoViewMode(row.querySelector('.asset-name'));
+        autoViewMode(nameInput);
     }
 
     function addAsset(catId, name='', qty=0, price=0, targetP=0, market='TPE') {
@@ -148,7 +163,7 @@
                 <div class="static-view view-price">${price > 0 ? (market==='US'?'🇺🇸':'')+price : '---'}</div>
             </div>
             <div>
-                <div class="static-view view-target" onclick="editMode(this)">${targetP}%</div>
+                <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP}%</div>
                 <div class="edit-container"><input type="number" class="edit-input asset-target" value="${targetP}" oninput="calculateAll()" onblur="autoViewMode(this)"></div>
             </div>
             <div>
@@ -163,7 +178,6 @@
 
     function calculateAll() {
         let grandTotal = 0, catSums = {};
-        
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (!card) return;
@@ -172,10 +186,10 @@
                 const q = parseFloat(row.querySelector('.asset-qty').value) || 0;
                 const p = parseFloat(row.querySelector('.asset-price').value) || 0;
                 const m = row.querySelector('.asset-market').value;
-                const subtotal = (m === 'US' ? p * EX_RATE : p) * q;
-                row._subtotal = subtotal;
-                sum += subtotal;
-                row.querySelector('.item-total').innerText = formatCurrency(subtotal);
+                const sub = (m === 'US' ? p * EX_RATE : p) * q;
+                row._subtotal = sub;
+                sum += sub;
+                row.querySelector('.item-total').innerText = formatCurrency(sub);
             });
             catSums[cat.id] = sum;
             grandTotal += sum;
@@ -188,16 +202,14 @@
             card.querySelector('.cat-ratio').innerText = grandTotal > 0 ? (sum / grandTotal * 100).toFixed(1) + "%" : "0%";
             
             card.querySelectorAll('.grid-row').forEach(row => {
-                const targetP = parseFloat(row.querySelector('.asset-target').value) || 0;
+                const targetP = parseFloat(row.querySelector('.edit-input.asset-target')?.value || row.querySelector('.asset-target')?.value) || 0;
                 row.querySelector('.item-ratio').innerText = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) + "%" : "0%";
-                
                 const tip = row.querySelector('.rebalance-tip');
                 if (sum > 0 && targetP > 0) {
                     const diff = row._subtotal - (sum * (targetP / 100));
-                    if (Math.abs(diff) < 10) tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
-                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
-                                                    `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
-                } else { tip.innerText = "--"; }
+                    tip.innerHTML = diff > 10 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
+                                    diff < -10 ? `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>` : `<span style="color:#bbb">平衡</span>`;
+                }
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(grandTotal);
@@ -216,7 +228,7 @@
                 <div class="category-header" onclick="toggleCollapse('${cat.id}')">
                     <span class="arrow-icon">▼</span>
                     <span onclick="event.stopPropagation(); editCatName('${cat.id}')" style="font-weight:900; flex:1;">${cat.name}</span>
-                    <div style="font-size:11px; font-weight:900; cursor:pointer;" onclick="event.stopPropagation(); editCatTarget('${cat.id}')">目標 ${cat.target}%</div>
+                    <div style="font-size:11px; font-weight:900;" onclick="event.stopPropagation(); editCatTarget('${cat.id}')">目標 ${cat.target}%</div>
                 </div>
                 <div class="category-content">
                     <div class="grid-row" style="opacity:0.4;"><div class="label-text"></div><div class="label-text">標的</div><div class="label-text">股數</div><div class="label-text">單價</div><div class="label-text">目標%</div><div class="label-text">總現值</div><div class="label-text">區域比</div></div>
@@ -233,31 +245,28 @@
         initSortable();
     }
 
-    function addCategory(name = "新投資區域", target = 20) {
+    function addCategory() {
         const id = 'cat_' + Date.now();
-        categories.push({ id, name, target, collapsed: false });
+        categories.push({ id, name: "新區域", target: 20, collapsed: false });
         renderUI();
         addAsset(id);
     }
 
-    function toggleCollapse(id) { 
-        const cat = categories.find(c => c.id === id);
-        cat.collapsed = !cat.collapsed;
-        document.getElementById(id).classList.toggle('collapsed');
-        saveData();
-    }
-    
-    // 修正：區域目標與名稱編輯功能
-    function editCatName(id) { 
-        const n = prompt("修改區域名稱："); 
-        if(n) { categories.find(c => c.id === id).name = n; renderUI(); calculateAll(); } 
-    }
-    function editCatTarget(id) { 
-        const t = prompt("修改該區域之組合占比 (%)：", categories.find(c => c.id === id).target); 
-        if(t !== null) { categories.find(c => c.id === id).target = parseInt(t) || 0; renderUI(); calculateAll(); } 
-    }
-    function deleteCategory(id) { 
-        if(confirm("確定刪除此投資區域？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } 
+    function editCatName(id) { const n = prompt("區域名稱："); if(n) { categories.find(c => c.id === id).name = n; renderUI(); calculateAll(); } }
+    function editCatTarget(id) { const t = prompt("占比 (%)："); if(t) { categories.find(c => c.id === id).target = parseInt(t); renderUI(); calculateAll(); } }
+    function deleteCategory(id) { if(confirm("確定刪除？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } }
+    function toggleCollapse(id) { categories.find(c => c.id === id).collapsed = !categories.find(c => c.id === id).collapsed; document.getElementById(id).classList.toggle('collapsed'); saveData(); }
+
+    function editMode(el) { el.style.display='none'; el.nextElementSibling.style.display='block'; el.nextElementSibling.querySelector('input').focus(); }
+    function autoViewMode(inputEl) {
+        setTimeout(() => {
+            if (document.activeElement.classList.contains('search-item')) return;
+            const container = inputEl.parentElement;
+            const view = container.previousElementSibling;
+            view.innerText = inputEl.value + (inputEl.classList.contains('asset-target') ? '%' : '');
+            container.style.display='none'; view.style.display='flex';
+            calculateAll();
+        }, 250);
     }
 
     function initSortable() {
@@ -271,40 +280,27 @@
         });
     }
 
-    function editMode(el) { el.style.display='none'; el.nextElementSibling.style.display='block'; el.nextElementSibling.querySelector('input').focus(); }
-    function autoViewMode(inputEl) {
-        setTimeout(() => {
-            if (document.activeElement.classList.contains('search-item')) return;
-            const container = inputEl.parentElement;
-            const view = container.previousElementSibling;
-            view.innerText = inputEl.value + (inputEl.classList.contains('asset-target') ? '%' : '');
-            container.style.display='none'; view.style.display='flex';
-            calculateAll();
-        }, 200);
-    }
-    function handleSearch(inputEl) {
-        const query = inputEl.value.toUpperCase();
-        const resEl = inputEl.parentElement.querySelector('.search-results');
-        if (!query) { resEl.style.display = 'none'; return; }
-        const filtered = STOCK_DB.filter(item => item.s.toString().includes(query) || item.n.includes(query)).slice(0, 6);
-        resEl.innerHTML = filtered.map(item => `<div class="search-item" onclick="pickStock(this, '${item.s}', '${item.m}')"><span>${item.s}</span><span>${item.n}</span></div>`).join('');
-        resEl.style.display = filtered.length ? 'block' : 'none';
-    }
-
     function saveData() {
         const data = {};
         categories.forEach(cat => {
             const list = [];
-            const rows = document.querySelectorAll(`#list-${cat.id} .grid-row`);
-            rows.forEach(row => list.push({ name: row.querySelector('.asset-name').value, qty: row.querySelector('.asset-qty').value, value: row.querySelector('.asset-price').value, targetP: row.querySelector('.asset-target').value, market: row.querySelector('.asset-market').value }));
+            document.querySelectorAll(`#list-${cat.id} .grid-row`).forEach(row => {
+                list.push({ 
+                    name: row.querySelector('.asset-name').value, 
+                    qty: row.querySelector('.asset-qty').value, 
+                    value: row.querySelector('.asset-price').value, 
+                    targetP: row.querySelector('.edit-input.asset-target')?.value || row.querySelector('.static-view[onclick*="target"]')?.innerText.replace('%',''), 
+                    market: row.querySelector('.asset-market').value 
+                });
+            });
             data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v6', JSON.stringify({ categories, details: data }));
+        localStorage.setItem('myPortfolio_v7', JSON.stringify({ categories, details: data }));
     }
 
     window.onload = () => {
-        fetch('uploaded:csvjson.json').then(res => res.json()).then(data => STOCK_DB = data).catch(() => {});
-        const saved = JSON.parse(localStorage.getItem('myPortfolio_v6'));
+        fetch('uploaded:csvjson.json').then(res => res.json()).then(data => STOCK_DB = data).catch(()=>{});
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v7'));
         if (saved) {
             categories = saved.categories;
             renderUI();
@@ -313,15 +309,13 @@
                 if (details) details.assets.forEach(a => addAsset(cat.id, a.name, a.qty, a.value, a.targetP, a.market));
             });
         } else {
-            categories = DEFAULT_CONFIG;
-            renderUI();
-            categories.forEach(cat => addAsset(cat.id));
+            addCategory();
         }
         setTheme(localStorage.getItem('userTheme') || 'orange');
     };
 
     function setTheme(t) { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('userTheme', t); }
-    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display==='none'?'block':'none'; calculateAll(); }
+    function toggleChart() { alert("圖表功能將在數據填充後呈現。"); }
 </script>
 </body>
 </html>
