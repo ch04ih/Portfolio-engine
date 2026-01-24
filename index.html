@@ -138,7 +138,7 @@
             <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets | 資產總現值 (TWD)</div>
             <div style="display:flex; gap:8px; flex-shrink: 0;">
                 <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步報價</button>
-                <button class="chart-btn" onclick="toggleChart()">📊 圖表</button>
+                <button class="chart-btn" onclick="toggleChart()">圖表</button>
             </div>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
@@ -296,40 +296,68 @@
     }
 
     async function syncPrices() {
-        const btn = document.getElementById('syncBtn');
-        const originalText = btn.innerText;
-        let symbolList = [];
-        document.querySelectorAll('.asset-name').forEach(input => {
-            const s = input.value.trim();
-            if (s && s !== '名稱') {
-                let fullSymbol = /^\d+$/.test(s) ? `TPE:${s}` : `NYSEARCA:${s}`;
-                symbolList.push(fullSymbol);
+    const btn = document.getElementById('syncBtn');
+    const originalText = btn.innerText;
+    let symbolList = [];
+
+    // 依據你的規則收集代號
+    document.querySelectorAll('.asset-item').forEach(item => {
+        const s = item.querySelector('.asset-name').value.trim();
+        if (s && s !== '名稱') {
+            let fullSymbol;
+            if (/^\d+$/.test(s)) {
+                // 1. 純數字：使用 TPE
+                fullSymbol = `TPE:${s}`;
+            } else if (/^[a-zA-Z]+$/.test(s)) {
+                // 2. 純英文：使用美股 (NYSEARCA)
+                fullSymbol = `NYSEARCA:${s}`;
+            } else {
+                // 3. 數字加英文 (或包含其他字元)：使用 OTCMKTS (櫃買)
+                fullSymbol = `OTCMKTS:${s}`;
+            }
+            symbolList.push(fullSymbol);
+        }
+    });
+
+    if (symbolList.length === 0) return alert("請先輸入標的代號");
+
+    try {
+        btn.innerText = "⏳ 同步中...";
+        btn.disabled = true;
+        
+        const finalUrl = `${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`;
+        const response = await fetch(finalUrl);
+        const cloudPrices = await response.json();
+
+        if (cloudPrices["CURRENCY:USDTWD"]) { usdRate = cloudPrices["CURRENCY:USDTWD"]; }
+
+        let updatedCount = 0;
+        document.querySelectorAll('.asset-item').forEach(item => {
+            const nameInput = item.querySelector('.asset-name');
+            const priceInput = item.querySelector('.asset-price');
+            const s = nameInput.value.trim();
+            
+            let key;
+            if (/^\d+$/.test(s)) key = `TPE:${s}`;
+            else if (/^[a-zA-Z]+$/.test(s)) key = `NYSEARCA:${s}`;
+            else key = `OTCMKTS:${s}`;
+
+            if (cloudPrices[key] && typeof cloudPrices[key] === 'number') {
+                priceInput.value = cloudPrices[key];
+                autoViewMode(priceInput);
+                updatedCount++;
             }
         });
-        if (symbolList.length === 0) return alert("請先輸入標的代號");
-        try {
-            btn.innerText = "⏳ 同步中...";
-            btn.disabled = true;
-            const finalUrl = `${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`;
-            const response = await fetch(finalUrl);
-            const cloudPrices = await response.json();
-            if (cloudPrices["CURRENCY:USDTWD"]) { usdRate = cloudPrices["CURRENCY:USDTWD"]; }
-            let updatedCount = 0;
-            document.querySelectorAll('.asset-item').forEach(item => {
-                const nameInput = item.querySelector('.asset-name');
-                const priceInput = item.querySelector('.asset-price');
-                const s = nameInput.value.trim();
-                let fullKey = /^\d+$/.test(s) ? `TPE:${s}` : `NYSEARCA:${s}`;
-                if (cloudPrices[fullKey] && typeof cloudPrices[fullKey] === 'number') {
-                    priceInput.value = cloudPrices[fullKey];
-                    autoViewMode(priceInput);
-                    updatedCount++;
-                }
-            });
-            alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。目前匯率：${usdRate}`);
-        } catch (e) { alert("同步失敗"); }
-        finally { btn.innerText = originalText; btn.disabled = false; calculateAll(); }
+        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
+    } catch (e) { 
+        alert("同步失敗，請檢查網路或 GAS 設定。"); 
+    } finally { 
+        btn.innerText = originalText; 
+        btn.disabled = false; 
+        calculateAll(); 
     }
+}
+
 
     function calculateAll() {
         let total = 0, catSums = {}, totalTargetP = 0;
