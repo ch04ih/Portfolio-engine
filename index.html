@@ -121,7 +121,7 @@
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">Total Assets | 資產總現值</div>
+            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">Total Assets | 資產總現值 (TWD)</div>
             <div style="display:flex; gap:8px;">
                 <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步報價</button>
                 <button class="chart-btn" onclick="toggleChart()">圖表</button>
@@ -147,6 +147,7 @@
     let myChart = null;
     let categories = [];
     let stockData = [];
+    let usdRate = 32.5; // 預設匯率
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
@@ -217,13 +218,11 @@
         if (input) { input.focus(); input.select(); }
     }
 
-    // 整合功能：自動帶入單價 + 計算 + 視覺更新
     function autoViewMode(inputEl) {
         const container = inputEl.parentElement;
         const item = inputEl.closest('.asset-item');
         const view = container.previousElementSibling;
         
-        // 1. 如果輸入標的代號，嘗試自動從 JSON 帶入價格
         if (inputEl.classList.contains('asset-name')) {
             let val = inputEl.value.trim();
             if (val.includes(' ')) val = val.split(' ')[0];
@@ -241,16 +240,21 @@
             }
         }
 
-        // 2. 計算現值
+        const name = item.querySelector('.asset-name').value.trim();
         const q = parseFloat(item.querySelector('.asset-qty').value);
         const p = parseFloat(item.querySelector('.asset-price').value);
-        if ((inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) && q > 0 && p > 0) {
+        
+        if ((inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price') || inputEl.classList.contains('asset-name')) && q > 0 && p > 0) {
             const valInput = item.querySelector('.asset-value');
-            valInput.value = Math.round(q * p);
+            // 匯率換算邏輯：名稱包含字母則判定為美股
+            if (/[a-zA-Z]/.test(name)) {
+                valInput.value = Math.round(q * p * usdRate);
+            } else {
+                valInput.value = Math.round(q * p);
+            }
             valInput.parentElement.previousElementSibling.innerText = formatCurrency(valInput.value);
         }
 
-        // 3. 視覺顯示邏輯 (處理 "-" 顯示)
         let displayVal = inputEl.value;
         if (inputEl.type === 'number') {
             if (displayVal === "" || displayVal == 0) {
@@ -270,7 +274,6 @@
         setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
 
-    // 核心功能：自動辨識市場並同步雲端報價
     async function syncPrices() {
         const btn = document.getElementById('syncBtn');
         const originalText = btn.innerText;
@@ -282,7 +285,6 @@
             card.querySelectorAll('.asset-name').forEach(input => {
                 const s = input.value.trim();
                 if (s && s !== '名稱') {
-                    // 自動判斷：純數字補 TPE:，字母補 NYSEARCA:
                     let fullSymbol = /^\d+$/.test(s) ? `TPE:${s}` : `NYSEARCA:${s}`;
                     symbolList.push(fullSymbol);
                 }
@@ -297,6 +299,11 @@
             const finalUrl = `${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`;
             const response = await fetch(finalUrl);
             const cloudPrices = await response.json();
+
+            // 如果雲端回傳了匯率，則更新
+            if (cloudPrices["CURRENCY:USDTWD"]) {
+                usdRate = cloudPrices["CURRENCY:USDTWD"];
+            }
 
             let updatedCount = 0;
             categories.forEach(cat => {
@@ -315,7 +322,7 @@
                     }
                 });
             });
-            alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。`);
+            alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。目前匯率：${usdRate}`);
         } catch (e) { alert("同步失敗，請確認 GAS 部署。"); }
         finally { btn.innerText = originalText; btn.disabled = false; calculateAll(); }
     }
@@ -388,7 +395,7 @@
             myChart = new Chart(ctx, { 
                 type: 'doughnut', data: data, 
                 options: { 
-                    cutout: '50%', // 加寬圓環
+                    cutout: '50%', 
                     plugins: { 
                         tooltip: { 
                             callbacks: { label: (c) => ` 現值: ${formatCurrency(c.raw)} (${grandTotal > 0 ? ((c.raw/grandTotal)*100).toFixed(1) : 0}%)` } 
