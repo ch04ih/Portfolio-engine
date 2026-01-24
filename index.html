@@ -5,149 +5,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portfolio Engine</title>
     
-    <link rel="apple-touch-icon" href="icon.png?v=3">
-    <link rel="icon" type="image/png" href="icon.png?v=3">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
-        :root {
-            --theme-accent: #FF8C42;
-            --theme-bg: #3D2B1F;
-            --theme-accent-rgb: 255, 140, 66;
-            --gray-marble: #F0F0F0;
-            --radius: 12px;
-        }
-        [data-theme="orange"] { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; }
-        [data-theme="forest"] { --theme-accent: #dac4fc; --theme-bg: #293d0b; --theme-accent-rgb: 218, 196, 252; }
-        [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; --theme-accent-rgb: 128, 197, 222; }
-        [data-theme="purple"] { --theme-accent: #B4D355; --theme-bg: #6245b7; --theme-accent-rgb: 180, 211, 85; }
-        [data-theme="navy"]   { --theme-accent: #e4d9c4; --theme-bg: #1b2941; --theme-accent-rgb: 228, 217, 196; }
-        [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
+        :root { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; --gray-marble: #F0F0F0; --radius: 12px; }
+        [data-theme="orange"] { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; }
+        [data-theme="forest"] { --theme-accent: #dac4fc; --theme-bg: #293d0b; }
+        [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; }
+        [data-theme="purple"] { --theme-accent: #B4D355; --theme-bg: #6245b7; }
+        [data-theme="navy"]   { --theme-accent: #e4d9c4; --theme-bg: #1b2941; }
+        [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        /* 移除輸入框小箭頭 */
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, sans-serif; margin: 0; padding: 0; }
-        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
+        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 12px; }
 
-        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
-        
-        .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        #rebalanceSummary { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
+        h1 { border: 4px solid #1A1A1A; text-align: center; margin-bottom: 20px; background: var(--theme-accent); padding: 15px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
 
-        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
-        
-        /* 六欄佈局設定 */
-        .grid-row { display: grid; grid-template-columns: 20px 1fr 0.7fr 0.9fr 0.6fr 1fr 0.6fr; gap: 4px; align-items: center; margin-bottom: 8px; }
-        .label-text { font-size: 8px; font-weight: 900; color: #bbb; text-align: center; margin-bottom: 4px; }
+        /* 卡片設計 */
+        .category-card { background: #fff; border: 4px solid #1A1A1A; margin-bottom: 20px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); overflow: hidden; }
+        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+        .category-content { padding: 12px; transition: max-height 0.3s ease; }
+        .collapsed .category-content { display: none; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 6px 2px; font-size: 10px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; }
+        /* 六欄佈局 */
+        .grid-row { display: grid; grid-template-columns: 20px 1fr 0.6fr 0.8fr 0.6fr 1fr 0.5fr; gap: 4px; align-items: center; margin-bottom: 8px; }
+        .label-text { font-size: 8px; font-weight: 900; color: #bbb; text-align: center; margin-bottom: 2px; }
+
+        .static-view { background: #1A1A1A; color: white; padding: 6px 2px; font-size: 10px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; }
         .view-price { background: #F0F0F0; color: #1A1A1A; border: 1px solid #DDD; }
         .view-target { background: #666; }
 
         .edit-container { position: relative; display: none; width: 100%; }
-        .edit-input { width: 100%; height: 34px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; font-size: 11px; outline: none; background: white; }
+        .edit-input { width: 100%; height: 34px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; font-size: 11px; outline: none; background: #FFF; }
         
-        .search-results { position: absolute; top: 36px; left: 0; right: 0; background: white; border: 3px solid #1A1A1A; border-radius: 8px; z-index: 1000; max-height: 150px; overflow-y: auto; display: none; }
+        .search-results { position: absolute; top: 36px; left: 0; right: 0; background: white; border: 3px solid #1A1A1A; border-radius: 8px; z-index: 1000; max-height: 150px; overflow-y: auto; display: none; box-shadow: 4px 4px 0px #000; }
         .search-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 10px; display: flex; justify-content: space-between; font-weight: bold; }
 
-        .item-info { font-size: 9px; font-weight: 900; text-align: right; line-height: 1.1; }
-        .balance-tip { font-size: 8px; font-weight: bold; margin-top: 2px; display: block; }
+        .item-total { font-size: 10px; font-weight: 900; text-align: right; }
+        .balance-tip { font-size: 8px; font-weight: bold; display: block; text-align: right; }
 
-        /* 主題顏色半半按鈕 */
-        .theme-options { display: none; gap: 8px; margin-top: 10px; flex-wrap: wrap; justify-content: flex-end; }
-        .theme-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; overflow: hidden; position: relative; padding: 0; }
-        .theme-btn span { position: absolute; top: 0; width: 50%; height: 100%; }
-        .theme-btn .left { left: 0; }
-        .theme-btn .right { right: 0; }
+        /* 主題顏色半半 */
+        .theme-options { display: none; gap: 8px; margin: 10px 0; justify-content: flex-end; }
+        .theme-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
+        .theme-btn .L { position: absolute; left: 0; width: 50%; height: 100%; }
+        .theme-btn .R { position: absolute; right: 0; width: 50%; height: 100%; }
 
-        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; }
+        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 15px; }
+        .ghost { opacity: 0.4; background: #c8ebfb; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="theme-panel" id="themePanel" style="text-align:right; margin-bottom:10px;">
-        <div style="font-size: 0.75rem; font-weight: bold; cursor: pointer; display:inline-block; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px;" onclick="document.querySelector('.theme-options').style.display = document.querySelector('.theme-options').style.display === 'flex' ? 'none' : 'flex'">🎨 主題切換</div>
+    <div style="text-align:right;">
+        <span onclick="document.querySelector('.theme-options').style.display='flex'" style="cursor:pointer; font-size:12px; font-weight:bold; background:#FFF; padding:4px 10px; border:2px solid #000; border-radius:20px;">🎨 配色方案</span>
         <div class="theme-options">
-            <button class="theme-btn" onclick="setTheme('orange')"><span class="left" style="background:#3D2B1F"></span><span class="right" style="background:#FF8C42"></span></button>
-            <button class="theme-btn" onclick="setTheme('forest')"><span class="left" style="background:#293d0b"></span><span class="right" style="background:#dac4fc"></span></button>
-            <button class="theme-btn" onclick="setTheme('wine')"><span class="left" style="background:#6e0000"></span><span class="right" style="background:#80C5DE"></span></button>
-            <button class="theme-btn" onclick="setTheme('purple')"><span class="left" style="background:#6245b7"></span><span class="right" style="background:#B4D355"></span></button>
-            <button class="theme-btn" onclick="setTheme('navy')"><span class="left" style="background:#1b2941"></span><span class="right" style="background:#e4d9c4"></span></button>
-            <button class="theme-btn" onclick="setTheme('amber')"><span class="left" style="background:#0045c6"></span><span class="right" style="background:#F0A650"></span></button>
+            <button class="theme-btn" onclick="setTheme('orange')"><span class="L" style="background:#3D2B1F"></span><span class="R" style="background:#FF8C42"></span></button>
+            <button class="theme-btn" onclick="setTheme('forest')"><span class="L" style="background:#293d0b"></span><span class="R" style="background:#dac4fc"></span></button>
+            <button class="theme-btn" onclick="setTheme('wine')"><span class="L" style="background:#6e0000"></span><span class="R" style="background:#80C5DE"></span></button>
+            <button class="theme-btn" onclick="setTheme('purple')"><span class="L" style="background:#6245b7"></span><span class="R" style="background:#B4D355"></span></button>
+            <button class="theme-btn" onclick="setTheme('navy')"><span class="L" style="background:#1b2941"></span><span class="R" style="background:#e4d9c4"></span></button>
+            <button class="theme-btn" onclick="setTheme('amber')"><span class="L" style="background:#0045c6"></span><span class="R" style="background:#F0A650"></span></button>
         </div>
     </div>
 
-    <h1>Portfolio Engine<br><span style="font-size: 0.7em;">資產組合計算器</span></h1>
+    <h1>Portfolio Engine<br><span style="font-size: 0.6em;">資產組合計算器</span></h1>
 
-    <div style="text-align:center; font-size:10px; margin:10px 0; font-weight:bold; color:#888;">
-        <span id="saveDot" style="display:inline-block; width:8px; height:8px; background:#ccc; border-radius:50%; margin-right:5px;"></span>
-        自動儲存已就緒
-    </div>
-
-    <div class="rebalance-panel">
+    <div class="category-card" style="padding:20px;">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888;">TOTAL ASSETS | 總現值</div>
-            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:2px 8px; border-radius:5px;" onclick="toggleChart()">圖表</button>
+            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">📊 圖表分析</button>
         </div>
-        <div id="rebalanceSummary">$0</div>
+        <div id="rebalanceSummary" style="font-size: 2.4rem; font-weight: 900;">$0</div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 200px;"><canvas id="portfolioChart"></canvas></div>
     </div>
 
     <div id="mainGrid"></div>
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
-    <button class="btn" style="background:#ddd; color:#888; border-color:#bbb; font-size:0.8rem;" onclick="clearAll()">重置資料</button>
 </div>
 
 <script>
-    let myChart = null, categories = [], STOCK_DB = [], EX_RATE = 32.5; 
+    let myChart = null, categories = [], STOCK_DB = [], EX_RATE = 32.5;
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSEPMNB8ApKn9N5fFjKjpTblkgvjOcJ1TE8r5SGC_rj2gNG8N2uKNCX92TxtJy9BL/exec";
+
+    const DEFAULT_CONFIG = [
+        { id: 'cat_1', name: '成長型投資', target: 40, collapsed: false },
+        { id: 'cat_2', name: '進攻型投資', target: 10, collapsed: false },
+        { id: 'cat_3', name: '防守型投資', target: 20, collapsed: false },
+        { id: 'cat_4', name: '高股息投資', target: 20, collapsed: false },
+        { id: 'cat_5', name: '安全存款', target: 10, collapsed: false }
+    ];
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    const DEFAULT_CONFIG = [
-        { id: 'cat_1', name: '成長型投資', target: 40 },
-        { id: 'cat_2', name: '進攻型投資', target: 10 },
-        { id: 'cat_3', name: '防守型投資', target: 20 },
-        { id: 'cat_4', name: '高股息投資', target: 20 },
-        { id: 'cat_5', name: '安全存款', target: 10 }
-    ];
+    function addCategory(name = "新投資區域", target = 20) {
+        const id = 'cat_' + Date.now();
+        categories.push({ id, name, target, collapsed: false });
+        renderUI();
+        addAsset(id); // 預設新增第一個標的
+    }
 
     async function pickStock(el, s, m) {
-        const item = el.closest('.grid-row');
-        const nameInput = item.querySelector('.asset-name');
-        const priceInput = item.querySelector('.asset-price');
-        const marketInput = item.querySelector('.asset-market');
-        const priceView = item.querySelector('.view-price');
-        
-        nameInput.value = s;
-        marketInput.value = m;
-        priceView.innerText = "...";
-        
+        const row = el.closest('.grid-row');
+        row.querySelector('.asset-name').value = s;
+        row.querySelector('.asset-market').value = m;
+        row.querySelector('.view-price').innerText = "...";
         try {
             const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
             const data = await res.json();
-            priceInput.value = data.price || 0;
-        } catch (e) { priceInput.value = 0; }
-        
-        autoViewMode(nameInput);
+            row.querySelector('.asset-price').value = data.price || 0;
+        } catch (e) { row.querySelector('.asset-price').value = 0; }
+        autoViewMode(row.querySelector('.asset-name'));
     }
 
     function addAsset(catId, name='', qty=0, price=0, targetP=0, market='TPE') {
         const list = document.getElementById(`list-${catId}`);
+        if (!list) return;
         const div = document.createElement('div');
         div.className = 'grid-row';
         div.innerHTML = `
-            <button style="background:none; border:none; color:#FF4444; font-size:16px; cursor:pointer;" onclick="this.closest('.grid-row').remove(); calculateAll();">×</button>
+            <div style="cursor:grab; color:#ccc; font-size:14px;">⋮⋮</div>
             <div style="position:relative;">
                 <div class="static-view" onclick="editMode(this)">${name || '搜尋'}</div>
                 <div class="edit-container">
-                    <input type="text" class="edit-input asset-name" value="${name}" oninput="handleStockSearch(this)" onblur="autoViewMode(this)">
+                    <input type="text" class="edit-input asset-name" value="${name}" oninput="handleSearch(this)" onblur="autoViewMode(this)">
                     <div class="search-results"></div>
                 </div>
             </div>
@@ -165,77 +151,125 @@
                 <div class="static-view view-target" onclick="editMode(this)">${targetP}%</div>
                 <div class="edit-container"><input type="number" class="edit-input asset-target" value="${targetP}" onblur="autoViewMode(this)"></div>
             </div>
-            <div class="item-info">
+            <div>
                 <div class="item-total">$0</div>
-                <span class="balance-tip" style="color:#bbb;">--</span>
+                <span class="balance-tip">--</span>
             </div>
             <div class="item-ratio" style="font-size:9px; font-weight:900; text-align:center;">0%</div>
+            <button onclick="this.closest('.grid-row').remove(); calculateAll();" style="border:none; background:none; color:#FF4444; font-weight:bold; cursor:pointer;">×</button>
         `;
         list.appendChild(div);
         calculateAll();
     }
 
     function calculateAll() {
-        let total = 0, catSums = {};
-        
+        let grandTotal = 0, catSums = {};
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (!card) return;
             let sum = 0;
-            card.querySelectorAll('.grid-row').forEach(item => {
-                const q = parseFloat(item.querySelector('.asset-qty').value) || 0;
-                const p = parseFloat(item.querySelector('.asset-price').value) || 0;
-                const m = item.querySelector('.asset-market').value;
-                const realPrice = (m === 'US') ? (p * EX_RATE) : p;
-                const subtotal = q * realPrice;
-                
-                item.querySelector('.view-price').innerText = (m === 'US' ? '🇺🇸' : '') + p;
-                item.querySelector('.item-total').innerText = formatCurrency(subtotal);
-                item._subtotal = subtotal;
+            card.querySelectorAll('.grid-row').forEach(row => {
+                const q = parseFloat(row.querySelector('.asset-qty').value) || 0;
+                const p = parseFloat(row.querySelector('.asset-price').value) || 0;
+                const m = row.querySelector('.asset-market').value;
+                const subtotal = (m === 'US' ? p * EX_RATE : p) * q;
+                row.querySelector('.item-total').innerText = formatCurrency(subtotal);
+                row.querySelector('.view-price').innerText = (m === 'US' ? '🇺🇸' : '') + p;
+                row._subtotal = subtotal;
                 sum += subtotal;
             });
             catSums[cat.id] = sum;
-            total += sum;
+            grandTotal += sum;
         });
 
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             const sum = catSums[cat.id];
-            card.querySelector('.cat-sum-display').innerText = formatCurrency(sum);
-            card.querySelector('.current-p').innerText = (total > 0 ? (sum / total * 100).toFixed(1) : 0) + "%";
-            
-            card.querySelectorAll('.grid-row').forEach(item => {
-                const targetP = parseFloat(item.querySelector('.asset-target').value) || 0;
-                const targetAmt = sum * (targetP / 100);
-                const diff = item._subtotal - targetAmt;
-                const tip = item.querySelector('.balance-tip');
-                
+            card.querySelector('.cat-sum').innerText = formatCurrency(sum);
+            card.querySelector('.cat-ratio').innerText = grandTotal > 0 ? (sum / grandTotal * 100).toFixed(1) + "%" : "0%";
+            card.querySelectorAll('.grid-row').forEach(row => {
+                const targetP = parseFloat(row.querySelector('.asset-target').value) || 0;
+                const diff = row._subtotal - (sum * (targetP / 100));
+                const tip = row.querySelector('.balance-tip');
                 if (sum > 0 && targetP > 0) {
-                    if (Math.abs(diff) < 100) tip.innerText = "BALANCED";
-                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
+                    tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">↓${Math.round(diff)}</span>` : `<span style="color:#008800">↑${Math.round(Math.abs(diff))}</span>`;
                 }
-                item.querySelector('.item-ratio').innerText = sum > 0 ? (item._subtotal / sum * 100).toFixed(1) + "%" : "0%";
+                row.querySelector('.item-ratio').innerText = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) + "%" : "0%";
             });
         });
-
-        document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums);
-        forceSave();
+        document.getElementById('rebalanceSummary').innerText = formatCurrency(grandTotal);
+        saveData();
     }
 
-    // 基礎功能
+    function renderUI() {
+        const grid = document.getElementById('mainGrid');
+        const scrollPos = window.scrollY;
+        grid.innerHTML = '';
+        categories.forEach(cat => {
+            const card = document.createElement('div');
+            card.id = cat.id;
+            card.className = `category-card ${cat.collapsed ? 'collapsed' : ''}`;
+            card.innerHTML = `
+                <div class="category-header" onclick="toggleCollapse('${cat.id}')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="cursor:grab;" class="cat-handle">☰</span>
+                        <span onclick="event.stopPropagation(); editCatName('${cat.id}')" style="font-weight:900;">${cat.name}</span>
+                    </div>
+                    <div style="font-size:11px; font-weight:900;">目標 <span onclick="event.stopPropagation(); editCatTarget('${cat.id}')">${cat.target}%</span></div>
+                </div>
+                <div class="category-content">
+                    <div class="grid-row" style="opacity:0.5;"><div class="label-text"></div><div class="label-text">標的</div><div class="label-text">股數</div><div class="label-text">單價</div><div class="label-text">目標%</div><div class="label-text">總現值</div><div class="label-text">區域比</div><div class="label-text"></div></div>
+                    <div id="list-${cat.id}" class="asset-list"></div>
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="btn" style="padding:6px; font-size:11px; flex:1;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
+                        <button class="btn" style="padding:6px; font-size:11px; width:60px; background:#FF4444; color:white;" onclick="deleteCategory('${cat.id}')">刪除區域</button>
+                    </div>
+                    <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #ddd; display:flex; justify-content:space-between; align-items:center;">
+                        <span class="cat-sum" style="font-size:1.1rem; font-weight:900;">$0</span>
+                        <span class="cat-ratio" style="font-size:11px; font-weight:bold;">0%</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        initSortable();
+        window.scrollTo(0, scrollPos);
+    }
+
+    function toggleCollapse(id) { 
+        const cat = categories.find(c => c.id === id);
+        cat.collapsed = !cat.collapsed;
+        document.getElementById(id).classList.toggle('collapsed');
+        saveData();
+    }
+    function editCatName(id) { const n = prompt("修改區域名稱："); if(n) { categories.find(c => c.id === id).name = n; renderUI(); calculateAll(); } }
+    function editCatTarget(id) { const t = prompt("修改目標百分比："); if(t) { categories.find(c => c.id === id).target = parseInt(t); renderUI(); calculateAll(); } }
+    function deleteCategory(id) { if(confirm("確定刪除此區域？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } }
+
+    function initSortable() {
+        new Sortable(document.getElementById('mainGrid'), { handle: '.cat-handle', animation: 150, ghostClass: 'ghost', onEnd: () => {
+            const newOrder = Array.from(document.getElementById('mainGrid').children).map(el => el.id);
+            categories.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+            saveData();
+        }});
+        document.querySelectorAll('.asset-list').forEach(list => {
+            new Sortable(list, { delay: 200, delayOnTouchOnly: true, animation: 150, onEnd: calculateAll });
+        });
+    }
+
     function editMode(el) { el.style.display='none'; el.nextElementSibling.style.display='block'; el.nextElementSibling.querySelector('input').focus(); }
-    function autoViewMode(inputEl) { 
+    function autoViewMode(inputEl) {
         setTimeout(() => {
             if (document.activeElement.classList.contains('search-item')) return;
-            inputEl.parentElement.style.display='none'; 
-            const view = inputEl.parentElement.previousElementSibling;
+            const container = inputEl.parentElement;
+            const view = container.previousElementSibling;
             view.innerText = inputEl.value + (inputEl.classList.contains('asset-target') ? '%' : '');
-            view.style.display='flex'; calculateAll();
+            container.style.display='none'; view.style.display='flex';
+            calculateAll();
         }, 200);
     }
     function updatePrice(input) { input.closest('.grid-row').querySelector('.asset-price').value = input.value; autoViewMode(input); }
-    function handleStockSearch(inputEl) {
+    function handleSearch(inputEl) {
         const query = inputEl.value.toUpperCase();
         const resEl = inputEl.parentElement.querySelector('.search-results');
         if (!query) { resEl.style.display = 'none'; return; }
@@ -244,60 +278,37 @@
         resEl.style.display = filtered.length ? 'block' : 'none';
     }
 
-    function renderUI() {
-        const savedData = JSON.parse(localStorage.getItem('myPortfolio_v2')) || {};
-        const grid = document.getElementById('mainGrid'); grid.innerHTML = '';
-        categories.forEach(cat => {
-            const data = savedData[cat.id] || { target: 20, assets: [] };
-            const card = document.createElement('div'); card.id = cat.id; card.className = 'category-card';
-            card.innerHTML = `
-                <div class="category-header"><span style="font-weight:900;">${cat.name}</span><div style="font-size:12px;">目標 ${data.target}%</div></div>
-                <div class="grid-row" style="margin-top:10px;"><div class="label-text"></div><div class="label-text">標的</div><div class="label-text">股數</div><div class="label-text">單價</div><div class="label-text">目標%</div><div class="label-text">總現值</div><div class="label-text">區域比</div></div>
-                <div id="list-${cat.id}"></div>
-                <button class="btn" style="padding:6px; font-size:11px; margin-top:10px;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
-                <div style="margin-top:15px; padding-top:10px; border-top:2px dashed #ddd; display:flex; justify-content:space-between; align-items:center;">
-                    <span class="cat-sum-display" style="font-size:1.2rem; font-weight:900;">$0</span>
-                    <span class="current-p" style="font-size:12px; font-weight:900;">0%</span>
-                </div>
-            `;
-            grid.appendChild(card);
-            if (data.assets) data.assets.forEach(a => addAsset(cat.id, a.name, a.qty, a.value, a.targetP, a.market));
-        });
-    }
-
-    function updateChart(catSums) {
-        const ctx = document.getElementById('portfolioChart'); if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
-        const data = { labels: categories.map(c => c.name), datasets: [{ data: categories.map(c => catSums[c.id]), backgroundColor: ["#FF8C42","#dac4fc","#80C5DE","#B4D355","#e4d9c4","#F0A650"] }] };
-        if (myChart) { myChart.data = data; myChart.update(); }
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } } } }); }
-    }
-
-    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display==='none'?'block':'none'; calculateAll(); }
-    function setTheme(t) { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('userTheme', t); }
-    function forceSave() {
+    function saveData() {
         const data = {};
         categories.forEach(cat => {
-            const card = document.getElementById(cat.id); if (!card) return;
-            const assets = [];
-            card.querySelectorAll('.grid-row:not(:first-child)').forEach(item => {
-                assets.push({ name: item.querySelector('.asset-name').value, qty: parseFloat(item.querySelector('.asset-qty').value)||0, value: parseFloat(item.querySelector('.asset-price').value)||0, targetP: parseFloat(item.querySelector('.asset-target').value)||0, market: item.querySelector('.asset-market').value });
-            });
-            data[cat.id] = { target: 20, assets: assets };
+            const list = [];
+            const rows = document.querySelectorAll(`#list-${cat.id} .grid-row`);
+            rows.forEach(row => list.push({ name: row.querySelector('.asset-name').value, qty: row.querySelector('.asset-qty').value, value: row.querySelector('.asset-price').value, targetP: row.querySelector('.asset-target').value, market: row.querySelector('.asset-market').value }));
+            data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v2', JSON.stringify(data));
-        localStorage.setItem('catConfig_v2', JSON.stringify(categories));
-        document.getElementById('saveDot').style.background = '#00C853'; setTimeout(()=>document.getElementById('saveDot').style.background = '#ccc', 500);
+        localStorage.setItem('myPortfolio_v3', JSON.stringify({ categories, details: data }));
     }
 
     window.onload = () => {
         fetch('csvjson.json').then(res => res.json()).then(data => STOCK_DB = data);
-        const savedCats = localStorage.getItem('catConfig_v2');
-        categories = savedCats ? JSON.parse(savedCats) : DEFAULT_CONFIG;
-        renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); calculateAll();
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v3'));
+        if (saved) {
+            categories = saved.categories;
+            renderUI();
+            categories.forEach(cat => {
+                const details = saved.details[cat.id];
+                if (details) details.assets.forEach(a => addAsset(cat.id, a.name, a.qty, a.value, a.targetP, a.market));
+            });
+        } else {
+            categories = DEFAULT_CONFIG;
+            renderUI();
+            categories.forEach(cat => addAsset(cat.id));
+        }
+        setTheme(localStorage.getItem('userTheme') || 'orange');
     };
 
-    function clearAll() { if(confirm("重置所有資料？")) { localStorage.clear(); location.reload(); } }
-    function addCategory() { const n = prompt("區域名稱？"); if(n){ categories.push({id:'cat_'+Date.now(), name:n}); renderUI(); calculateAll(); } }
+    function setTheme(t) { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('userTheme', t); }
+    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display==='none'?'block':'none'; calculateAll(); }
 </script>
 </body>
 </html>
