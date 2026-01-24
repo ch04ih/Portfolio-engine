@@ -56,10 +56,14 @@
         .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1fr 0.6fr 55px; gap: 4px; margin-bottom: 12px; align-items: center; padding: 0; border-radius: 8px; cursor: grab; width: 100%; position: relative; }
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; z-index: 2; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; }
+        .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid transparent; }
         
+        /* 核心修改：當標的非股票時的淺灰色樣式 */
+        .static-view.empty-placeholder { background: transparent; color: #CCC; border: none; font-weight: 400; }
+
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
-        .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { background: #EEE; color: #888; border: 1px solid #DDD; }
+        .asset-item div:nth-child(3) .static-view:not(.empty-placeholder), 
+        .asset-item div:nth-child(4) .static-view:not(.empty-placeholder) { background: #EEE; color: #888; border: 1px solid #DDD; }
         .asset-item div:nth-child(5) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
         .asset-item div:nth-child(6) .static-view { background: #666; color: white; }
 
@@ -78,7 +82,6 @@
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
 
-        /* 核心修改：警告橫幅樣式 */
         #target-sum-alert { margin-top:10px; font-size:12px; font-weight:900; text-align:center; padding:8px; border-radius:8px; display:none; border: 2px solid #FF4444; }
         .alert-red { background-color: #FFE5E5 !important; color: #B30000 !important; }
 
@@ -279,16 +282,29 @@
 
         let val = inputEl.value;
         if (inputEl.type === 'number') { 
-            if (val === "" || isNaN(val)) {
+            if (val === "" || isNaN(val) || val == 0) {
                 if (inputEl.classList.contains('asset-value') || inputEl.classList.contains('target-p-input')) {
                     val = 0; inputEl.value = 0;
                 } else { val = ""; }
             } 
         } else { if (val.trim() === "") { val = "未命名"; inputEl.value = val; } }
         
-        if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(val);
-        else if (inputEl.classList.contains('target-p-input')) view.innerText = (val || 0) + "%";
-        else view.innerText = val;
+        // 核心修改：判斷是否顯示 "-" 以及移除外框
+        if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
+            if (val === "" || val == 0) {
+                view.innerText = "-";
+                view.classList.add('empty-placeholder');
+            } else {
+                view.innerText = val;
+                view.classList.remove('empty-placeholder');
+            }
+        } else if (inputEl.classList.contains('asset-value')) {
+            view.innerText = formatCurrency(val);
+        } else if (inputEl.classList.contains('target-p-input')) {
+            view.innerText = (val || 0) + "%";
+        } else {
+            view.innerText = val;
+        }
         
         setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
@@ -362,6 +378,13 @@
         if(!list) return;
         const div = document.createElement('div');
         div.className = 'asset-item';
+        
+        // 判斷初始顯示
+        const qtyDisplay = (qty === '' || qty == 0) ? '-' : qty;
+        const priceDisplay = (price === '' || price == 0) ? '-' : price;
+        const qtyClass = (qty === '' || qty == 0) ? 'static-view empty-placeholder' : 'static-view';
+        const priceClass = (price === '' || price == 0) ? 'static-view empty-placeholder' : 'static-view';
+
         div.innerHTML = `
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div>
@@ -369,11 +392,11 @@
                 <div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
-                <div class="static-view" onclick="editMode(this)">${qty}</div>
+                <div class="${qtyClass}" onclick="editMode(this)">${qtyDisplay}</div>
                 <div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
-                <div class="static-view" onclick="editMode(this)">${price}</div>
+                <div class="${priceClass}" onclick="editMode(this)">${priceDisplay}</div>
                 <div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div>
             </div>
             <div>
@@ -429,7 +452,6 @@
             }
         });
 
-        // 修改：警告文字與邏輯
         const alertDiv = document.getElementById('target-sum-alert');
         if (Math.abs(totalTargetP - 100) > 0.01) {
             alertDiv.style.display = 'block';
@@ -476,7 +498,6 @@
     function updateChart(catSums, grandTotal) {
         const ctx = document.getElementById('portfolioChart');
         if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
-        
         const themeColors = generateThemeGradientScale(categories.length);
         const data = { 
             labels: categories.map(c => c.name), 
@@ -487,7 +508,6 @@
                 borderColor: '#fff' 
             }] 
         };
-        
         if (myChart) { 
             myChart.data = data; 
             myChart.update(); 
@@ -497,13 +517,10 @@
                 data: data, 
                 options: { 
                     maintainAspectRatio: false, 
-                    cutout: '50%', // 修改：圖表加寬
+                    cutout: '50%', 
                     plugins: { 
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } 
-                        },
-                        tooltip: { // 修改：點擊顯示內容優化
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } },
+                        tooltip: { 
                             callbacks: {
                                 label: function(context) {
                                     const value = context.raw;
