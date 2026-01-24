@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portfolio Engine</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
@@ -76,10 +75,7 @@
     <h1>Portfolio Engine<br><span style="font-size: 0.6em;">資產組合計算器</span></h1>
 
     <div class="category-card" style="padding:20px; border-width: 4px;">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #888;">TOTAL ASSETS | 總現值</div>
-            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">圖表分析</button>
-        </div>
+        <div style="font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 10px;">TOTAL ASSETS | 總現值</div>
         <div id="rebalanceSummary" style="font-size: 2.4rem; font-weight: 900;">$0</div>
     </div>
 
@@ -93,22 +89,26 @@
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    // 搜尋功能核心
+    // 1. 強化的搜尋函數
     function handleSearch(inputEl) {
         const query = inputEl.value.toString().toUpperCase();
         const resEl = inputEl.parentElement.querySelector('.search-results');
-        if (!query) { resEl.style.display = 'none'; return; }
+        
+        if (!query || STOCK_DB.length === 0) { 
+            resEl.style.display = 'none'; 
+            return; 
+        }
         
         const filtered = STOCK_DB.filter(item => 
-            item.s.toString().toUpperCase().includes(query) || 
-            item.n.includes(query)
-        ).slice(0, 8);
+            item.s.toString().includes(query) || 
+            (item.n && item.n.includes(query))
+        ).slice(0, 10);
 
         if (filtered.length > 0) {
             resEl.innerHTML = filtered.map(item => `
-                <div class="search-item" onclick="pickStock(this, '${item.s}', '${item.m}', '${item.n}')">
+                <div class="search-item" onmousedown="pickStock(this, '${item.s}', '${item.m}', '${item.n}')">
                     <span>${item.s}</span>
-                    <span style="color:#888; font-size:9px;">${item.n}</span>
+                    <span style="color:#888; font-size:9px;">${item.n || ''}</span>
                 </div>
             `).join('');
             resEl.style.display = 'block';
@@ -117,25 +117,31 @@
         }
     }
 
+    // 2. 選擇標的後的處理
     async function pickStock(el, s, m, n) {
         const row = el.closest('.grid-row');
         const nameInput = row.querySelector('.asset-name');
-        nameInput.value = s;
-        row.querySelector('.asset-market').value = m;
-        
         const priceView = row.querySelector('.view-price');
+        const priceHidden = row.querySelector('.asset-price');
+        const marketHidden = row.querySelector('.asset-market');
+
+        nameInput.value = s;
+        marketHidden.value = m;
         priceView.innerText = "...";
         
         try {
             const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
             const data = await res.json();
             const price = parseFloat(data.price) || 0;
-            row.querySelector('.asset-price').value = price;
+            priceHidden.value = price;
             priceView.innerText = (m === 'US' ? '🇺🇸' : '') + price;
             calculateAll();
         } catch (e) {
             priceView.innerText = "Error";
         }
+        
+        // 關閉搜尋選單並切換回靜態視圖
+        el.parentElement.style.display = 'none';
         autoViewMode(nameInput);
     }
 
@@ -145,7 +151,7 @@
         const div = document.createElement('div');
         div.className = 'grid-row';
         div.innerHTML = `
-            <button onclick="this.closest('.grid-row').remove(); calculateAll();" style="border:none; background:none; color:#FF4444; font-size:16px; font-weight:bold; cursor:pointer; padding:0;">×</button>
+            <button onclick="this.closest('.grid-row').remove(); calculateAll();" style="border:none; background:none; color:#FF4444; font-size:16px; font-weight:bold; cursor:pointer;">×</button>
             <div style="position:relative;">
                 <div class="static-view" onclick="editMode(this)">${name || '搜尋'}</div>
                 <div class="edit-container">
@@ -183,7 +189,7 @@
             if (!card) return;
             let sum = 0;
             card.querySelectorAll('.grid-row').forEach(row => {
-                const q = parseFloat(row.querySelector('.asset-qty').value) || 0;
+                const q = parseFloat(row.querySelector('.asset-qty')?.value || row.querySelector('.edit-input.asset-qty')?.value) || 0;
                 const p = parseFloat(row.querySelector('.asset-price').value) || 0;
                 const m = row.querySelector('.asset-market').value;
                 const sub = (m === 'US' ? p * EX_RATE : p) * q;
@@ -202,13 +208,14 @@
             card.querySelector('.cat-ratio').innerText = grandTotal > 0 ? (sum / grandTotal * 100).toFixed(1) + "%" : "0%";
             
             card.querySelectorAll('.grid-row').forEach(row => {
-                const targetP = parseFloat(row.querySelector('.edit-input.asset-target')?.value || row.querySelector('.asset-target')?.value) || 0;
+                const targetP = parseFloat(row.querySelector('.edit-input.asset-target')?.value) || 0;
                 row.querySelector('.item-ratio').innerText = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) + "%" : "0%";
                 const tip = row.querySelector('.rebalance-tip');
                 if (sum > 0 && targetP > 0) {
                     const diff = row._subtotal - (sum * (targetP / 100));
-                    tip.innerHTML = diff > 10 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
-                                    diff < -10 ? `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>` : `<span style="color:#bbb">平衡</span>`;
+                    if (Math.abs(diff) < 10) tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
+                    else tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
+                                                    `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
                 }
             });
         });
@@ -260,13 +267,13 @@
     function editMode(el) { el.style.display='none'; el.nextElementSibling.style.display='block'; el.nextElementSibling.querySelector('input').focus(); }
     function autoViewMode(inputEl) {
         setTimeout(() => {
-            if (document.activeElement.classList.contains('search-item')) return;
+            if (document.activeElement && document.activeElement.closest('.search-results')) return;
             const container = inputEl.parentElement;
             const view = container.previousElementSibling;
             view.innerText = inputEl.value + (inputEl.classList.contains('asset-target') ? '%' : '');
             container.style.display='none'; view.style.display='flex';
             calculateAll();
-        }, 250);
+        }, 200);
     }
 
     function initSortable() {
@@ -285,22 +292,33 @@
         categories.forEach(cat => {
             const list = [];
             document.querySelectorAll(`#list-${cat.id} .grid-row`).forEach(row => {
-                list.push({ 
-                    name: row.querySelector('.asset-name').value, 
-                    qty: row.querySelector('.asset-qty').value, 
-                    value: row.querySelector('.asset-price').value, 
-                    targetP: row.querySelector('.edit-input.asset-target')?.value || row.querySelector('.static-view[onclick*="target"]')?.innerText.replace('%',''), 
-                    market: row.querySelector('.asset-market').value 
-                });
+                const name = row.querySelector('.asset-name').value;
+                if(name) {
+                    list.push({ 
+                        name: name, 
+                        qty: row.querySelector('.asset-qty').value, 
+                        value: row.querySelector('.asset-price').value, 
+                        targetP: row.querySelector('.edit-input.asset-target')?.value || 0, 
+                        market: row.querySelector('.asset-market').value 
+                    });
+                }
             });
             data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v7', JSON.stringify({ categories, details: data }));
+        localStorage.setItem('myPortfolio_v8', JSON.stringify({ categories, details: data }));
     }
 
-    window.onload = () => {
-        fetch('uploaded:csvjson.json').then(res => res.json()).then(data => STOCK_DB = data).catch(()=>{});
-        const saved = JSON.parse(localStorage.getItem('myPortfolio_v7'));
+    window.onload = async () => {
+        // 優先加載資料庫
+        try {
+            const response = await fetch('csvjson.json');
+            STOCK_DB = await response.json();
+            console.log("Database loaded, size:", STOCK_DB.length);
+        } catch (e) {
+            console.error("Database failed to load:", e);
+        }
+
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v8'));
         if (saved) {
             categories = saved.categories;
             renderUI();
@@ -315,7 +333,6 @@
     };
 
     function setTheme(t) { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('userTheme', t); }
-    function toggleChart() { alert("圖表功能將在數據填充後呈現。"); }
 </script>
 </body>
 </html>
