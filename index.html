@@ -274,8 +274,12 @@
         
         if ((inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price') || inputEl.classList.contains('asset-name')) && q > 0 && p > 0) {
             const valInput = item.querySelector('.asset-value');
-            if (/[a-zA-Z]/.test(name)) { valInput.value = Math.round(q * p * usdRate); } 
-            else { valInput.value = Math.round(q * p); }
+            // 只有「純英文」才乘匯率，00687B 有數字就不會被當成美股
+if (/^[A-Za-z]+$/.test(name)) { 
+    valInput.value = Math.round(q * p * usdRate); 
+} else {
+    valInput.value = Math.round(q * p);
+}
             valInput.parentElement.previousElementSibling.innerText = formatCurrency(valInput.value);
         }
 
