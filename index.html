@@ -312,19 +312,16 @@ if (/^[A-Za-z]+$/.test(name)) {
         const s = item.querySelector('.asset-name').value.trim().toUpperCase();
         if (s && s !== '名稱') {
             let fullSymbol;
-            if (/^[A-Z]+$/.test(s)) {
-                // 規則 1：純英文 -> NASDAQ:
-                fullSymbol = `NASDAQ:${s}`;
-            } else if (/^\d+$/.test(s)) {
-                // 規則 2：純數字 -> TPE:
-                fullSymbol = `TPE:${s}`;
-            } else if (/^\d{5}B$/i.test(s)) {
-                // 規則 3：5個數字+B -> TWO:
-                fullSymbol = `TWO:${s}`;
-            } else {
-                // 備用：其他情況預設用 TPE (或可依需求調整)
-                fullSymbol = `TPE:${s}`;
-            }
+
+// 修改後：美股直接傳代號，讓 Google 自己找，成功率最高
+if (/^[A-Z]+$/.test(s)) {
+    fullSymbol = s; 
+} else if (/^\d+$/.test(s)) {
+    fullSymbol = `TPE:${s}`;
+} else if (/^\d{5}B$/i.test(s)) {
+    fullSymbol = `TWO:${s}`;
+}
+
             symbolList.push(fullSymbol);
         }
     });
@@ -347,10 +344,13 @@ if (/^[A-Za-z]+$/.test(name)) {
             const priceInput = item.querySelector('.asset-price');
             const s = nameInput.value.trim().toUpperCase();
             
-            let key;
-            if (/^[A-Z]+$/.test(s)) key = `NASDAQ:${s}`;
-            else if (/^\d+$/.test(s)) key = `TPE:${s}`;
-            else if (/^\d{5}B$/i.test(s)) key = `TWO:${s}`;
+
+// 修改後：
+let key;
+if (/^[A-Z]+$/.test(s)) key = s; // VOO 就直接用 "VOO" 當 Key
+else if (/^\d+$/.test(s)) key = `TPE:${s}`;
+else if (/^\d{5}B$/i.test(s)) key = `TWO:${s}`;
+
             else key = `TPE:${s}`;
 
             if (cloudPrices[key] && typeof cloudPrices[key] === 'number') {
