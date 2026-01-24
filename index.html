@@ -26,7 +26,6 @@
 
         h1 { border: 4px solid #1A1A1A; text-align: center; margin-bottom: 20px; background: var(--theme-accent); padding: 15px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
 
-        /* 卡片設計 */
         .category-card { background: #fff; border: 4px solid #1A1A1A; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; display: flex; align-items: center; cursor: pointer; user-select: none; }
         .category-content { padding: 12px; }
@@ -35,15 +34,14 @@
         .arrow-icon { font-size: 10px; margin-right: 8px; transition: transform 0.2s; }
         .collapsed .arrow-icon { transform: rotate(-90deg); }
 
-        /* 右上角刪除鈕 */
         .btn-delete-card { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; background: var(--theme-accent); border: 3px solid #1A1A1A; border-radius: 50%; color: var(--theme-bg); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #000; z-index: 10; }
 
-        /* 六欄佈局 */
+        /* 六欄佈局：刪除 | 標的 | 股數 | 單價 | 目標% | 總現值 | 區域比 */
         .grid-row { display: grid; grid-template-columns: 20px 1fr 0.6fr 0.7fr 0.6fr 1.1fr 0.5fr; gap: 4px; align-items: center; margin-bottom: 10px; }
         .label-text { font-size: 8px; font-weight: 900; color: #bbb; text-align: center; margin-bottom: 2px; }
 
         .static-view { background: #1A1A1A; color: white; padding: 6px 2px; font-size: 10px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; }
-        .view-price { background: #F0F0F0; color: #1A1A1A; border: 1px solid #DDD; cursor: default; } /* 單價預設非輸入樣式 */
+        .view-price { background: #F0F0F0; color: #1A1A1A; border: 1px solid #DDD; cursor: default; } 
         .view-target { background: #666; }
 
         .edit-container { position: relative; display: none; width: 100%; }
@@ -55,7 +53,6 @@
         .item-total { font-size: 10px; font-weight: 900; text-align: right; }
         .rebalance-tip { font-size: 8px; font-weight: bold; display: block; text-align: right; margin-top: 1px; }
 
-        /* 主題顏色半半 */
         .theme-options { display: none; gap: 8px; margin: 10px 0; justify-content: flex-end; }
         .theme-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-btn span { position: absolute; top: 0; height: 100%; width: 50%; }
@@ -67,7 +64,7 @@
 
 <div class="container">
     <div style="text-align:right;">
-        <span onclick="document.querySelector('.theme-options').style.display='flex'" style="cursor:pointer; font-size:12px; font-weight:bold; background:#FFF; padding:4px 10px; border:2px solid #000; border-radius:20px;">🎨 配色</span>
+        <span onclick="document.querySelector('.theme-options').style.display='flex'" style="cursor:pointer; font-size:12px; font-weight:bold; background:#FFF; padding:4px 10px; border:2px solid #000; border-radius:20px;">主題配色</span>
         <div class="theme-options">
             <button class="theme-btn" onclick="setTheme('orange')"><span style="left:0; background:#3D2B1F"></span><span style="right:0; background:#FF8C42"></span></button>
             <button class="theme-btn" onclick="setTheme('forest')"><span style="left:0; background:#293d0b"></span><span style="right:0; background:#dac4fc"></span></button>
@@ -83,7 +80,7 @@
     <div class="category-card" style="padding:20px; border-width: 4px;">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888;">TOTAL ASSETS | 總現值</div>
-            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">📊 圖表</button>
+            <button style="background:var(--theme-accent); border:2px solid #000; font-size:10px; font-weight:900; padding:4px 10px; border-radius:8px;" onclick="toggleChart()">圖表</button>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.4rem; font-weight: 900;">$0</div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 200px;"><canvas id="portfolioChart"></canvas></div>
@@ -107,26 +104,21 @@
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    function addCategory(name = "新投資區域", target = 20) {
-        const id = 'cat_' + Date.now();
-        categories.push({ id, name, target, collapsed: false });
-        renderUI();
-        addAsset(id);
-    }
-
     async function pickStock(el, s, m) {
         const row = el.closest('.grid-row');
         row.querySelector('.asset-name').value = s;
         row.querySelector('.asset-market').value = m;
-        row.querySelector('.view-price').innerText = "...";
+        row.querySelector('.view-price').innerText = "載入中";
         
         try {
             const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
             const data = await res.json();
-            row.querySelector('.asset-price').value = data.price || 0;
-            row.querySelector('.asset-price-edit').value = data.price || 0;
+            const price = parseFloat(data.price) || 0;
+            row.querySelector('.asset-price').value = price;
+            row.querySelector('.view-price').innerText = (m === 'US' ? '🇺🇸' : '') + price;
+            calculateAll(); // 抓到價後立刻計算
         } catch (e) { 
-            row.querySelector('.asset-price').value = 0; 
+            row.querySelector('.view-price').innerText = "錯誤";
         }
         autoViewMode(row.querySelector('.asset-name'));
     }
@@ -147,17 +139,16 @@
             </div>
             <div>
                 <div class="static-view" style="background:#888;" onclick="editMode(this)">${qty}</div>
-                <div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" oninput="calculateAll()" onblur="autoViewMode(this)"></div>
             </div>
             <div>
                 <input type="hidden" class="asset-market" value="${market}">
                 <input type="hidden" class="asset-price" value="${price}">
-                <div class="static-view view-price" onclick="editMode(this)">${price}</div>
-                <div class="edit-container"><input type="number" class="edit-input asset-price-edit" value="${price}" onblur="updatePrice(this)"></div>
+                <div class="static-view view-price">${price > 0 ? (market==='US'?'🇺🇸':'')+price : '---'}</div>
             </div>
             <div>
                 <div class="static-view view-target" onclick="editMode(this)">${targetP}%</div>
-                <div class="edit-container"><input type="number" class="edit-input asset-target" value="${targetP}" onblur="autoViewMode(this)"></div>
+                <div class="edit-container"><input type="number" class="edit-input asset-target" value="${targetP}" oninput="calculateAll()" onblur="autoViewMode(this)"></div>
             </div>
             <div>
                 <div class="item-total">$0</div>
@@ -171,6 +162,8 @@
 
     function calculateAll() {
         let grandTotal = 0, catSums = {};
+        
+        // 核心計算循環
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             if (!card) return;
@@ -179,17 +172,19 @@
                 const q = parseFloat(row.querySelector('.asset-qty').value) || 0;
                 const p = parseFloat(row.querySelector('.asset-price').value) || 0;
                 const m = row.querySelector('.asset-market').value;
+                
+                // 股數 * 單價 = 總價 (若美股則乘匯率)
                 const subtotal = (m === 'US' ? p * EX_RATE : p) * q;
                 row._subtotal = subtotal;
                 sum += subtotal;
                 
                 row.querySelector('.item-total').innerText = formatCurrency(subtotal);
-                row.querySelector('.view-price').innerText = (m === 'US' ? '🇺🇸' : '') + p;
             });
             catSums[cat.id] = sum;
             grandTotal += sum;
         });
 
+        // 二次循環：更新區域比例與再平衡建議
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
             const sum = catSums[cat.id];
@@ -201,13 +196,17 @@
                 const rowRatio = sum > 0 ? (row._subtotal / sum * 100).toFixed(1) : 0;
                 row.querySelector('.item-ratio').innerText = rowRatio + "%";
                 
-                // 再平衡功能補回
+                // 補回平衡功能：(區域總值 * 目標%) - 當前值
                 const tip = row.querySelector('.rebalance-tip');
                 if (sum > 0 && targetP > 0) {
-                    const diff = row._subtotal - (sum * (targetP / 100));
-                    tip.innerHTML = diff > 100 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
-                                    diff < -100 ? `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>` : 
-                                    `<span style="color:#bbb">平衡</span>`;
+                    const idealAmt = sum * (targetP / 100);
+                    const diff = row._subtotal - idealAmt;
+                    if (Math.abs(diff) < 10) {
+                        tip.innerHTML = `<span style="color:#bbb">平衡</span>`;
+                    } else {
+                        tip.innerHTML = diff > 0 ? `<span style="color:#FF4444">移出${Math.round(diff)}</span>` : 
+                                        `<span style="color:#008800">補入${Math.round(Math.abs(diff))}</span>`;
+                    }
                 } else { tip.innerText = "--"; }
             });
         });
@@ -217,7 +216,6 @@
 
     function renderUI() {
         const grid = document.getElementById('mainGrid');
-        const scrollPos = window.scrollY;
         grid.innerHTML = '';
         categories.forEach(cat => {
             const card = document.createElement('div');
@@ -243,7 +241,13 @@
             grid.appendChild(card);
         });
         initSortable();
-        window.scrollTo(0, scrollPos);
+    }
+
+    function addCategory(name = "新投資區域", target = 20) {
+        const id = 'cat_' + Date.now();
+        categories.push({ id, name, target, collapsed: false });
+        renderUI();
+        addAsset(id);
     }
 
     function toggleCollapse(id) { 
@@ -253,16 +257,14 @@
         saveData();
     }
     function editCatName(id) { const n = prompt("修改區域名稱："); if(n) { categories.find(c => c.id === id).name = n; calculateAll(); renderUI(); } }
-    function deleteCategory(id) { if(confirm("確定刪除此投資區域與所有標的？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } }
+    function deleteCategory(id) { if(confirm("確定刪除此投資區域？")) { categories = categories.filter(c => c.id !== id); renderUI(); calculateAll(); } }
 
     function initSortable() {
-        // 卡片排序 (長按觸發)
         new Sortable(document.getElementById('mainGrid'), { delay: 400, delayOnTouchOnly: true, animation: 150, onEnd: () => {
             const newOrder = Array.from(document.getElementById('mainGrid').children).map(el => el.id);
             categories.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
             saveData();
         }});
-        // 標的排序 (長按觸發)
         document.querySelectorAll('.asset-list').forEach(list => {
             new Sortable(list, { delay: 400, delayOnTouchOnly: true, animation: 150, onEnd: calculateAll });
         });
@@ -278,11 +280,6 @@
             container.style.display='none'; view.style.display='flex';
             calculateAll();
         }, 200);
-    }
-    function updatePrice(input) { 
-        const row = input.closest('.grid-row');
-        row.querySelector('.asset-price').value = input.value; 
-        autoViewMode(input); 
     }
     function handleSearch(inputEl) {
         const query = inputEl.value.toUpperCase();
@@ -301,12 +298,12 @@
             rows.forEach(row => list.push({ name: row.querySelector('.asset-name').value, qty: row.querySelector('.asset-qty').value, value: row.querySelector('.asset-price').value, targetP: row.querySelector('.asset-target').value, market: row.querySelector('.asset-market').value }));
             data[cat.id] = { assets: list };
         });
-        localStorage.setItem('myPortfolio_v4', JSON.stringify({ categories, details: data }));
+        localStorage.setItem('myPortfolio_v5', JSON.stringify({ categories, details: data }));
     }
 
     window.onload = () => {
         fetch('csvjson.json').then(res => res.json()).then(data => STOCK_DB = data);
-        const saved = JSON.parse(localStorage.getItem('myPortfolio_v4'));
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v5'));
         if (saved) {
             categories = saved.categories;
             renderUI();
