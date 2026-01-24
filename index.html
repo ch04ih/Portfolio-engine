@@ -295,27 +295,24 @@
         setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
 
-    async function syncPrices() {
+   async function syncPrices() {
     const btn = document.getElementById('syncBtn');
     const originalText = btn.innerText;
     let symbolList = [];
 
-    // 依據你的規則收集代號
+    // 1. 收集所有可能的代號組合（增加備用方案）
     document.querySelectorAll('.asset-item').forEach(item => {
-        const s = item.querySelector('.asset-name').value.trim();
+        const s = item.querySelector('.asset-name').value.trim().toUpperCase(); // 強制大寫
         if (s && s !== '名稱') {
-            let fullSymbol;
             if (/^\d+$/.test(s)) {
-                // 1. 純數字：使用 TPE
-                fullSymbol = `TPE:${s}`;
-            } else if (/^[a-zA-Z]+$/.test(s)) {
-                // 2. 純英文：使用美股 (NYSEARCA)
-                fullSymbol = `NYSEARCA:${s}`;
+                symbolList.push(`TPE:${s}`); // 純數字
+            } else if (/^[A-Z]+$/.test(s)) {
+                symbolList.push(`NYSEARCA:${s}`); // 純英文
             } else {
-                // 3. 數字加英文 (或包含其他字元)：使用 OTCMKTS (櫃買)
-                fullSymbol = `OTCMKTS:${s}`;
+                // 數字+英文 (如 00687B)：同時請求兩種可能，增加成功率
+                symbolList.push(`OTCMKTS:${s}`);
+                symbolList.push(`TPE:${s}`);
             }
-            symbolList.push(fullSymbol);
         }
     });
 
@@ -335,28 +332,39 @@
         document.querySelectorAll('.asset-item').forEach(item => {
             const nameInput = item.querySelector('.asset-name');
             const priceInput = item.querySelector('.asset-price');
-            const s = nameInput.value.trim();
+            const s = nameInput.value.trim().toUpperCase();
             
-            let key;
-            if (/^\d+$/.test(s)) key = `TPE:${s}`;
-            else if (/^[a-zA-Z]+$/.test(s)) key = `NYSEARCA:${s}`;
-            else key = `OTCMKTS:${s}`;
+            let price = null;
+            if (/^\d+$/.test(s)) {
+                price = cloudPrices[`TPE:${s}`];
+            } else if (/^[A-Z]+$/.test(s)) {
+                price = cloudPrices[`NYSEARCA:${s}`];
+            } else {
+                // 債券型：先看 OTCMKTS，沒有再看 TPE
+                price = cloudPrices[`OTCMKTS:${s}`] || cloudPrices[`TPE:${s}`];
+            }
 
-            if (cloudPrices[key] && typeof cloudPrices[key] === 'number') {
-                priceInput.value = cloudPrices[key];
+            if (price && typeof price === 'number') {
+                priceInput.value = price;
                 autoViewMode(priceInput);
                 updatedCount++;
             }
         });
-        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
+        
+        if (updatedCount === 0) {
+            alert("⚠️ 抓不到報價，請確認代號是否正確（例如：00687B）");
+        } else {
+            alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
+        }
     } catch (e) { 
-        alert("同步失敗，請檢查網路或 GAS 設定。"); 
+        alert("同步失敗，請確認網路或 GAS 服務是否正常。"); 
     } finally { 
         btn.innerText = originalText; 
         btn.disabled = false; 
         calculateAll(); 
     }
 }
+
 
 
     function calculateAll() {
