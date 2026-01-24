@@ -66,6 +66,31 @@
         .edit-container.prefix::before { content: '$'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
         .edit-container.suffix::after { content: '%'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
 
+        /* 新增：搜尋下拉選單樣式 */
+        .search-results {
+            position: absolute;
+            top: 40px; left: 0; right: 0;
+            background: white;
+            border: 3px solid #1A1A1A;
+            border-radius: 8px;
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 4px 4px 0px #000;
+            display: none;
+        }
+        .search-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .search-item:hover { background: var(--theme-accent); color: var(--theme-bg); }
+        .search-item .market-tag { font-size: 9px; background: #eee; padding: 2px 4px; border-radius: 4px; color: #666; }
+
         .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; }
         .footer-row { display: flex; justify-content: space-between; align-items: center; }
         .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
@@ -137,10 +162,11 @@
 <script>
     let myChart = null;
     let categories = [];
+    let STOCK_DB = []; // 存放 JSON
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSEPMNB8ApKn9N5fFjKjpTblkgvjOcJ1TE8r5SGC_rj2gNG8N2uKNCX92TxtJy9BL/exec";
 
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
-    // 核心預設配置
     const DEFAULT_CONFIG = [
         { id: 'cat_1', name: '成長型投資', target: 40 },
         { id: 'cat_2', name: '進攻型投資', target: 10 },
@@ -148,6 +174,57 @@
         { id: 'cat_4', name: '高股息投資', target: 20 },
         { id: 'cat_5', name: '安全存款', target: 10 }
     ];
+
+    // 新增：搜尋邏輯
+    function handleStockSearch(inputEl) {
+        const query = inputEl.value.toUpperCase();
+        const resultsEl = inputEl.parentElement.querySelector('.search-results');
+        if (!query) { resultsEl.style.display = 'none'; return; }
+
+        const filtered = STOCK_DB.filter(item => 
+            item.s.toString().includes(query) || item.n.includes(query)
+        ).slice(0, 10);
+
+        if (filtered.length > 0) {
+            resultsEl.innerHTML = filtered.map(item => `
+                <div class="search-item" onclick="pickStock(this, '${item.s}', '${item.n}', '${item.m}')">
+                    <span>${item.s} ${item.n}</span>
+                    <span class="market-tag">${item.m}</span>
+                </div>
+            `).join('');
+            resultsEl.style.display = 'block';
+        } else {
+            resultsEl.style.display = 'none';
+        }
+    }
+
+    // 新增：選擇股票並抓取價格
+    async function pickStock(el, s, n, m) {
+        const container = el.closest('.edit-container');
+        const input = container.querySelector('.asset-name');
+        const resultsEl = container.querySelector('.search-results');
+        const assetItem = el.closest('.asset-item');
+        const priceInput = assetItem.querySelector('.asset-value');
+        const priceView = assetItem.querySelectorAll('.static-view')[2];
+
+        input.value = n;
+        resultsEl.style.display = 'none';
+
+        // 顯示抓取中
+        priceView.innerText = "抓取中...";
+        try {
+            const res = await fetch(`${SCRIPT_URL}?s=${s}&m=${m}`);
+            const data = await res.json();
+            if (data.price) {
+                priceInput.value = Math.round(data.price);
+                priceView.innerText = formatCurrency(data.price);
+                calculateAll();
+            }
+        } catch (e) {
+            priceView.innerText = "失敗";
+        }
+        autoViewMode(input); // 結束編輯模式
+    }
 
     function syncOrder() {
         const newOrder = [];
@@ -248,15 +325,26 @@
     }
 
     function autoViewMode(inputEl) {
+        // 如果正在搜尋，不立即關閉
+        if (document.activeElement === inputEl && inputEl.classList.contains('asset-name')) return;
+        
         const container = inputEl.parentElement;
         const view = container.previousElementSibling;
         let val = inputEl.value;
         if (inputEl.type === 'number') { if (val === "" || isNaN(val) || val < 0) { val = 0; inputEl.value = 0; } }
         else { if (val.trim() === "") { val = "未命名標的"; inputEl.value = val; } }
+        
         if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(val);
         else if (inputEl.classList.contains('target-p-input')) view.innerText = val + "%";
         else view.innerText = val;
-        setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+        
+        setTimeout(() => { 
+            const results = container.querySelector('.search-results');
+            if (results && results.style.display === 'block') return; // 如果選單開著，不要關閉編輯模式
+            container.style.display = 'none'; 
+            view.style.display = 'flex'; 
+            calculateAll(); 
+        }, 200);
     }
 
     function renderUI() {
@@ -265,7 +353,6 @@
         grid.innerHTML = '';
         
         categories.forEach(cat => {
-            // 讀取存檔目標比例，若無則使用 DEFAULT_CONFIG 中的對應比例
             const defaultMatch = DEFAULT_CONFIG.find(d => d.name === cat.name);
             const defaultTarget = defaultMatch ? defaultMatch.target : 20;
             const data = savedData[cat.id] || { target: defaultTarget, assets: [], collapsed: false };
@@ -303,6 +390,7 @@
             const listEl = card.querySelector('.asset-list');
             new Sortable(listEl, {
                 animation: 200, delay: 200, delayOnTouchOnly: true,
+                handle: '.asset-item',
                 ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
                 onEnd: () => { calculateAll(); }
             });
@@ -314,6 +402,7 @@
 
         new Sortable(grid, {
             animation: 200, delay: 200, delayOnTouchOnly: true,
+            handle: '.category-header',
             ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
             onEnd: () => { syncOrder(); calculateAll(); }
         });
@@ -328,9 +417,14 @@
         div.className = 'asset-item';
         div.innerHTML = `
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${name || '名稱'}</div>
-                <div class="edit-container"><input type="text" class="edit-input asset-name" value="${name}" onblur="autoViewMode(this)"></div>
+            <div style="position:relative;">
+                <div class="static-view" onclick="editMode(this)">${name || '搜尋或輸入'}</div>
+                <div class="edit-container">
+                    <input type="text" class="edit-input asset-name" value="${name}" 
+                           oninput="handleStockSearch(this)" 
+                           onblur="autoViewMode(this)">
+                    <div class="search-results"></div>
+                </div>
             </div>
             <div>
                 <div class="static-view" style="background:#666;" onclick="editMode(this)">${targetP > 0 ? targetP + '%' : '0%'}</div>
@@ -427,6 +521,12 @@
     }
 
     window.onload = () => {
+        // 載入 JSON 資料庫
+        fetch('csvjson.json')
+            .then(res => res.json())
+            .then(data => { STOCK_DB = data; console.log("JSON 載入成功"); })
+            .catch(err => console.error("JSON 載入失敗"));
+
         const savedCats = localStorage.getItem('catConfig_v2');
         if (savedCats) categories = JSON.parse(savedCats);
         else categories = DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
