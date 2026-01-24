@@ -8,61 +8,83 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
+        /* 主題與配色系統 */
         :root { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; --gray-marble: #F0F0F0; --radius: 12px; }
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
-        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
-        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
-        
-        .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
-        .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
+        [data-theme="orange"] { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; }
+        [data-theme="forest"] { --theme-accent: #dac4fc; --theme-bg: #293d0b; --theme-accent-rgb: 218, 196, 252; }
+        [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; --theme-accent-rgb: 128, 197, 222; }
+        [data-theme="purple"] { --theme-accent: #B4D355; --theme-bg: #6245b7; --theme-accent-rgb: 180, 211, 85; }
+        [data-theme="navy"]   { --theme-accent: #e4d9c4; --theme-bg: #1b2941; --theme-accent-rgb: 228, 217, 196; }
+        [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
 
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, sans-serif; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
+        
+        /* 標題與狀態 */
+        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; }
+        .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .status-dot { width: 8px; height: 8px; background: #00C853; border-radius: 50%; box-shadow: 0 0 5px #00C853; }
+
+        /* 主題切換按鈕 */
+        .theme-panel { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .theme-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; box-shadow: 2px 2px 0px #000; }
+
+        /* 資產面板 */
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 12px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; }
 
+        /* 區域卡片 */
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: pointer; }
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-        .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; }
-        .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; }
+        .target-input { width: 45px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; }
+        .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; }
 
+        /* 列表樣式 */
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1fr 0.6fr 55px; gap: 4px; padding-bottom: 8px; border-bottom: 1px solid #EEE; margin-bottom: 5px; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #BBB; text-align: center; }
-
-        .asset-list { margin-bottom: 15px; min-height: 5px; }
         .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1fr 0.6fr 55px; gap: 4px; margin-bottom: 12px; align-items: center; }
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; }
 
-        .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; border: 1px solid transparent; overflow: hidden; }
+        .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; border: 1px solid transparent; }
         .static-view.empty-placeholder { background: transparent !important; color: #CCC !important; border: none !important; font-weight: 400; }
 
+        /* 欄位配色 */
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view:not(.empty-placeholder), 
         .asset-item div:nth-child(4) .static-view:not(.empty-placeholder) { background: #EEE; color: #888; border: 1px solid #DDD; }
         .asset-item div:nth-child(5) .static-view { background: #F8F8F8; color: #1A1A1A; border: 1px solid #DDD; }
         .asset-item div:nth-child(6) .static-view { background: #666; color: white; }
 
-        .edit-container { position: relative; display: none; width: 100%; }
+        .edit-container { display: none; width: 100%; }
         .edit-input { width: 100%; height: 38px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; font-size: 12px; outline: none; }
 
-        .card-footer { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; }
-        .footer-row { display: flex; justify-content: space-between; align-items: center; }
-        .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
-        .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
+        .footer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 2px dashed #DDD; padding-top: 10px; }
+        .status-tag { margin-top: 10px; padding: 8px; text-align: center; font-size: 0.75rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.1); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.2); }
 
-        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
-        .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; font-size: 0.8rem; }
+        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; }
+        .btn-reset { background: #ddd; color: #888; border-color: #bbb; font-size: 0.8rem; margin-top: 20px; }
         
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
     </style>
 </head>
-<body>
+<body data-theme="orange">
 
 <div class="container">
-    <h1>Portfolio Engine<br><small style="font-size: 0.6em;">資產組合計算器</small></h1>
-    <div class="save-status"><div class="status-dot" id="saveDot"></div><span id="saveText">正在載入...</span></div>
+    <h1>Portfolio Engine<br><small style="font-size: 0.6em;">資產組合大師</small></h1>
+    
+    <div class="save-status"><div class="status-dot"></div><span>美股匯率自動換算中</span></div>
+
+    <div class="theme-panel">
+        <div class="theme-dot" style="background:#FF8C42" onclick="setTheme('orange')"></div>
+        <div class="theme-dot" style="background:#dac4fc" onclick="setTheme('forest')"></div>
+        <div class="theme-dot" style="background:#80C5DE" onclick="setTheme('wine')"></div>
+        <div class="theme-dot" style="background:#B4D355" onclick="setTheme('purple')"></div>
+        <div class="theme-dot" style="background:#e4d9c4" onclick="setTheme('navy')"></div>
+        <div class="theme-dot" style="background:#F0A650" onclick="setTheme('amber')"></div>
+    </div>
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -73,27 +95,28 @@
             </div>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
-        <div id="target-sum-alert" style="display:none; color:red; font-size:12px; font-weight:bold;"></div>
-        <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;"><canvas id="portfolioChart"></canvas></div>
+        <div id="chartContainer" style="display:none; margin-top: 20px; height: 250px;"><canvas id="portfolioChart"></canvas></div>
     </div>
 
     <div id="mainGrid"></div>
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
-    <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
+    <button class="btn btn-reset" onclick="clearAll()">重置資料</button>
 </div>
 
 <datalist id="stockList"></datalist>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec";
-    let usdRate = 32.5; // 預設匯率
+    let usdRate = 32.5; 
     let categories = [];
     let stockData = [];
     let myChart = null;
 
+    function setTheme(t) { document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString(); }
 
-    async function loadData() {
+    async function init() {
+        const t = localStorage.getItem('theme'); if(t) setTheme(t);
         try {
             const res = await fetch('csvjson.json');
             stockData = await res.json();
@@ -103,13 +126,8 @@
 
         const saved = localStorage.getItem('myPortfolio_v5');
         const savedCats = localStorage.getItem('catConfig_v5');
-        if (savedCats) {
-            categories = JSON.parse(savedCats);
-        } else {
-            categories = [{id:'cat_1', name:'台股'}, {id:'cat_2', name:'美股'}];
-        }
+        categories = savedCats ? JSON.parse(savedCats) : [{id:'cat_1', name:'台股'}, {id:'cat_2', name:'美股'}];
         renderUI(saved ? JSON.parse(saved) : {});
-        document.getElementById('saveText').innerText = "自動儲存中";
     }
 
     function renderUI(savedData) {
@@ -133,7 +151,7 @@
                 <div class="asset-list" id="list-${cat.id}"></div>
                 <button class="btn btn-add-asset" onclick="addAsset('${cat.id}')">+ 新增標的</button>
                 <div class="card-footer">
-                    <div class="footer-row"><span style="font-size:0.75rem;">區域合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div>
+                    <div class="footer-row"><span style="font-size:0.75rem;">區域合計</span><span class="cat-sum-display" style="font-weight:900;">$0</span><span class="current-p" style="font-weight:900;">0%</span></div>
                     <div class="status-tag status-alert">✅ 比例理想</div>
                 </div>
             `;
@@ -177,10 +195,8 @@
     }
 
     function editMode(el) {
-        el.style.display = 'none';
-        const container = el.nextElementSibling;
-        container.style.display = 'block';
-        container.querySelector('input').focus();
+        el.style.display = 'none'; el.nextElementSibling.style.display = 'block';
+        el.nextElementSibling.querySelector('input').focus();
     }
 
     function autoViewMode(inputEl) {
@@ -193,11 +209,7 @@
             const stock = stockData.find(s => s.s == val);
             if (stock && stock.p) {
                 const pIn = item.querySelector('.asset-price');
-                if(!pIn.value || pIn.value == 0) {
-                    pIn.value = stock.p;
-                    const pView = pIn.parentElement.previousElementSibling;
-                    pView.innerText = stock.p; pView.classList.remove('empty-placeholder');
-                }
+                if(!pIn.value || pIn.value == 0) pIn.value = stock.p;
             }
         }
 
@@ -206,47 +218,42 @@
         const p = parseFloat(item.querySelector('.asset-price').value);
         const vIn = item.querySelector('.asset-value');
 
+        // 美股匯率自動計算
         if (!isNaN(q) && !isNaN(p) && q > 0 && p > 0) {
-            vIn.value = /[a-zA-Z]/.test(name) ? Math.round(q * p * usdRate) : Math.round(q * p);
+            vIn.value = /^[a-zA-Z]/.test(name) ? Math.round(q * p * usdRate) : Math.round(q * p);
         }
 
-        // 視覺渲染邏輯
         let val = inputEl.value;
         if (inputEl.type === 'number') {
             if (!val || val == 0) {
-                if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
-                    view.innerText = "-"; view.classList.add('empty-placeholder');
-                } else { view.innerText = "$0"; view.classList.remove('empty-placeholder'); }
+                view.innerText = (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) ? "-" : "$0";
+                if(view.innerText === "-") view.classList.add('empty-placeholder');
             } else {
-                view.innerText = inputEl.classList.contains('asset-value') ? formatCurrency(val) : 
-                                 inputEl.classList.contains('target-p-input') ? val+"%" : val;
+                view.innerText = inputEl.classList.contains('asset-value') ? formatCurrency(val) : (inputEl.classList.contains('target-p-input') ? val+"%" : val);
                 view.classList.remove('empty-placeholder');
             }
         } else { view.innerText = val || "名稱"; }
 
-        inputEl.parentElement.style.display = 'none';
-        view.style.display = 'flex';
+        inputEl.parentElement.style.display = 'none'; view.style.display = 'flex';
         calculateAll();
     }
 
     async function syncPrices() {
         const btn = document.getElementById('syncBtn');
-        let symbols = [];
-        categories.forEach(cat => {
-            document.querySelectorAll(`#list-${cat.id} .asset-name`).forEach(i => {
-                const s = i.value.trim();
-                if(s) symbols.push(/^[a-zA-Z]/.test(s) ? `NYSEARCA:${s}` : `TPE:${s}`);
-            });
+        let syms = [];
+        document.querySelectorAll('.asset-name').forEach(i => {
+            const s = i.value.trim();
+            if(s) syms.push(/^[a-zA-Z]/.test(s) ? `NYSEARCA:${s}` : `TPE:${s}`);
         });
-        if(symbols.length === 0) return;
+        if(syms.length === 0) return;
         btn.innerText = "⏳...";
         try {
-            const res = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(symbols.join(','))}`);
+            const res = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(syms.join(','))}`);
             const data = await res.json();
             if(data["CURRENCY:USDTWD"]) usdRate = data["CURRENCY:USDTWD"];
             document.querySelectorAll('.asset-item').forEach(item => {
-                const name = item.querySelector('.asset-name').value.trim();
-                const key = /^[a-zA-Z]/.test(name) ? `NYSEARCA:${name}` : `TPE:${name}`;
+                const n = item.querySelector('.asset-name').value.trim();
+                const key = /^[a-zA-Z]/.test(n) ? `NYSEARCA:${n}` : `TPE:${n}`;
                 if(data[key]) {
                     const pIn = item.querySelector('.asset-price');
                     pIn.value = data[key];
@@ -260,14 +267,19 @@
     }
 
     function calculateAll() {
-        let total = 0, catSums = {};
-        categories.forEach(cat => {
+        let total = 0, catSums = {}, labels = [], values = [], colors = [];
+        const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
+
+        categories.forEach((cat, idx) => {
             let sum = 0;
             const card = document.getElementById(cat.id);
             if(!card) return;
             card.querySelectorAll('.asset-value').forEach(v => sum += parseFloat(v.value)||0);
             catSums[cat.id] = sum;
             total += sum;
+            labels.push(cat.name);
+            values.push(sum);
+            colors.push(idx === 0 ? themeColor : `rgba(${255-idx*30}, ${140+idx*20}, ${66+idx*40}, 0.8)`);
         });
 
         categories.forEach(cat => {
@@ -284,13 +296,29 @@
             const tag = card.querySelector('.status-alert');
             tag.innerHTML = total === 0 ? "請輸入資料" : (Math.abs(p-target)<1 ? "✅ 比例理想" : 
                 (diff > 0 ? `⚠️ 建議移出 ${formatCurrency(diff)}` : `⚠️ 建議補入 ${formatCurrency(Math.abs(diff))}`));
+
+            card.querySelectorAll('.asset-item').forEach(item => {
+                const val = parseFloat(item.querySelector('.asset-value').value) || 0;
+                item.querySelector('.ratio-val').innerText = catSums[cat.id] > 0 ? (val/catSums[cat.id]*100).toFixed(1)+'%' : '0%';
+            });
         });
 
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        forceSave();
+        updateChart(labels, values, colors);
+        save();
     }
 
-    function forceSave() {
+    function updateChart(labels, data, colors) {
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#1A1A1A' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
+        });
+    }
+
+    function save() {
         const data = {};
         categories.forEach(cat => {
             const card = document.getElementById(cat.id);
@@ -311,13 +339,13 @@
         localStorage.setItem('catConfig_v5', JSON.stringify(categories));
     }
 
-    function toggleCategory(id) { document.getElementById(id).classList.toggle('collapsed'); forceSave(); }
-    function deleteCategory(id) { if(confirm('刪除？')) { categories = categories.filter(c=>c.id!==id); renderUI({}); forceSave(); } }
-    function addCategory() { categories.push({id:'cat_'+Date.now(), name:'新區域'}); renderUI({}); }
-    function clearAll() { if(confirm('重置？')) { localStorage.clear(); location.reload(); } }
+    function toggleCategory(id) { document.getElementById(id).classList.toggle('collapsed'); save(); }
+    function deleteCategory(id) { if(confirm('確定刪除區域？')) { categories = categories.filter(c=>c.id!==id); renderUI({}); } }
+    function addCategory() { categories.push({id:'cat_'+Date.now(), name:'新投資區域'}); renderUI({}); }
+    function clearAll() { if(confirm('確定重置所有資料？')) { localStorage.clear(); location.reload(); } }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display==='none'?'block':'none'; }
 
-    window.onload = loadData;
+    window.onload = init;
 </script>
 </body>
 </html>
