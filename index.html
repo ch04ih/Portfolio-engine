@@ -70,7 +70,6 @@
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; z-index: 2; }
 
         .static-view { background: #1A1A1A; color: white; padding: 8px 2px; font-size: 9px; text-align: center; min-height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 900; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid transparent; }
-        .static-view.empty-placeholder { background: transparent !important; color: #CCC !important; border: none !important; font-weight: 400 !important; }
 
         .asset-item div:nth-child(2) .static-view { background: #1A1A1A; color: white; }
         .asset-item div:nth-child(3) .static-view:not(.empty-placeholder), 
@@ -295,24 +294,30 @@
         setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
 
-   async function syncPrices() {
+  async function syncPrices() {
     const btn = document.getElementById('syncBtn');
     const originalText = btn.innerText;
     let symbolList = [];
 
-    // 1. 收集所有可能的代號組合（增加備用方案）
+    // 1. 收集並依照你的新規則判斷代號
     document.querySelectorAll('.asset-item').forEach(item => {
-        const s = item.querySelector('.asset-name').value.trim().toUpperCase(); // 強制大寫
+        const s = item.querySelector('.asset-name').value.trim().toUpperCase();
         if (s && s !== '名稱') {
-            if (/^\d+$/.test(s)) {
-                symbolList.push(`TPE:${s}`); // 純數字
-            } else if (/^[A-Z]+$/.test(s)) {
-                symbolList.push(`NYSEARCA:${s}`); // 純英文
+            let fullSymbol;
+            if (/^[A-Z]+$/.test(s)) {
+                // 規則 1：純英文 -> NASDAQ:
+                fullSymbol = `NASDAQ:${s}`;
+            } else if (/^\d+$/.test(s)) {
+                // 規則 2：純數字 -> TPE:
+                fullSymbol = `TPE:${s}`;
+            } else if (/^\d{5}B$/i.test(s)) {
+                // 規則 3：5個數字+B -> TWO:
+                fullSymbol = `TWO:${s}`;
             } else {
-                // 數字+英文 (如 00687B)：同時請求兩種可能，增加成功率
-                symbolList.push(`OTCMKTS:${s}`);
-                symbolList.push(`TPE:${s}`);
+                // 備用：其他情況預設用 TPE (或可依需求調整)
+                fullSymbol = `TPE:${s}`;
             }
+            symbolList.push(fullSymbol);
         }
     });
 
@@ -334,36 +339,29 @@
             const priceInput = item.querySelector('.asset-price');
             const s = nameInput.value.trim().toUpperCase();
             
-            let price = null;
-            if (/^\d+$/.test(s)) {
-                price = cloudPrices[`TPE:${s}`];
-            } else if (/^[A-Z]+$/.test(s)) {
-                price = cloudPrices[`NYSEARCA:${s}`];
-            } else {
-                // 債券型：先看 OTCMKTS，沒有再看 TPE
-                price = cloudPrices[`OTCMKTS:${s}`] || cloudPrices[`TPE:${s}`];
-            }
+            let key;
+            if (/^[A-Z]+$/.test(s)) key = `NASDAQ:${s}`;
+            else if (/^\d+$/.test(s)) key = `TPE:${s}`;
+            else if (/^\d{5}B$/i.test(s)) key = `TWO:${s}`;
+            else key = `TPE:${s}`;
 
-            if (price && typeof price === 'number') {
-                priceInput.value = price;
+            if (cloudPrices[key] && typeof cloudPrices[key] === 'number') {
+                priceInput.value = cloudPrices[key];
                 autoViewMode(priceInput);
                 updatedCount++;
             }
         });
         
-        if (updatedCount === 0) {
-            alert("⚠️ 抓不到報價，請確認代號是否正確（例如：00687B）");
-        } else {
-            alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
-        }
+        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。\n目前匯率：${usdRate}`);
     } catch (e) { 
-        alert("同步失敗，請確認網路或 GAS 服務是否正常。"); 
+        alert("同步失敗，請確認網路或 GAS 設定。"); 
     } finally { 
         btn.innerText = originalText; 
         btn.disabled = false; 
         calculateAll(); 
     }
 }
+
 
 
 
