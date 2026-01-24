@@ -387,17 +387,41 @@
         list.appendChild(div);
     }
 
-    // 核心修改：大幅增加色階差別
+    // 輔助函數：將 RGB 轉換為 HSL
+    function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        if (max === min) h = s = 0;
+        else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return [h * 360, s * 100, l * 100];
+    }
+
+    // 核心修改：結合透明度調整與色相旋轉 (Hue Rotation)
     function generateMonochromeScale(baseHex, steps = 7) {
         let hex = baseHex.replace('#', '');
         let r = parseInt(hex.substring(0, 2), 16);
         let g = parseInt(hex.substring(2, 4), 16);
         let b = parseInt(hex.substring(4, 6), 16);
+        
+        let [h, s, l] = rgbToHsl(r, g, b);
         let colors = [];
+        
         for (let i = 0; i < steps; i++) {
-            // 大幅調整透明度區間從 1.0 到 0.1
-            let opacity = Math.max(0.1, 1 - (i * 0.2)); 
-            colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
+            // 色相旋轉：每一階偏移 6 度，讓鄰近分類顏色有微妙差別
+            let newH = (h + (i * 6)) % 360;
+            // 透明度：大幅遞減，區間從 1.0 到 0.15
+            let opacity = Math.max(0.15, 1 - (i * 0.18));
+            colors.push(`hsla(${newH}, ${s}%, ${l}%, ${opacity})`);
         }
         return colors;
     }
