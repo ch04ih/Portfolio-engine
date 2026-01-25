@@ -122,7 +122,7 @@
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets｜資產總現值 (TWD)</div>
+            <div style="font-size: 0.7rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets｜資產總現值 (TWD)</div>
             <div style="display:flex; gap:8px;">
                 <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 最新股價</button>
                 <button class="chart-btn" onclick="toggleChart()">圖表</button>
@@ -235,7 +235,7 @@
         });
         if (sL.length === 0) return alert("請輸入代號");
         try {
-            btn.innerText = "⏳"; btn.disabled = true;
+            btn.innerText = "⏳..."; btn.disabled = true;
             const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
             const cloud = await resp.json();
             if (cloud["CURRENCY:USDTWD"]) usdRate = cloud["CURRENCY:USDTWD"];
@@ -243,7 +243,7 @@
                 const s = i.querySelector('.asset-name').value.trim().toUpperCase(), p = cloud[s];
                 if (p && p > 0) { const pI = i.querySelector('.asset-price'); pI.value = p; autoViewMode(pI); }
             });
-            alert(`✅ 匯率：${usdRate.toFixed(2)}`);
+            alert(`✅ 股價已更新 目前匯率：${usdRate.toFixed(2)}`);
         } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
     }
 
@@ -264,7 +264,7 @@
             card.querySelector('.current-p').innerText = curP.toFixed(1) + "%";
             const tag = card.querySelector('.status-alert'), diff = catSums[card.id] - (total * (target / 100));
             if (total === 0) tag.innerText = "✅ 等待資料";
-            else if (Math.abs(curP - target) <= 1) tag.innerText = "✅ 比例理想";
+            else if (Math.abs(curP - target) <= 3) tag.innerText = "✅ 比例理想";
             else tag.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`;
 
             card.querySelectorAll('.asset-item').forEach(item => {
