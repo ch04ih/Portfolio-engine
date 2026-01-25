@@ -48,7 +48,7 @@
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        /* 欄位比例微調：縮小股數與單價佔比，騰出空間給右側目標欄位 */
+        /* 欄位佈局 */
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
 
@@ -58,13 +58,10 @@
         .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
         .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
 
-        /* 名稱：淺藍底色，置中 */
+        /* 視覺亮點與縮小輔助資訊 */
         .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; } 
-        /* 股數單價：縮小、淡化 */
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
-        /* 現值：黃金色底色，靠右 */
         .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
-        /* 目標%：靠右，並與右側差異建議更接近 */
         .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
 
         .edit-container { position: relative; display: none; width: 100%; }
@@ -78,15 +75,17 @@
         .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
-        .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
-        #target-sum-alert { margin-top:10px; font-size:12px; font-weight:900; text-align:center; padding:8px; border-radius:8px; display:none; border: 2px solid #FF4444; }
+        
+        /* 圖表寬度修正 */
+        #chartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
+        #portfolioChart { width: 100% !important; height: auto !important; }
+
         .alert-red { background-color: #FFE5E5 !important; color: #B30000 !important; }
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
         .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
-        .theme-options button::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg); }
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
@@ -114,27 +113,27 @@
 
     <div class="save-status">
         <div class="status-dot" id="saveDot"></div>
-        <span id="saveText">正在載入數據...</span>
+        <span id="saveText">數據載入中...</span>
     </div>
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets (TWD)</div>
-            <div style="display:flex; gap:8px; flex-shrink: 0;">
+            <div style="display:flex; gap:8px;">
                 <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步</button>
                 <button class="chart-btn" onclick="toggleChart()">圖表</button>
             </div>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
-        <div id="target-sum-alert"></div>
-        <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;">
+        <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px;" class="alert-red"></div>
+        <div id="chartContainer">
             <canvas id="portfolioChart"></canvas>
         </div>
     </div>
 
     <div id="mainGrid"></div>
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
-    <button class="btn btn-reset" onclick="clearAll()">重置資料</button>
+    <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAll()">重置資料</button>
 </div>
 
 <datalist id="stockList"></datalist>
@@ -280,14 +279,34 @@
     }
 
     function updateChart(catSums, grandTotal) {
-        const ctx = document.getElementById('portfolioChart'); if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        const container = document.getElementById('chartContainer');
+        const ctx = document.getElementById('portfolioChart'); 
+        if (!ctx || container.style.display === 'none') return;
+        
         const cA = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
         const cB = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg').trim();
         const ids = Object.keys(catSums);
         const colors = ids.map((_, i) => interpolateColor(cA, cB, i / (ids.length > 1 ? ids.length - 1 : 1)));
-        const data = { labels: ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText), datasets: [{ data: ids.map(id => catSums[id]), backgroundColor: colors, borderWidth: 2 }] };
-        if (myChart) { myChart.data = data; myChart.update(); } 
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } } }); }
+        const labels = ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText);
+        const dataValues = ids.map(id => catSums[id]);
+
+        if (myChart) {
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = dataValues;
+            myChart.data.datasets[0].backgroundColor = colors;
+            myChart.update();
+            myChart.resize(); // 確保重新調整大小
+        } else {
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: colors, borderWidth: 2 }] },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } 
+                }
+            });
+        }
     }
 
     function interpolateColor(c1, c2, f) {
@@ -315,9 +334,26 @@
             grid.appendChild(card);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, onEnd: () => calculateAll() });
+            
+            // 標的移動延遲設定
+            new Sortable(document.getElementById(`list-${cat.id}`), { 
+                animation: 150, 
+                delay: 200, 
+                delayOnTouchOnly: true, 
+                touchStartThreshold: 5,
+                onEnd: () => calculateAll() 
+            });
         });
-        new Sortable(grid, { animation: 150, handle: '.category-header', onEnd: () => calculateAll() });
+        
+        // 區域移動延遲設定
+        new Sortable(grid, { 
+            animation: 150, 
+            handle: '.category-header', 
+            delay: 200, 
+            delayOnTouchOnly: true, 
+            touchStartThreshold: 5,
+            onEnd: () => calculateAll() 
+        });
         calculateAll();
     }
 
