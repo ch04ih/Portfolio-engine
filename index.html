@@ -38,7 +38,6 @@
         .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 10px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; white-space: nowrap; flex-shrink: 0; }
 
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
@@ -49,27 +48,29 @@
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        /* --- 視覺優化區域 --- */
-        .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.7fr 0.7fr 1.1fr 0.6fr 50px; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
+        /* 欄位比例微調：縮小股數與單價佔比，騰出空間給右側目標欄位 */
+        .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.7fr 0.7fr 1.1fr 0.6fr 50px; gap: 6px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
+        .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
         
-        .static-view { 
-            background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; 
-        }
+        .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
+        .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
 
-        /* 增加底色優化 */
+        /* 名稱：淺藍底色，置中 */
         .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; } 
-        .asset-item div:nth-child(3) .static-view, 
-        .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; justify-content: center; } 
+        /* 股數單價：縮小、淡化 */
+        .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
+        /* 現值：黃金色底色，靠右 */
         .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
+        /* 目標%：靠右，並與右側差異建議更接近 */
         .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 28px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
-        .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; }
+        .edit-container.prefix::before { content: '$'; position: absolute; left: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
+        .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
 
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
         .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
@@ -89,14 +90,13 @@
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
-        .sortable-ghost { opacity: 0.3; background: var(--theme-accent) !important; border: 2px dashed #000; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="theme-panel" id="themePanel">
-        <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 主題配色</div>
+        <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 配色</div>
         <div class="theme-options">
             <button style="background: #FF8C42; --btn-bg: #3D2B1F" onclick="setTheme('orange')"></button>
             <button style="background: #dac4fc; --btn-bg: #293d0b" onclick="setTheme('forest')"></button>
@@ -108,8 +108,8 @@
     </div>
 
     <h1>
-        <span style="font-size: 0.9em; letter-spacing: 2px;">Portfolio Engine</span><br>
-        <span style="font-size: 0.7em;">資產組合計算器</span>
+        <span style="font-size: 0.8em; letter-spacing: 2px;">Portfolio Engine</span><br>
+        <span style="font-size: 0.6em;">資產組合計算器</span>
     </h1>
 
     <div class="save-status">
@@ -118,7 +118,7 @@
     </div>
 
     <div class="rebalance-panel">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
             <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets (TWD)</div>
             <div style="display:flex; gap:8px; flex-shrink: 0;">
                 <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步</button>
@@ -134,7 +134,7 @@
 
     <div id="mainGrid"></div>
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
-    <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
+    <button class="btn btn-reset" onclick="clearAll()">重置資料</button>
 </div>
 
 <datalist id="stockList"></datalist>
@@ -143,10 +143,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
     let myChart = null, categories = [], stockData = [], usdRate = 32.5;
 
-    function formatNum(num) { 
-        if (num === '' || isNaN(num) || num == null) return "-";
-        return parseFloat(num).toLocaleString('en-US'); 
-    }
+    function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
     const DEFAULT_CONFIG = [
@@ -159,15 +156,11 @@
 
     async function loadStockData() {
         try {
-            const response = await fetch('csvjson.json');
-            stockData = await response.json();
-            const datalist = document.getElementById('stockList');
-            stockData.forEach(item => {
-                const option = document.createElement('option');
-                option.value = `${item.s} ${item.n}`;
-                datalist.appendChild(option);
-            });
-            document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
+            const resp = await fetch('csvjson.json');
+            stockData = await resp.json();
+            const dl = document.getElementById('stockList');
+            stockData.forEach(i => { const opt = document.createElement('option'); opt.value = `${i.s} ${i.n}`; dl.appendChild(opt); });
+            document.getElementById('saveText').innerText = "自動儲存至本地";
         } catch (e) { document.getElementById('saveText').innerText = "數據載入失敗"; }
     }
 
@@ -175,7 +168,7 @@
         try {
             const data = {}, newCats = [];
             document.querySelectorAll('.category-card').forEach(card => {
-                const catId = card.id, assets = [];
+                const assets = [];
                 card.querySelectorAll('.asset-item').forEach(item => {
                     assets.push({
                         name: item.querySelector('.asset-name').value || '',
@@ -185,68 +178,56 @@
                         targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
                     });
                 });
-                newCats.push({ id: catId, name: card.querySelector('.cat-name-text').innerText });
-                data[catId] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
+                newCats.push({ id: card.id, name: card.querySelector('.cat-name-text').innerText });
+                data[card.id] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
             });
             categories = newCats;
             localStorage.setItem('myPortfolio_v5', JSON.stringify(data));
             localStorage.setItem('catConfig_v5', JSON.stringify(categories));
-            const dot = document.getElementById('saveDot');
-            if (dot) { dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800); }
+            const dot = document.getElementById('saveDot'); dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800);
         } catch(e) {}
     }
 
-    function setTheme(themeName) {
-        document.documentElement.setAttribute('data-theme', themeName);
-        localStorage.setItem('userTheme', themeName);
-        if (document.getElementById('themePanel')) document.getElementById('themePanel').classList.remove('active');
-        calculateAll();
-    }
-
+    function setTheme(name) { document.documentElement.setAttribute('data-theme', name); localStorage.setItem('userTheme', name); calculateAll(); }
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
     function editMode(el) {
-        const container = el.nextElementSibling;
-        el.style.display = 'none'; container.style.display = 'block';
-        const input = container.querySelector('input');
-        if (input) { input.focus(); input.select(); }
+        const con = el.nextElementSibling; el.style.display = 'none'; con.style.display = 'block';
+        const i = con.querySelector('input'); if (i) { i.focus(); i.select(); }
     }
 
-    function autoViewMode(inputEl) {
-        const container = inputEl.parentElement, item = inputEl.closest('.asset-item'), view = container.previousElementSibling;
-        if (inputEl.classList.contains('asset-name')) {
-            let val = inputEl.value.trim(); if (val.includes(' ')) val = val.split(' ')[0];
-            inputEl.value = val;
-            const stock = stockData.find(s => s.s == val);
-            if (stock && stock.p) {
-                const pI = item.querySelector('.asset-price');
-                if (!pI.value || pI.value == 0) pI.value = stock.p;
-            }
+    function autoViewMode(iEl) {
+        const item = iEl.closest('.asset-item'), view = iEl.parentElement.previousElementSibling;
+        if (iEl.classList.contains('asset-name')) {
+            let val = iEl.value.trim(); if (val.includes(' ')) val = val.split(' ')[0];
+            iEl.value = val;
+            const s = stockData.find(st => st.s == val);
+            if (s && s.p) { const pI = item.querySelector('.asset-price'); if (!pI.value || pI.value == 0) pI.value = s.p; }
         }
         const name = item.querySelector('.asset-name').value.trim(), q = parseFloat(item.querySelector('.asset-qty').value), p = parseFloat(item.querySelector('.asset-price').value);
-        if ((inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price') || inputEl.classList.contains('asset-name')) && q > 0 && p > 0) {
+        if (q > 0 && p > 0) {
             const vI = item.querySelector('.asset-value');
             vI.value = /^[A-Za-z]+$/.test(name) ? Math.round(q * p * usdRate) : Math.round(q * p);
         }
-        let dV = inputEl.value;
-        if (inputEl.type === 'number') {
+        let dV = iEl.value;
+        if (iEl.type === 'number') {
             if (dV === "" || dV == 0) {
-                view.innerText = (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) ? "-" : (inputEl.classList.contains('target-p-input') ? "0%" : "$0");
-                if (view.innerText === "-") view.classList.add('empty-placeholder');
+                view.innerText = (iEl.classList.contains('asset-qty') || iEl.classList.contains('asset-price')) ? "-" : (iEl.classList.contains('target-p-input') ? "0%" : "$0");
+                view.classList.toggle('empty-placeholder', view.innerText === "-");
             } else {
-                if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) view.innerText = formatNum(dV);
-                else if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(dV);
-                else if (inputEl.classList.contains('target-p-input')) view.innerText = dV + "%";
+                if (iEl.classList.contains('asset-qty') || iEl.classList.contains('asset-price')) view.innerText = formatNum(dV);
+                else if (iEl.classList.contains('asset-value')) view.innerText = formatCurrency(dV);
+                else if (iEl.classList.contains('target-p-input')) view.innerText = dV + "%";
                 view.classList.remove('empty-placeholder');
             }
         } else { view.innerText = dV || "點擊輸入"; }
-        setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+        setTimeout(() => { iEl.parentElement.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
 
     async function syncPrices() {
         const btn = document.getElementById('syncBtn'), oT = btn.innerText;
-        let sL = []; document.querySelectorAll('.asset-item').forEach(item => {
-            const s = item.querySelector('.asset-name').value.trim().toUpperCase();
+        let sL = []; document.querySelectorAll('.asset-item').forEach(i => {
+            const s = i.querySelector('.asset-name').value.trim().toUpperCase();
             if (s && s !== '點擊輸入') sL.push(s);
         });
         if (sL.length === 0) return alert("請輸入代號");
@@ -255,9 +236,9 @@
             const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
             const cloud = await resp.json();
             if (cloud["CURRENCY:USDTWD"]) usdRate = cloud["CURRENCY:USDTWD"];
-            document.querySelectorAll('.asset-item').forEach(item => {
-                const s = item.querySelector('.asset-name').value.trim().toUpperCase(), p = cloud[s];
-                if (p && p > 0) { const pI = item.querySelector('.asset-price'); pI.value = p; autoViewMode(pI); }
+            document.querySelectorAll('.asset-item').forEach(i => {
+                const s = i.querySelector('.asset-name').value.trim().toUpperCase(), p = cloud[s];
+                if (p && p > 0) { const pI = i.querySelector('.asset-price'); pI.value = p; autoViewMode(pI); }
             });
             alert(`✅ 匯率：${usdRate.toFixed(2)}`);
         } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
@@ -266,28 +247,28 @@
     function calculateAll() {
         let total = 0, catSums = {}, totalTargetP = 0;
         document.querySelectorAll('.category-card').forEach(card => {
-            const catId = card.id; totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
+            totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
             let sum = 0; card.querySelectorAll('.asset-value').forEach(i => { sum += parseFloat(i.value) || 0; });
-            catSums[catId] = sum; total += sum;
+            catSums[card.id] = sum; total += sum;
         });
         const alertDiv = document.getElementById('target-sum-alert');
         if (Math.abs(totalTargetP - 100) > 0.01) { alertDiv.style.display = 'block'; alertDiv.innerText = `⚠️ 目標總和: ${totalTargetP}%`; } else alertDiv.style.display = 'none';
 
         document.querySelectorAll('.category-card').forEach(card => {
-            const catId = card.id, target = parseFloat(card.querySelector('.target-input').value) || 0, curP = total > 0 ? (catSums[catId] / total * 100) : 0;
+            const target = parseFloat(card.querySelector('.target-input').value) || 0, curP = total > 0 ? (catSums[card.id] / total * 100) : 0;
             card.querySelector('.target-amount-label').innerText = formatCurrency(total * (target / 100));
-            card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[catId]);
+            card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[card.id]);
             card.querySelector('.current-p').innerText = curP.toFixed(1) + "%";
-            const tag = card.querySelector('.status-alert'), diff = catSums[catId] - (total * (target / 100));
+            const tag = card.querySelector('.status-alert'), diff = catSums[card.id] - (total * (target / 100));
             if (total === 0) tag.innerText = "✅ 等待資料";
             else if (Math.abs(curP - target) <= 1) tag.innerText = "✅ 比例理想";
             else tag.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`;
 
             card.querySelectorAll('.asset-item').forEach(item => {
                 const val = parseFloat(item.querySelector('.asset-value').value) || 0, tP = parseFloat(item.querySelector('.target-p-input').value) || 0;
-                item.querySelector('.ratio-val').innerText = (catSums[catId] > 0 ? (val / catSums[catId] * 100).toFixed(1) : 0) + '%';
+                item.querySelector('.ratio-val').innerText = (catSums[card.id] > 0 ? (val / catSums[card.id] * 100).toFixed(1) : 0) + '%';
                 const sug = item.querySelector('.diff-suggestion');
-                if (total > 0 && catSums[catId] > 0 && tP > 0) {
+                if (total > 0 && catSums[card.id] > 0 && tP > 0) {
                     const d = (total * (target/100) * (tP/100)) - val;
                     sug.innerText = (d > 0 ? "+" : "") + Math.round(d).toLocaleString();
                     sug.style.color = d > 0 ? "#008800" : "#FF4444";
@@ -298,51 +279,15 @@
         updateChart(catSums, total); forceSave();
     }
 
-    // 完整的圖表更新邏輯
     function updateChart(catSums, grandTotal) {
-        const canvas = document.getElementById('portfolioChart');
-        const container = document.getElementById('chartContainer');
-        if (!canvas || container.style.display === 'none') return;
-        
-        const cA = getCSSVar('--theme-accent'), cB = getCSSVar('--theme-bg'), ids = Object.keys(catSums);
-        const labels = ids.map(id => {
-            const name = document.getElementById(id).querySelector('.cat-name-text').innerText;
-            const val = catSums[id];
-            const p = grandTotal > 0 ? (val / grandTotal * 100).toFixed(1) : 0;
-            return `${name} (${p}%)`;
-        });
-        const dataVals = ids.map(id => catSums[id]);
+        const ctx = document.getElementById('portfolioChart'); if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        const cA = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
+        const cB = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg').trim();
+        const ids = Object.keys(catSums);
         const colors = ids.map((_, i) => interpolateColor(cA, cB, i / (ids.length > 1 ? ids.length - 1 : 1)));
-
-        const config = {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: dataVals,
-                    backgroundColor: colors,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 10, weight: '900' }, color: '#333', padding: 15 } }
-                }
-            }
-        };
-
-        if (myChart) {
-            myChart.data.labels = labels;
-            myChart.data.datasets[0].data = dataVals;
-            myChart.data.datasets[0].backgroundColor = colors;
-            myChart.update();
-        } else {
-            myChart = new Chart(canvas, config);
-        }
+        const data = { labels: ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText), datasets: [{ data: ids.map(id => catSums[id]), backgroundColor: colors, borderWidth: 2 }] };
+        if (myChart) { myChart.data = data; myChart.update(); } 
+        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } } }); }
     }
 
     function interpolateColor(c1, c2, f) {
@@ -364,13 +309,13 @@
                 </div>
                 <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span></span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
-                <button class="btn" style="padding:8px;font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
-                <div class="card-footer"><div class="footer-row"><span style="font-size:0.75rem; color:#888;">區域合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
+                <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
+                <div class="card-footer"><div class="footer-row"><span style="font-size:0.75rem; color:#888;">合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
             `;
             grid.appendChild(card);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 300, onEnd: () => calculateAll() });
+            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, onEnd: () => calculateAll() });
         });
         new Sortable(grid, { animation: 150, handle: '.category-header', onEnd: () => calculateAll() });
         calculateAll();
@@ -385,7 +330,7 @@
             <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
             <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
         `;
@@ -396,15 +341,9 @@
     function deleteCategory(id) { if (confirm('刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
     function toggleCategory(id) { if (event.target.tagName !== 'INPUT' && !event.target.isContentEditable) { document.getElementById(id).classList.toggle('collapsed'); forceSave(); } }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('確定重置？')) { localStorage.clear(); location.reload(); } }
+    function clearAll() { if (confirm('重置？')) { localStorage.clear(); location.reload(); } }
 
-    window.onload = () => { 
-        loadStockData(); 
-        const s = localStorage.getItem('catConfig_v5'); 
-        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); 
-        renderUI(); 
-        setTheme(localStorage.getItem('userTheme') || 'orange'); 
-    };
+    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); };
 </script>
 </body>
 </html>
