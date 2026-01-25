@@ -307,18 +307,11 @@ if (/^[A-Za-z]+$/.test(name)) {
     const originalText = btn.innerText;
     let symbolList = [];
 
-    // 1. 依照你的新規則收集代號
     document.querySelectorAll('.asset-item').forEach(item => {
         const s = item.querySelector('.asset-name').value.trim().toUpperCase();
         if (s && s !== '名稱') {
-            if (/^[A-Z]+$/.test(s)) {
-                // 規則：純英文直接用代號 (VOO)
-                symbolList.push(s);
-            } else {
-                // 規則：不是純英文，同時請求 TPE 和 TWO 做為保險
-                symbolList.push(`TPE:${s}`);
-                symbolList.push(`TWO:${s}`);
-            }
+            // 直接傳送原始代號 (例如 2330, VOO, 00687B)，讓 GAS 去判斷
+            symbolList.push(s);
         }
     });
 
@@ -331,7 +324,10 @@ if (/^[A-Za-z]+$/.test(name)) {
         const response = await fetch(finalUrl);
         const cloudPrices = await response.json();
 
-        if (cloudPrices["CURRENCY:USDTWD"]) { usdRate = cloudPrices["CURRENCY:USDTWD"]; }
+        // 更新當前匯率
+        if (cloudPrices["CURRENCY:USDTWD"]) { 
+            usdRate = cloudPrices["CURRENCY:USDTWD"]; 
+        }
 
         let updatedCount = 0;
         document.querySelectorAll('.asset-item').forEach(item => {
@@ -339,15 +335,8 @@ if (/^[A-Za-z]+$/.test(name)) {
             const priceInput = item.querySelector('.asset-price');
             const s = nameInput.value.trim().toUpperCase();
             
-            let price = null;
-            if (/^[A-Z]+$/.test(s)) {
-                price = cloudPrices[s];
-            } else {
-                // 優先用 TPE，找不到就用 TWO
-                price = (cloudPrices[`TPE:${s}`] && cloudPrices[`TPE:${s}`] > 0) 
-                        ? cloudPrices[`TPE:${s}`] 
-                        : cloudPrices[`TWO:${s}`];
-            }
+            // 直接用代號當 Key 去拿資料
+            const price = cloudPrices[s];
 
             if (price && typeof price === 'number' && price > 0) {
                 priceInput.value = price;
@@ -356,9 +345,14 @@ if (/^[A-Za-z]+$/.test(name)) {
             }
         });
         
-        alert(`✅ 同步完成！更新了 ${updatedCount} 筆報價。`);
-    } catch (e) { alert("同步失敗"); }
-    finally { btn.innerText = originalText; btn.disabled = false; calculateAll(); }
+        alert(`✅ 同步完成！匯率已更新至：${usdRate.toFixed(2)}`);
+    } catch (e) { 
+        alert("同步失敗，請檢查 GAS 部署是否正確"); 
+    } finally { 
+        btn.innerText = originalText; 
+        btn.disabled = false; 
+        calculateAll(); 
+    }
 }
 
 
@@ -529,20 +523,27 @@ if (/^[A-Za-z]+$/.test(name)) {
     }
 
     function addAsset(catId, name='', value=0, targetP=0, qty='', price='') {
-        const list = document.getElementById(`list-${catId}`); if(!list) return;
-        const div = document.createElement('div'); div.className = 'asset-item';
-        const qD = (qty===''||qty==0)?'-':qty; const pD = (price===''||price==0)?'-':price;
-        div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
-            <div><div class="static-view" onclick="editMode(this)">${name||'名稱'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view ${qD==='-'}?empty-placeholder:''" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view ${pD==='-'}?empty-placeholder:''" onclick="editMode(this)">${pD}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
-            <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
-        `;
-        list.appendChild(div);
-    }
+    const list = document.getElementById(`list-${catId}`); if(!list) return;
+    const div = document.createElement('div'); div.className = 'asset-item';
+    
+    const qD = (qty === '' || qty == 0) ? '-' : qty;
+    const pD = (price === '' || price == 0) ? '-' : price;
+    
+    // 正確的樣式判斷
+    const qClass = (qD === '-') ? 'empty-placeholder' : '';
+    const pClass = (pD === '-') ? 'empty-placeholder' : '';
+
+    div.innerHTML = `
+        <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
+        <div><div class="static-view" onclick="editMode(this)">${name||'名稱'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
+        <div><div class="static-view ${qClass}" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
+        <div><div class="static-view ${pClass}" onclick="editMode(this)">${pD}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
+        <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
+        <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
+        <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
+    `;
+    list.appendChild(div);
+}
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新投資區域' }); renderUI(); }
     function deleteCategory(id) { if (confirm('確定刪除區域？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
