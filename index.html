@@ -39,19 +39,7 @@
 
         .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
         
-        .chart-btn { 
-            background: var(--theme-accent); 
-            color: var(--theme-bg); 
-            border: 2px solid #1A1A1A; 
-            padding: 5px 10px; 
-            font-size: 0.75rem; 
-            font-weight: 900; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            box-shadow: 2px 2px 0px #1A1A1A; 
-            white-space: nowrap; 
-            flex-shrink: 0;
-        }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 10px; font-size: 0.75rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; white-space: nowrap; flex-shrink: 0; }
 
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
@@ -61,66 +49,47 @@
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        /* --- 視覺優化：調整間距與置中 --- */
-        /* 增加 gap 到 10px 讓股數單價拉開 */
-        .asset-header-row { display: grid; grid-template-columns: 24px 1.2fr 0.8fr 0.8fr 1.1fr 0.7fr 55px; gap: 10px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
-        .asset-header-row span { font-size: 10px; font-weight: 900; color: #888; text-align: center; letter-spacing: 1px; }
+        /* --- 視覺優化區 --- */
+        /* 調整欄位比例：讓目標%往右靠 */
+        .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.7fr 0.7fr 1.1fr 0.6fr 50px; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
+        .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        .asset-item { display: grid; grid-template-columns: 24px 1.2fr 0.8fr 0.8fr 1.1fr 0.7fr 55px; gap: 10px; padding: 10px 0; align-items: center; border-bottom: 1px solid #F0F0F0; position: relative; cursor: grab; transition: background 0.2s; }
-        .asset-item:hover { background-color: rgba(0,0,0,0.02); }
-        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; z-index: 2; text-align: left; }
-
+        .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.7fr 0.7fr 1.1fr 0.6fr 50px; gap: 6px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
+        
         .static-view { 
-            background: transparent !important; 
-            border: none !important; 
-            color: #333; 
-            font-size: 12px; 
-            min-height: 32px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; /* 預設文字全部置中 */
-            font-weight: 500; 
-            cursor: pointer; 
-            overflow: hidden; 
-            white-space: nowrap; 
+            background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; 
         }
 
-        .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
-
-        /* 名稱置中並加粗 */
-        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; justify-content: center; } 
-        /* 股數單價置中調淡 */
+        /* 名稱：置中、加粗、淺藍底色 */
+        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; } 
+        /* 股數單價：縮小、淡化 */
         .asset-item div:nth-child(3) .static-view, 
-        .asset-item div:nth-child(4) .static-view { color: #888; justify-content: center; } 
-        /* 現值與目標%改為靠右，符合數字閱讀習慣 */
-        .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; } 
-        .asset-item div:nth-child(6) .static-view { color: var(--theme-bg); justify-content: flex-end; opacity: 0.7; } 
+        .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
+        /* 現值：靠右、加粗、淺黃底色 */
+        .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
+        /* 目標%：靠右、稍微縮小 */
+        .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
 
         .edit-container { position: relative; display: none; width: 100%; }
-        .edit-input { width: 100%; height: 32px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; padding: 0 4px; }
-        .edit-container.prefix::before { content: '$'; position: absolute; left: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
-        .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
+        .edit-input { width: 100%; height: 28px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
+        /* --- 視覺優化結束 --- */
 
+        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
         .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
         .footer-row { display: flex; justify-content: space-between; align-items: center; }
         .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
-
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
-
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-reset { background: #ddd; color: #888; border-color: #bbb; margin-top: 20px; box-shadow: 3px 3px 0px #999; font-size: 0.8rem; }
-
         #target-sum-alert { margin-top:10px; font-size:12px; font-weight:900; text-align:center; padding:8px; border-radius:8px; display:none; border: 2px solid #FF4444; }
         .alert-red { background-color: #FFE5E5 !important; color: #B30000 !important; }
-
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
         .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-options button::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: var(--btn-bg); }
-
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
@@ -154,13 +123,13 @@
 
     <div class="rebalance-panel">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets | 資產總現值 (TWD)</div>
+            <div style="font-size: 0.8rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets (TWD)</div>
             <div style="display:flex; gap:8px; flex-shrink: 0;">
-                <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步報價</button>
+                <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 同步</button>
                 <button class="chart-btn" onclick="toggleChart()">圖表</button>
             </div>
         </div>
-        <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">$0</div>
+        <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
         <div id="target-sum-alert"></div>
         <div id="chartContainer" style="display:none; margin-top: 20px; height: 220px;">
             <canvas id="portfolioChart"></canvas>
@@ -168,7 +137,6 @@
     </div>
 
     <div id="mainGrid"></div>
-
     <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
     <button class="btn btn-reset" onclick="clearAll()">重置所有資料</button>
 </div>
@@ -177,16 +145,9 @@
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
-    let myChart = null;
-    let categories = [];
-    let stockData = [];
-    let usdRate = 32.5;
+    let myChart = null, categories = [], stockData = [], usdRate = 32.5;
 
-    // 格式化數字加上逗號
-    function formatNum(num) { 
-        if (num === '' || num == null || isNaN(num)) return "-";
-        return parseFloat(num).toLocaleString('en-US'); 
-    }
+    function formatNum(num) { return (num === '' || isNaN(num)) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
     const DEFAULT_CONFIG = [
@@ -208,20 +169,14 @@
                 datalist.appendChild(option);
             });
             document.getElementById('saveText').innerText = "自動儲存至本地瀏覽器";
-        } catch (e) {
-            document.getElementById('saveText').innerText = "股票數據載入失敗";
-        }
+        } catch (e) { document.getElementById('saveText').innerText = "數據載入失敗"; }
     }
-
-    function getCSSVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 
     function forceSave() {
         try {
-            const data = {};
-            const newCategories = [];
+            const data = {}, newCats = [];
             document.querySelectorAll('.category-card').forEach(card => {
-                const catId = card.id;
-                const assets = [];
+                const catId = card.id, assets = [];
                 card.querySelectorAll('.asset-item').forEach(item => {
                     assets.push({
                         name: item.querySelector('.asset-name').value || '',
@@ -231,15 +186,10 @@
                         targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
                     });
                 });
-                const catName = card.querySelector('.cat-name-text').innerText;
-                newCategories.push({ id: catId, name: catName });
-                data[catId] = { 
-                    target: parseFloat(card.querySelector('.target-input').value) || 0, 
-                    collapsed: card.classList.contains('collapsed'), 
-                    assets: assets 
-                };
+                newCats.push({ id: catId, name: card.querySelector('.cat-name-text').innerText });
+                data[catId] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
             });
-            categories = newCategories;
+            categories = newCats;
             localStorage.setItem('myPortfolio_v5', JSON.stringify(data));
             localStorage.setItem('catConfig_v5', JSON.stringify(categories));
             const dot = document.getElementById('saveDot');
@@ -258,124 +208,84 @@
 
     function editMode(el) {
         const container = el.nextElementSibling;
-        el.style.display = 'none';
-        container.style.display = 'block';
+        el.style.display = 'none'; container.style.display = 'block';
         const input = container.querySelector('input');
         if (input) { input.focus(); input.select(); }
     }
 
     function autoViewMode(inputEl) {
-        const container = inputEl.parentElement;
-        const item = inputEl.closest('.asset-item');
-        const view = container.previousElementSibling;
-        
+        const container = inputEl.parentElement, item = inputEl.closest('.asset-item'), view = container.previousElementSibling;
         if (inputEl.classList.contains('asset-name')) {
-            let val = inputEl.value.trim();
-            if (val.includes(' ')) val = val.split(' ')[0];
+            let val = inputEl.value.trim(); if (val.includes(' ')) val = val.split(' ')[0];
             inputEl.value = val;
             const stock = stockData.find(s => s.s == val);
             if (stock && stock.p) {
-                const priceInput = item.querySelector('.asset-price');
-                if (!priceInput.value || priceInput.value == 0) priceInput.value = stock.p;
+                const pI = item.querySelector('.asset-price');
+                if (!pI.value || pI.value == 0) pI.value = stock.p;
             }
         }
-
-        const name = item.querySelector('.asset-name').value.trim();
-        const q = parseFloat(item.querySelector('.asset-qty').value);
-        const p = parseFloat(item.querySelector('.asset-price').value);
-        
+        const name = item.querySelector('.asset-name').value.trim(), q = parseFloat(item.querySelector('.asset-qty').value), p = parseFloat(item.querySelector('.asset-price').value);
         if ((inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price') || inputEl.classList.contains('asset-name')) && q > 0 && p > 0) {
-            const valInput = item.querySelector('.asset-value');
-            if (/^[A-Za-z]+$/.test(name)) { valInput.value = Math.round(q * p * usdRate); } else { valInput.value = Math.round(q * p); }
+            const vI = item.querySelector('.asset-value');
+            vI.value = /^[A-Za-z]+$/.test(name) ? Math.round(q * p * usdRate) : Math.round(q * p);
         }
-
-        let displayVal = inputEl.value;
+        let dV = inputEl.value;
         if (inputEl.type === 'number') {
-            if (displayVal === "" || displayVal == 0) {
-                if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
-                    view.innerText = "-"; view.classList.add('empty-placeholder');
-                } else {
-                    view.innerText = inputEl.classList.contains('target-p-input') ? "0%" : "$0";
-                    view.classList.remove('empty-placeholder');
-                }
+            if (dV === "" || dV == 0) {
+                view.innerText = (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) ? "-" : (inputEl.classList.contains('target-p-input') ? "0%" : "$0");
+                if (view.innerText === "-") view.classList.add('empty-placeholder');
             } else {
-                // 這裡加入千分位邏輯
-                if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) {
-                    view.innerText = formatNum(displayVal);
-                } else if (inputEl.classList.contains('asset-value')) {
-                    view.innerText = formatCurrency(displayVal);
-                } else if (inputEl.classList.contains('target-p-input')) {
-                    view.innerText = displayVal + "%";
-                }
+                if (inputEl.classList.contains('asset-qty') || inputEl.classList.contains('asset-price')) view.innerText = formatNum(dV);
+                else if (inputEl.classList.contains('asset-value')) view.innerText = formatCurrency(dV);
+                else if (inputEl.classList.contains('target-p-input')) view.innerText = dV + "%";
                 view.classList.remove('empty-placeholder');
             }
-        } else { view.innerText = displayVal || "點擊輸入"; }
-        
+        } else { view.innerText = dV || "點擊輸入"; }
         setTimeout(() => { container.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
     }
 
     async function syncPrices() {
-        const btn = document.getElementById('syncBtn');
-        const originalText = btn.innerText;
-        let symbolList = [];
-        document.querySelectorAll('.asset-item').forEach(item => {
+        const btn = document.getElementById('syncBtn'), oT = btn.innerText;
+        let sL = []; document.querySelectorAll('.asset-item').forEach(item => {
             const s = item.querySelector('.asset-name').value.trim().toUpperCase();
-            if (s && s !== '點擊輸入') symbolList.push(s);
+            if (s && s !== '點擊輸入') sL.push(s);
         });
-        if (symbolList.length === 0) return alert("請先輸入標的代號");
+        if (sL.length === 0) return alert("請輸入代號");
         try {
-            btn.innerText = "⏳ 同步中...";
-            btn.disabled = true;
-            const response = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(symbolList.join(','))}`);
-            const cloudPrices = await response.json();
-            if (cloudPrices["CURRENCY:USDTWD"]) usdRate = cloudPrices["CURRENCY:USDTWD"];
+            btn.innerText = "⏳"; btn.disabled = true;
+            const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
+            const cloud = await resp.json();
+            if (cloud["CURRENCY:USDTWD"]) usdRate = cloud["CURRENCY:USDTWD"];
             document.querySelectorAll('.asset-item').forEach(item => {
-                const s = item.querySelector('.asset-name').value.trim().toUpperCase();
-                const price = cloudPrices[s];
-                if (price && typeof price === 'number' && price > 0) {
-                    const priceInput = item.querySelector('.asset-price');
-                    priceInput.value = price;
-                    autoViewMode(priceInput);
-                }
+                const s = item.querySelector('.asset-name').value.trim().toUpperCase(), p = cloud[s];
+                if (p && p > 0) { const pI = item.querySelector('.asset-price'); pI.value = p; autoViewMode(pI); }
             });
-            alert(`✅ 同步完成！匯率：${usdRate.toFixed(2)}`);
-        } catch (e) { alert("同步失敗"); } finally { btn.innerText = originalText; btn.disabled = false; calculateAll(); }
+            alert(`✅ 匯率：${usdRate.toFixed(2)}`);
+        } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
     }
 
     function calculateAll() {
         let total = 0, catSums = {}, totalTargetP = 0;
         document.querySelectorAll('.category-card').forEach(card => {
-            const catId = card.id;
-            totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
-            let sum = 0;
-            card.querySelectorAll('.asset-value').forEach(i => { sum += parseFloat(i.value) || 0; });
-            catSums[catId] = sum;
-            total += sum;
+            const catId = card.id; totalTargetP += parseFloat(card.querySelector('.target-input').value) || 0;
+            let sum = 0; card.querySelectorAll('.asset-value').forEach(i => { sum += parseFloat(i.value) || 0; });
+            catSums[catId] = sum; total += sum;
         });
-
         const alertDiv = document.getElementById('target-sum-alert');
-        if (Math.abs(totalTargetP - 100) > 0.01) {
-            alertDiv.style.display = 'block'; alertDiv.classList.add('alert-red');
-            alertDiv.innerText = `⚠️ 區域目標總和: ${totalTargetP}% (應為100%)`;
-        } else { alertDiv.style.display = 'none'; }
+        if (Math.abs(totalTargetP - 100) > 0.01) { alertDiv.style.display = 'block'; alertDiv.innerText = `⚠️ 目標總和: ${totalTargetP}%`; } else alertDiv.style.display = 'none';
 
         document.querySelectorAll('.category-card').forEach(card => {
-            const catId = card.id;
-            const target = parseFloat(card.querySelector('.target-input').value) || 0;
-            const currentP = total > 0 ? (catSums[catId] / total * 100) : 0;
+            const catId = card.id, target = parseFloat(card.querySelector('.target-input').value) || 0, curP = total > 0 ? (catSums[catId] / total * 100) : 0;
             card.querySelector('.target-amount-label').innerText = formatCurrency(total * (target / 100));
             card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[catId]);
-            card.querySelector('.current-p').innerText = currentP.toFixed(1) + "%";
-            
-            const alertTag = card.querySelector('.status-alert');
-            const diff = catSums[catId] - (total * (target / 100));
-            if (total === 0) alertTag.innerText = "✅ 請輸入資料";
-            else if (Math.abs(currentP - target) <= 1) alertTag.innerText = "✅ 比例理想";
-            else alertTag.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`;
+            card.querySelector('.current-p').innerText = curP.toFixed(1) + "%";
+            const tag = card.querySelector('.status-alert'), diff = catSums[catId] - (total * (target / 100));
+            if (total === 0) tag.innerText = "✅ 等待資料";
+            else if (Math.abs(curP - target) <= 1) tag.innerText = "✅ 比例理想";
+            else tag.innerHTML = diff > 0 ? `⚠️ 建議移出 <span style="color:#FF4444">${formatCurrency(diff)}</span>` : `⚠️ 建議補入 <span style="color:#008800">${formatCurrency(Math.abs(diff))}</span>`;
 
             card.querySelectorAll('.asset-item').forEach(item => {
-                const val = parseFloat(item.querySelector('.asset-value').value) || 0;
-                const tP = parseFloat(item.querySelector('.target-p-input').value) || 0;
+                const val = parseFloat(item.querySelector('.asset-value').value) || 0, tP = parseFloat(item.querySelector('.target-p-input').value) || 0;
                 item.querySelector('.ratio-val').innerText = (catSums[catId] > 0 ? (val / catSums[catId] * 100).toFixed(1) : 0) + '%';
                 const sug = item.querySelector('.diff-suggestion');
                 if (total > 0 && catSums[catId] > 0 && tP > 0) {
@@ -386,38 +296,29 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums, total);
-        forceSave();
+        updateChart(catSums, total); forceSave();
     }
 
     function updateChart(catSums, grandTotal) {
-        const ctx = document.getElementById('portfolioChart');
-        if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
-        const currentAccent = getCSSVar('--theme-accent'), currentBg = getCSSVar('--theme-bg');
-        const catIds = Object.keys(catSums);
-        const backgroundColors = catIds.map((_, i) => interpolateColor(currentAccent, currentBg, i / (catIds.length > 1 ? catIds.length - 1 : 1)));
-        const data = { 
-            labels: catIds.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText), 
-            datasets: [{ data: catIds.map(id => catSums[id]), backgroundColor: backgroundColors, borderWidth: 3, borderColor: '#fff' }] 
-        };
+        const ctx = document.getElementById('portfolioChart'); if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        const cA = getCSSVar('--theme-accent'), cB = getCSSVar('--theme-bg'), ids = Object.keys(catSums);
+        const colors = ids.map((_, i) => interpolateColor(cA, cB, i / (ids.length > 1 ? ids.length - 1 : 1)));
+        const data = { labels: ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText), datasets: [{ data: ids.map(id => catSums[id]), backgroundColor: colors, borderWidth: 2 }] };
         if (myChart) { myChart.data = data; myChart.update(); } 
         else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } } }); }
     }
 
-    function interpolateColor(color1, color2, factor) {
-        const r1 = parseInt(color1.substring(1,3), 16), g1 = parseInt(color1.substring(3,5), 16), b1 = parseInt(color1.substring(5,7), 16);
-        const r2 = parseInt(color2.substring(1,3), 16), g2 = parseInt(color2.substring(3,5), 16), b2 = parseInt(color2.substring(5,7), 16);
-        return `rgb(${Math.round(r1 + factor * (r2-r1))}, ${Math.round(g1 + factor * (g2-g1))}, ${Math.round(b1 + factor * (b2-b1))})`;
+    function interpolateColor(c1, c2, f) {
+        const r1 = parseInt(c1.substring(1,3), 16), g1 = parseInt(c1.substring(3,5), 16), b1 = parseInt(c1.substring(5,7), 16);
+        const r2 = parseInt(c2.substring(1,3), 16), g2 = parseInt(c2.substring(3,5), 16), b2 = parseInt(c2.substring(5,7), 16);
+        return `rgb(${Math.round(r1 + f * (r2-r1))}, ${Math.round(g1 + f * (g2-g1))}, ${Math.round(b1 + f * (b2-b1))})`;
     }
 
     function renderUI() {
-        const savedData = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {};
-        const grid = document.getElementById('mainGrid'); 
-        grid.innerHTML = '';
+        const saved = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {}, grid = document.getElementById('mainGrid'); grid.innerHTML = '';
         categories.forEach(cat => {
-            const data = savedData[cat.id] || { target: 20, assets: [], collapsed: false };
-            const card = document.createElement('div');
-            card.id = cat.id; card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
+            const data = saved[cat.id] || { target: 20, assets: [], collapsed: false };
+            const card = document.createElement('div'); card.id = cat.id; card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
                 <div class="category-header">
@@ -426,53 +327,41 @@
                 </div>
                 <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span></span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
-                <button class="btn btn-add-asset" onclick="addAsset('${cat.id}')">+ 新增標的</button>
+                <button class="btn" style="padding:8px;font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
                 <div class="card-footer"><div class="footer-row"><span style="font-size:0.75rem; color:#888;">區域合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
             `;
             grid.appendChild(card);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 500, delayOnTouchOnly: true, onEnd: () => calculateAll() });
+            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 300, onEnd: () => calculateAll() });
         });
-        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 500, delayOnTouchOnly: true, onEnd: () => calculateAll() });
+        new Sortable(grid, { animation: 150, handle: '.category-header', onEnd: () => calculateAll() });
         calculateAll();
     }
 
     function addAsset(catId, name='', value=0, targetP=0, qty='', price='') {
         const list = document.getElementById(`list-${catId}`); if(!list) return;
         const div = document.createElement('div'); div.className = 'asset-item';
-        
-        // 初次載入也加上格式化
-        const qD = (qty === '' || qty == 0) ? '-' : formatNum(qty);
-        const pD = (price === '' || price == 0) ? '-' : formatNum(price);
-        const qClass = (qD === '-') ? 'empty-placeholder' : '';
-        const pClass = (pD === '-') ? 'empty-placeholder' : '';
-        
+        const qD = (qty === '' || qty == 0) ? '-' : formatNum(qty), pD = (price === '' || price == 0) ? '-' : formatNum(price);
         div.innerHTML = `
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view ${qClass}" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view ${pClass}" onclick="editMode(this)">${pD}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container"><input type="number" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
             <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
         `;
         list.appendChild(div);
     }
 
-    function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新投資區域' }); renderUI(); }
-    function deleteCategory(id) { if (confirm('確定刪除區域？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+    function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
+    function deleteCategory(id) { if (confirm('刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
     function toggleCategory(id) { if (event.target.tagName !== 'INPUT' && !event.target.isContentEditable) { document.getElementById(id).classList.toggle('collapsed'); forceSave(); } }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('確定重置所有資料嗎？')) { localStorage.clear(); location.reload(); } }
+    function clearAll() { if (confirm('確定重置？')) { localStorage.clear(); location.reload(); } }
 
-    window.onload = () => { 
-        loadStockData(); 
-        const savedCats = localStorage.getItem('catConfig_v5'); 
-        categories = savedCats ? JSON.parse(savedCats) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); 
-        renderUI(); 
-        setTheme(localStorage.getItem('userTheme') || 'orange'); 
-    };
+    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); };
 </script>
 </body>
 </html>
