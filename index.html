@@ -49,8 +49,7 @@
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        /* --- 視覺優化區 --- */
-        /* 調整欄位比例：讓目標%往右靠 */
+        /* --- 視覺優化區域 --- */
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.7fr 0.7fr 1.1fr 0.6fr 50px; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
 
@@ -61,19 +60,16 @@
             background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; 
         }
 
-        /* 名稱：置中、加粗、淺藍底色 */
-        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; } 
-        /* 股數單價：縮小、淡化 */
+        /* 增加底色優化 */
+        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; } 
         .asset-item div:nth-child(3) .static-view, 
-        .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
-        /* 現值：靠右、加粗、淺黃底色 */
+        .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; justify-content: center; } 
         .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
-        /* 目標%：靠右、稍微縮小 */
         .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 28px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
-        /* --- 視覺優化結束 --- */
+        .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; }
 
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
         .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
@@ -147,7 +143,10 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
     let myChart = null, categories = [], stockData = [], usdRate = 32.5;
 
-    function formatNum(num) { return (num === '' || isNaN(num)) ? "-" : parseFloat(num).toLocaleString('en-US'); }
+    function formatNum(num) { 
+        if (num === '' || isNaN(num) || num == null) return "-";
+        return parseFloat(num).toLocaleString('en-US'); 
+    }
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
 
     const DEFAULT_CONFIG = [
@@ -299,13 +298,51 @@
         updateChart(catSums, total); forceSave();
     }
 
+    // 完整的圖表更新邏輯
     function updateChart(catSums, grandTotal) {
-        const ctx = document.getElementById('portfolioChart'); if (!ctx || document.getElementById('chartContainer').style.display === 'none') return;
+        const canvas = document.getElementById('portfolioChart');
+        const container = document.getElementById('chartContainer');
+        if (!canvas || container.style.display === 'none') return;
+        
         const cA = getCSSVar('--theme-accent'), cB = getCSSVar('--theme-bg'), ids = Object.keys(catSums);
+        const labels = ids.map(id => {
+            const name = document.getElementById(id).querySelector('.cat-name-text').innerText;
+            const val = catSums[id];
+            const p = grandTotal > 0 ? (val / grandTotal * 100).toFixed(1) : 0;
+            return `${name} (${p}%)`;
+        });
+        const dataVals = ids.map(id => catSums[id]);
         const colors = ids.map((_, i) => interpolateColor(cA, cB, i / (ids.length > 1 ? ids.length - 1 : 1)));
-        const data = { labels: ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText), datasets: [{ data: ids.map(id => catSums[id]), backgroundColor: colors, borderWidth: 2 }] };
-        if (myChart) { myChart.data = data; myChart.update(); } 
-        else { myChart = new Chart(ctx, { type: 'doughnut', data: data, options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } } }); }
+
+        const config = {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataVals,
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10, weight: '900' }, color: '#333', padding: 15 } }
+                }
+            }
+        };
+
+        if (myChart) {
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = dataVals;
+            myChart.data.datasets[0].backgroundColor = colors;
+            myChart.update();
+        } else {
+            myChart = new Chart(canvas, config);
+        }
     }
 
     function interpolateColor(c1, c2, f) {
@@ -361,7 +398,13 @@
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     function clearAll() { if (confirm('確定重置？')) { localStorage.clear(); location.reload(); } }
 
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); };
+    window.onload = () => { 
+        loadStockData(); 
+        const s = localStorage.getItem('catConfig_v5'); 
+        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); 
+        renderUI(); 
+        setTheme(localStorage.getItem('userTheme') || 'orange'); 
+    };
 </script>
 </body>
 </html>
