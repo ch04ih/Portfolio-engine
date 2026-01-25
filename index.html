@@ -48,7 +48,6 @@
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        /* 欄位佈局 */
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
 
@@ -58,7 +57,6 @@
         .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
         .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
 
-        /* 視覺亮點與縮小輔助資訊 */
         .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; } 
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
         .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
@@ -73,19 +71,25 @@
         .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
         .footer-row { display: flex; justify-content: space-between; align-items: center; }
         .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
+        
+        /* 合計百分比字體縮小 */
+        .current-p { font-size: 0.85rem; font-weight: 700; color: #555; }
+
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         
-        /* 圖表寬度修正 */
         #chartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #portfolioChart { width: 100% !important; height: auto !important; }
 
-        .alert-red { background-color: #FFE5E5 !important; color: #B30000 !important; }
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
         .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
+        
+        /* 雙色主題預覽按鍵 */
         .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
+        .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
+        
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
         .chevron { transition: 0.3s; font-size: 0.8rem; }
         .collapsed .chevron { transform: rotate(-90deg); }
@@ -97,12 +101,12 @@
     <div class="theme-panel" id="themePanel">
         <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 配色</div>
         <div class="theme-options">
-            <button style="background: #FF8C42; --btn-bg: #3D2B1F" onclick="setTheme('orange')"></button>
-            <button style="background: #dac4fc; --btn-bg: #293d0b" onclick="setTheme('forest')"></button>
-            <button style="background: #80C5DE; --btn-bg: #6e0000" onclick="setTheme('wine')"></button>
-            <button style="background: #B4D355; --btn-bg: #6245b7" onclick="setTheme('purple')"></button>
-            <button style="background: #e4d9c4; --btn-bg: #1b2941" onclick="setTheme('navy')"></button>
-            <button style="background: #F0A650; --btn-bg: #0045c6" onclick="setTheme('amber')"></button>
+            <button style="background: #3D2B1F; --btn-accent: #FF8C42" onclick="setTheme('orange')"></button>
+            <button style="background: #293d0b; --btn-accent: #dac4fc" onclick="setTheme('forest')"></button>
+            <button style="background: #6e0000; --btn-accent: #80C5DE" onclick="setTheme('wine')"></button>
+            <button style="background: #6245b7; --btn-accent: #B4D355" onclick="setTheme('purple')"></button>
+            <button style="background: #1b2941; --btn-accent: #e4d9c4" onclick="setTheme('navy')"></button>
+            <button style="background: #0045c6; --btn-accent: #F0A650" onclick="setTheme('amber')"></button>
         </div>
     </div>
 
@@ -125,7 +129,7 @@
             </div>
         </div>
         <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
-        <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px;" class="alert-red"></div>
+        <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px; background:#FFE5E5; color:#B30000; border:2px solid #FF4444; text-align:center; font-weight:bold;"></div>
         <div id="chartContainer">
             <canvas id="portfolioChart"></canvas>
         </div>
@@ -282,29 +286,18 @@
         const container = document.getElementById('chartContainer');
         const ctx = document.getElementById('portfolioChart'); 
         if (!ctx || container.style.display === 'none') return;
-        
         const cA = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
         const cB = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg').trim();
         const ids = Object.keys(catSums);
         const colors = ids.map((_, i) => interpolateColor(cA, cB, i / (ids.length > 1 ? ids.length - 1 : 1)));
         const labels = ids.map(id => document.getElementById(id).querySelector('.cat-name-text').innerText);
         const dataValues = ids.map(id => catSums[id]);
-
         if (myChart) {
-            myChart.data.labels = labels;
-            myChart.data.datasets[0].data = dataValues;
-            myChart.data.datasets[0].backgroundColor = colors;
-            myChart.update();
-            myChart.resize(); // 確保重新調整大小
+            myChart.data.labels = labels; myChart.data.datasets[0].data = dataValues; myChart.data.datasets[0].backgroundColor = colors;
+            myChart.update(); myChart.resize();
         } else {
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: colors, borderWidth: 2 }] },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } 
-                }
+            myChart = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: colors, borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
             });
         }
     }
@@ -334,26 +327,9 @@
             grid.appendChild(card);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            
-            // 標的移動延遲設定
-            new Sortable(document.getElementById(`list-${cat.id}`), { 
-                animation: 150, 
-                delay: 200, 
-                delayOnTouchOnly: true, 
-                touchStartThreshold: 5,
-                onEnd: () => calculateAll() 
-            });
+            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
         });
-        
-        // 區域移動延遲設定
-        new Sortable(grid, { 
-            animation: 150, 
-            handle: '.category-header', 
-            delay: 200, 
-            delayOnTouchOnly: true, 
-            touchStartThreshold: 5,
-            onEnd: () => calculateAll() 
-        });
+        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
         calculateAll();
     }
 
