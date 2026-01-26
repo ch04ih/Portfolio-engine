@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portfolio Engine Pro</title>
     
-    <link rel="apple-touch-icon" href="icon.png?v=3">
-    <link rel="icon" type="image/png" href="icon.png?v=3">
+    <link id="apple-icon" rel="apple-touch-icon" href="icon-orange.png?v=4">
+    <link id="favicon" rel="icon" type="image/png" href="icon-orange.png?v=4">
     <meta name="apple-mobile-web-app-title" content="投資配比">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -191,7 +191,24 @@
         } catch(e) {}
     }
 
-    function setTheme(name) { document.documentElement.setAttribute('data-theme', name); localStorage.setItem('userTheme', name); calculateAll(); }
+    function setTheme(themeName) {
+    // 1. 切換網頁整體主題
+    document.documentElement.setAttribute('data-theme', themeName);
+    localStorage.setItem('userTheme', themeName);
+    
+    // 2. 更新 Icon 路徑
+    // 這邊會根據傳入的 themeName (如 'forest') 自動變成 'icon-forest.png'
+    const newPath = `icon-${themeName}.png?v=4`; 
+    document.getElementById('apple-icon').href = newPath;
+    document.getElementById('favicon').href = newPath;
+
+    // 3. 關閉主題面板與重新計算
+    if (document.getElementById('themePanel')) {
+        document.getElementById('themePanel').classList.remove('active');
+    }
+    calculateAll();
+}
+    
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
     function editMode(el) {
