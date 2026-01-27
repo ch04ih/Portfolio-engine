@@ -227,8 +227,14 @@
         const name = item.querySelector('.asset-name').value.trim(), q = parseFloat(item.querySelector('.asset-qty').value), p = parseFloat(item.querySelector('.asset-price').value);
         if (q > 0 && p > 0) {
             const vI = item.querySelector('.asset-value');
+            const vV = vI.parentElement.previousElementSibling; // 找到現值的顯示層
             vI.value = /^[A-Za-z]+$/.test(name) ? Math.round(q * p * usdRate) : Math.round(q * p);
+            if (vV) { 
+                vV.innerText = formatCurrency(vI.value); 
+                vV.classList.remove('empty-placeholder');
+            }
         }
+
         let dV = iEl.value;
         if (iEl.type === 'number') {
             if (dV === "" || dV == 0) {
