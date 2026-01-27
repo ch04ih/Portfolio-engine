@@ -91,7 +91,7 @@
         .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
         
         .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
-        .chevron { transition: 0.3s; font-size: 0.8rem; }
+        .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; tranform: rotate(0deg);}
         .collapsed .chevron { transform: rotate(-90deg); }
     </style>
 </head>
@@ -245,24 +245,36 @@
     }
 
     async function syncPrices() {
-        const btn = document.getElementById('syncBtn'), oT = btn.innerText;
-        let sL = []; document.querySelectorAll('.asset-item').forEach(i => {
-            const s = i.querySelector('.asset-name').value.trim().toUpperCase();
-            if (s && s !== '點擊輸入') sL.push(s);
+    const btn = document.getElementById('syncBtn'), oT = btn.innerText;
+    let sL = []; document.querySelectorAll('.asset-item').forEach(i => {
+        const s = i.querySelector('.asset-name').value.trim().toUpperCase();
+        if (s && s !== '點擊輸入') sL.push(s);
+    });
+    if (sL.length === 0) return alert("請輸入代號");
+    try {
+        btn.innerText = "⏳..."; btn.disabled = true;
+        const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
+        const cloud = await resp.json();
+        if (cloud["CURRENCY:USDTWD"]) usdRate = cloud["CURRENCY:USDTWD"];
+        document.querySelectorAll('.asset-item').forEach(i => {
+            const nI = i.querySelector('.asset-name'), s = nI.value.trim().toUpperCase(), p = cloud[s];
+            if (p && p > 0) { 
+                const pI = i.querySelector('.asset-price'), qI = i.querySelector('.asset-qty'), vI = i.querySelector('.asset-value');
+                pI.value = p; 
+                autoViewMode(pI); 
+                
+                // 自動更新現值功能
+                const q = parseFloat(qI.value) || 0;
+                let nV = /^[A-Za-z]+$/.test(nI.value.trim()) ? Math.round(q * p * usdRate) : Math.round(q * p);
+                vI.value = nV;
+                const vV = vI.parentElement.previousElementSibling;
+                if (vV) { vV.innerText = formatCurrency(nV); vV.classList.remove('empty-placeholder'); }
+            }
         });
-        if (sL.length === 0) return alert("請輸入代號");
-        try {
-            btn.innerText = "⏳..."; btn.disabled = true;
-            const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
-            const cloud = await resp.json();
-            if (cloud["CURRENCY:USDTWD"]) usdRate = cloud["CURRENCY:USDTWD"];
-            document.querySelectorAll('.asset-item').forEach(i => {
-                const s = i.querySelector('.asset-name').value.trim().toUpperCase(), p = cloud[s];
-                if (p && p > 0) { const pI = i.querySelector('.asset-price'); pI.value = p; autoViewMode(pI); }
-            });
-            alert(`✅ 股價已更新 目前匯率：${usdRate.toFixed(2)}`);
-        } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
-    }
+        alert(`✅ 股價已更新 目前匯率：${usdRate.toFixed(2)}`);
+    } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
+}
+
 
     function calculateAll() {
         let total = 0, catSums = {}, totalTargetP = 0;
@@ -367,10 +379,10 @@
     }
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
-    function deleteCategory(id) { if (confirm('刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+    function deleteCategory(id) { if (confirm('是否確定要刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
     function toggleCategory(id) { if (event.target.tagName !== 'INPUT' && !event.target.isContentEditable) { document.getElementById(id).classList.toggle('collapsed'); forceSave(); } }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('重置？')) { localStorage.clear(); location.reload(); } }
+    function clearAll() { if (confirm('是否清除所有資料並重置？')) { localStorage.clear(); location.reload(); } }
 
     window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); };
 </script>
