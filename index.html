@@ -316,15 +316,15 @@
 
 <script>
     function showPage(pageId) {
-    // 1. 隱藏所有頁面
-    document.querySelectorAll('.page-view').forEach(p => {
-        p.style.display = 'none';
-    });
-    // 2. 顯示點擊的那一頁
-    document.getElementById(pageId).style.display = 'block';
-    
-    // 3. 換頁後自動捲回頂部，體驗比較好
-    window.scrollTo(0, 0);
+        // 1. 隱藏所有頁面
+        document.querySelectorAll('.page-view').forEach(p => {
+            p.style.display = 'none';
+        });
+        // 2. 顯示點擊的那一頁
+        document.getElementById(pageId).style.display = 'block';
+        
+        // 3. 換頁後自動捲回頂部，體驗比較好
+        window.scrollTo(0, 0);
     }
     
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
@@ -377,22 +377,22 @@
     }
 
     function setTheme(themeName) {
-    // 1. 切換網頁整體主題
-    document.documentElement.setAttribute('data-theme', themeName);
-    localStorage.setItem('userTheme', themeName);
+        // 1. 切換網頁整體主題
+        document.documentElement.setAttribute('data-theme', themeName);
+        localStorage.setItem('userTheme', themeName);
+        
+        // 2. 更新 Icon 路徑
+        // 這邊會根據傳入的 themeName (如 'forest') 自動變成 'icon-forest.png'
+        const newPath = `icon-${themeName}.png?v=4`; 
+        document.getElementById('apple-icon').href = newPath;
+        document.getElementById('favicon').href = newPath;
     
-    // 2. 更新 Icon 路徑
-    // 這邊會根據傳入的 themeName (如 'forest') 自動變成 'icon-forest.png'
-    const newPath = `icon-${themeName}.png?v=4`; 
-    document.getElementById('apple-icon').href = newPath;
-    document.getElementById('favicon').href = newPath;
-
-    // 3. 關閉主題面板與重新計算
-    if (document.getElementById('themePanel')) {
-        document.getElementById('themePanel').classList.remove('active');
+        // 3. 關閉主題面板與重新計算
+        if (document.getElementById('themePanel')) {
+            document.getElementById('themePanel').classList.remove('active');
+        }
+        calculateAll();
     }
-    calculateAll();
-}
     
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
@@ -654,14 +654,12 @@
                 const val = parseFloat(item.value) || 0;
                 catSum += val;
                 return `
-                    <div class="asset-item">
-                        <input type="text" class="edit-input" value="${item.name}" 
-                               onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
-                        <input type="number" class="edit-input asset-value" value="${item.value}" 
-                               oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
-                        <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
-                    </div>
-                `;
+                <div class="asset-item">
+                    <input type="text" class="edit-input" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
+                    <input type="number" class="edit-input asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
+                    <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
+                </div>
+            `;
             }).join('');
     
             card.innerHTML = `
@@ -760,7 +758,18 @@
         if (dashNet) dashNet.innerText = formatCurrency(totalAssets - totalLiab);
     }
     
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI();loadLiabilities(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
+    window.onload = () => { 
+    loadStockData(); 
+    const s = localStorage.getItem('catConfig_v5'); 
+    categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); 
+    renderUI(); 
+    
+    // 確保這裡有這一行
+    loadLiabilities(); 
+    
+    setTheme(localStorage.getItem('userTheme') || 'orange'); 
+    showPage('home-view');
+}; // <--- 檢查這裡有沒有漏掉分號或大括號
 </script>
 </body>
 </html>
