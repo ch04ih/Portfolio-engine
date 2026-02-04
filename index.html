@@ -90,7 +90,11 @@
         .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
         
-        .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .btn-add-asset { display: none; }
+        /* 當卡片收合時，隱藏列表、標頭行、新增按鈕以及建議標籤 */
+        .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .category-card > .btn, .collapsed .status-tag { display: none;}
+
+        /* 讓 footer 的間距在收合時更緊湊（選配） */
+        .collapsed .card-footer {margin-top: 5px;padding-top: 10px;}
         .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; tranform: rotate(0deg);}
         .collapsed .chevron { transform: rotate(-90deg); }
     </style>
@@ -350,9 +354,10 @@
             const card = document.createElement('div'); card.id = cat.id; card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
-                <div class="category-header">
-                    <div onclick="toggleCategory('${cat.id}')"><span class="chevron">▼</span> <span class="cat-name-text" contenteditable="true" onblur="forceSave()">${cat.name}</span></div>
-                    <div>目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
+                // 修改後的寫法：將 onclick 移到最外層 div
+                <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                    <div><span class="chevron">▼</span> <span class="cat-name-text" contenteditable="true" onblur="forceSave()">${cat.name}</span></div>
+                    <div onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
                 </div>
                 <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span></span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
@@ -386,7 +391,16 @@
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
     function deleteCategory(id) { if (confirm('是否確定要刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
-    function toggleCategory(id) { if (event.target.tagName !== 'INPUT' && !event.target.isContentEditable) { document.getElementById(id).classList.toggle('collapsed'); forceSave(); } }
+    function toggleCategory(id) {
+    // 如果點擊的是輸入框 (INPUT) 或正在編輯文字 (contenteditable)，則不觸發收合
+        const target = event.target;
+        if (target.tagName === 'INPUT' || target.isContentEditable) {
+            return;
+        }
+    
+        document.getElementById(id).classList.toggle('collapsed');
+        forceSave();
+    }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     function clearAll() { if (confirm('是否清除所有資料並重置？')) { localStorage.clear(); location.reload(); } }
 
