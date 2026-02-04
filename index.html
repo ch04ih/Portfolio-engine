@@ -707,11 +707,24 @@
     }
 
     function updateLiabItemValue(catId, index, val) {
-        const cat = liabilityCategories.find(c => c.id === catId);
+        const cat = liabilityCategories.find(c => c.id === id || c.id === catId);
         if (cat) {
             cat.items[index].value = val;
             
-            // 1. 重新計算所有負債總額
+            // 1. 計算該卡片的小計
+            let catSum = 0;
+            cat.items.forEach(item => {
+                catSum += parseFloat(item.value) || 0;
+            });
+    
+            // 2. 更新「卡片標題」旁邊的小計顯示
+            const card = document.getElementById(catId);
+            if (card) {
+                const catSumEl = card.querySelector('.cat-sum-display');
+                if (catSumEl) catSumEl.innerText = formatCurrency(catSum);
+            }
+    
+            // 3. 計算並更新「頁面頂部」的負債總額
             let totalLiab = 0;
             liabilityCategories.forEach(c => {
                 c.items.forEach(item => {
@@ -719,14 +732,11 @@
                 });
             });
     
-            // 2. 只更新畫面上顯示金額的數字，不重畫整個 HTML
             const summaryEl = document.getElementById('liabilitiesSummary');
             if (summaryEl) summaryEl.innerText = formatCurrency(totalLiab);
             
-            // 3. 同步到主頁 Dashboard
+            // 4. 同步到主頁 Dashboard 並儲存
             updateDashboardLiabilities(totalLiab);
-            
-            // 4. 背景默默儲存
             saveLiabilities();
         }
     }
