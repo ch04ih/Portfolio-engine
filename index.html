@@ -101,7 +101,7 @@
 </head>
 <body>
 
-<div class="container">
+
     <div class="theme-panel" id="themePanel">
         <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 主題配色</div>
         <div class="theme-options">
@@ -113,40 +113,82 @@
             <button style="background: #0045c6; --btn-accent: #F0A650" onclick="setTheme('amber')"></button>
         </div>
     </div>
-
-    <h1>
-        <span style="font-size: 0.8em; letter-spacing: 2px;">Portfolio Engine</span><br>
-        <span style="font-size: 0.6em;">資產組合計算器</span>
-    </h1>
-
-    <div class="save-status">
-        <div class="status-dot" id="saveDot"></div>
-        <span id="saveText">數據載入中...</span>
-    </div>
-
-    <div class="rebalance-panel">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-            <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets｜資產總現值 (TWD)</div>
-            <div style="display:flex; gap:8px;">
-                <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 最新股價</button>
-                <button class="chart-btn" onclick="toggleChart()">圖表</button>
+    
+<div class="container">
+    <div id="home-view" class="page-view">
+            <h1>財務總覽 Dashboard</h1>
+            <div class="dashboard-grid">
+                <div class="dash-card" onclick="showPage('assets-view')">
+                    <span class="dash-label">總資產 (Assets)</span>
+                    <span id="dash-total-assets" class="dash-value">$0</span>
+                </div>
+                <div class="dash-card" onclick="showPage('liabilities-view')" style="border-color: #FF4444;">
+                    <span class="dash-label">總負債 (Liabilities)</span>
+                    <span id="dash-total-liabilities" class="dash-value" style="color: #FF4444;">$0</span>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-label">淨資產 (Net Worth)</span>
+                    <span id="dash-net-worth" class="dash-value" style="color: #008800;">$0</span>
+                </div>
             </div>
         </div>
-        <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
-        <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px; background:#FFE5E5; color:#B30000; border:2px solid #FF4444; text-align:center; font-weight:bold;"></div>
-        <div id="chartContainer">
-            <canvas id="portfolioChart"></canvas>
+    
+    <div id="assets-view" class="page-view" style="display:none;">
+        <h1>
+            <span style="font-size: 0.8em; letter-spacing: 2px;">Portfolio Engine</span><br>
+            <span style="font-size: 0.6em;">資產組合計算器</span>
+        </h1>
+    
+        <div class="save-status">
+            <div class="status-dot" id="saveDot"></div>
+            <span id="saveText">數據載入中...</span>
         </div>
+    
+        <div class="rebalance-panel">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
+                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Assets｜資產總現值 (TWD)</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="chart-btn" onclick="syncPrices()" id="syncBtn">🔄 最新股價</button>
+                    <button class="chart-btn" onclick="toggleChart()">圖表</button>
+                </div>
+            </div>
+            <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px; background:#FFE5E5; color:#B30000; border:2px solid #FF4444; text-align:center; font-weight:bold;"></div>
+            <div id="chartContainer">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+    
+        <div id="mainGrid"></div>
+        <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
+        <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAll()">重置資料</button>
+    </div>    
+    
+    <div id="liabilities-view" class="page-view" style="display:none;">
+            <h1>負債管理</h1>
+            <p style="text-align:center; color:#888;">尚未開發...</p>
     </div>
-
-    <div id="mainGrid"></div>
-    <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
-    <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAll()">重置資料</button>
 </div>
-
+<nav class="bottom-nav">
+        <div onclick="showPage('home-view')">🏠 總覽</div>
+        <div onclick="showPage('assets-view')">💰 資產</div>
+        <div onclick="showPage('liabilities-view')">📉 負債</div>
+    </nav>
 <datalist id="stockList"></datalist>
 
 <script>
+    function showPage(pageId) {
+    // 1. 隱藏所有頁面
+    document.querySelectorAll('.page-view').forEach(p => {
+        p.style.display = 'none';
+    });
+    // 2. 顯示點擊的那一頁
+    document.getElementById(pageId).style.display = 'block';
+    
+    // 3. 換頁後自動捲回頂部，體驗比較好
+    window.scrollTo(0, 0);
+    }
+    
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
     let myChart = null, categories = [], stockData = [], usdRate = 32.5;
 
@@ -318,7 +360,18 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        updateChart(catSums, total); forceSave();
+        
+        const dashAssets = document.getElementById('dash-total-assets');
+        const dashNet = document.getElementById('dash-net-worth');
+        const dashLiabilities = document.getElementById('dash-total-liabilities');
+    
+        // total 是你原本 code 裡算出來的總資產變數
+        if (dashAssets) dashAssets.innerText = formatCurrency(total);
+        if (dashLiabilities) dashLiabilities.innerText = formatCurrency(0); // 目前負債先設 0
+        if (dashNet) dashNet.innerText = formatCurrency(total - 0); 
+    
+        updateChart(catSums, total); 
+        forceSave();
     }
 
     function updateChart(catSums, grandTotal) {
@@ -403,7 +456,7 @@
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     function clearAll() { if (confirm('是否清除所有資料並重置？')) { localStorage.clear(); location.reload(); } }
 
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); };
+    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
 </script>
 </body>
 </html>
