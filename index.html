@@ -755,18 +755,12 @@
         const dashLiab = document.getElementById('dash-total-liabilities');
         const dashNet = document.getElementById('dash-net-worth');
         const dashAssets = document.getElementById('dash-total-assets');
-    
-        // 從主頁抓取目前的資產數字（把 $ 和 , 拿掉轉成純數字）
         const totalAssets = parseFloat(dashAssets.innerText.replace(/[$,]/g, '')) || 0;
-    
-        // 1. 更新主頁的總負債文字
         if (dashLiab) dashLiab.innerText = formatCurrency(totalLiab);
-        
-        // 2. 更新主頁的淨資產 (資產 - 負債)
         if (dashNet) dashNet.innerText = formatCurrency(totalAssets - totalLiab);
     }
     
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
+    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI();loadLiabilities(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
 </script>
 </body>
 </html>
