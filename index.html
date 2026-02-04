@@ -671,9 +671,11 @@
                         <input type="text" class="liab-edit-name" value="${item.name}" 
                                onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
                         <div class="liab-input-wrapper">
+                                // 找到 renderLiabilities 裡金額輸入框那一行，改成這樣：
                                 <input type="number" class="liab-edit-value asset-value" value="${item.value}" 
-                                oninput="updateLiabItemValue('${cat.id}', ${index}, this.value)" 
-                                onblur="renderLiabilities()" placeholder="0">
+                                       oninput="updateLiabItemValue('${cat.id}', ${index}, this.value)" 
+                                       onkeydown="if(event.key==='Enter') { this.blur(); event.preventDefault(); }"
+                                       onblur="renderLiabilities()" placeholder="0">
                         </div>
                         <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
@@ -707,27 +709,26 @@
     }
 
     function updateLiabItemValue(catId, index, val) {
-        // 1. 找到對應的分類
         const cat = liabilityCategories.find(c => c.id === catId);
         if (!cat) return;
     
-        // 2. 更新數值
-        cat.items[index].value = val;
+        // [重要] 確保存進去的是數字，否則加總會變字串相加
+        cat.items[index].value = parseFloat(val) || 0; 
         
-        // 3. 計算該卡片的小計
+        // 計算卡片小計
         let catSum = 0;
         cat.items.forEach(item => {
             catSum += parseFloat(item.value) || 0;
         });
     
-        // 4. 即時更新「卡片上」的小計顯示
+        // 即時更新卡片顯示
         const card = document.getElementById(catId);
         if (card) {
             const catSumEl = card.querySelector('.cat-sum-display');
             if (catSumEl) catSumEl.innerText = formatCurrency(catSum);
         }
     
-        // 5. 計算並更新「頁面頂部」的總額
+        // 計算總額
         let totalLiab = 0;
         liabilityCategories.forEach(c => {
             c.items.forEach(item => {
@@ -738,9 +739,8 @@
         const summaryEl = document.getElementById('liabilitiesSummary');
         if (summaryEl) summaryEl.innerText = formatCurrency(totalLiab);
         
-        // 6. 更新 Dashboard 與儲存
         updateDashboardLiabilities(totalLiab);
-        saveLiabilities();
+        saveLiabilities(); // 確保這裡有執行儲存
     }
 
     function updateLiabCatName(id, newName) {
