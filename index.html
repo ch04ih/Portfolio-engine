@@ -91,7 +91,7 @@
         .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
         
         /* 當卡片收合時，隱藏列表、標頭行、新增按鈕以及建議標籤 */
-        .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .category-card > .btn, .collapsed .status-tag { display: none;}
+        .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .category-card > .btn, .collapsed .status-tag { display: none !important;}
 
         /* 讓 footer 的間距在收合時更緊湊（選配） */
         .collapsed .card-footer {margin-top: 5px;padding-top: 10px;}
@@ -354,7 +354,6 @@
             const card = document.createElement('div'); card.id = cat.id; card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
-                // 修改後的寫法：將 onclick 移到最外層 div
                 <div class="category-header" onclick="toggleCategory('${cat.id}')">
                     <div><span class="chevron">▼</span> <span class="cat-name-text" contenteditable="true" onblur="forceSave()">${cat.name}</span></div>
                     <div onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
