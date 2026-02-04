@@ -217,6 +217,46 @@
             padding: 6px;
             font-weight: bold;
         }
+
+        /* 增加負債管理標題與總額卡片之間的距離 */
+        #liabilities-view h1 {
+            margin-bottom: 30px !important;
+        }
+        
+        /* 讓負債頁面的卡片標頭與內容更有質感 */
+        #liabilitiesGrid .category-card {
+            margin-top: 15px;
+        }
+      /* 標的名稱與金額輸入框美化 */
+        .liab-edit-name, .liab-edit-value {
+            border: none !important;
+            background: #F0F4F8; /* 淺藍灰色背景 */
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-family: inherit;
+            outline: none;
+        }
+        
+        .liab-edit-value {
+            text-align: right;
+            padding-left: 20px !important; /* 為 $ 留空間 */
+        }
+        
+        .liab-input-wrapper {
+            position: relative;
+        }
+        
+        .liab-input-wrapper::before {
+            content: '$';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 900;
+            font-size: 12px;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
@@ -626,17 +666,21 @@
             card.id = cat.id;
     
             let itemsHtml = cat.items.map((item, index) => {
-                catSum += parseFloat(item.value) || 0;
+                const displayVal = item.value ? parseFloat(item.value).toLocaleString() : '0';
                 return `
                     <div class="asset-item">
-                        <input type="text" class="edit-input" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="名稱">
-                        <input type="number" class="edit-input asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
+                        <input type="text" class="liab-edit-name" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
+                        <div class="liab-input-wrapper">
+                            <input type="number" class="liab-edit-value" value="${item.value}" onchange="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="0">
+                        </div>
                         <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
                 `;
             }).join('');
     
             card.innerHTML = `
+                <button class="btn-delete-card" onclick="deleteLiabCategory('${cat.id}')">×</button>
+                
                 <div class="category-header" onclick="toggleLiabCategory('${cat.id}')">
                     <div>
                         <span class="chevron">▼</span> 
@@ -647,9 +691,6 @@
                 <div class="asset-list">
                     ${itemsHtml}
                     <button class="btn" style="padding:8px; font-size:0.85rem; margin-top:5px;" onclick="addLiabItem('${cat.id}')">+ 新增項目</button>
-                    <div style="text-align:right; margin-top:15px;">
-                        <button onclick="deleteLiabCategory('${cat.id}')" style="font-size:11px; color:#888; background:none; border:none; cursor:pointer; text-decoration:underline;">🗑️ 刪除分類</button>
-                    </div>
                 </div>
             `;
             grid.appendChild(card);
