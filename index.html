@@ -119,7 +119,7 @@
             border-radius: var(--radius);
             color: var(--theme-bg);
             font-weight: 900;
-            margin-bottom: 30px;
+            margin-bottom: 40px !important;
         }
         
         /* 3. Dashboard 卡片網格 */
@@ -127,6 +127,7 @@
             display: grid;
             grid-template-columns: 1fr; /* 手機上一列一個 */
             gap: 20px;
+            margin-top: 20px;
         }
         
         /* 4. 單張卡片設計 */
@@ -224,7 +225,7 @@
                     <span class="dash-label">總資產 (Assets)</span>
                     <span id="dash-total-assets" class="dash-value">$0</span>
                 </div>
-                <div class="dash-card" onclick="showPage('liabilities-view')" style="border-color: #FF4444;">
+                <div class="dash-card" onclick="showPage('liabilities-view')">
                     <span class="dash-label">總負債 (Liabilities)</span>
                     <span id="dash-total-liabilities" class="dash-value" style="color: #FF4444;">$0</span>
                 </div>
