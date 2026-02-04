@@ -43,6 +43,10 @@
         .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
         .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
 
+        /* 負債卡片樣式，沿用資產卡片風格 */
+        .liab-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
+        .liab-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
+
         .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
@@ -50,6 +54,20 @@
 
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
+
+        /* 負債列表的欄位配置（簡化為名稱 + 金額，靠左對齊） */
+        .liab-header-row { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
+        .liab-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: left; }
+        .liab-header-row span:first-child { text-align: center; }
+        .liab-header-row span:nth-child(2) { padding-left: 4px; }
+        .liab-header-row span:nth-child(3) { padding-left: 4px; }
+
+        .liab-list { margin-bottom: 15px; min-height: 5px; }
+        .liab-item { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 8px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
+        .liab-item div:nth-child(2) .static-view,
+        .liab-item div:nth-child(2) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
+        .liab-item div:nth-child(3) .static-view,
+        .liab-item div:nth-child(3) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
         .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
@@ -80,6 +98,8 @@
         
         #chartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #portfolioChart { width: 100% !important; height: auto !important; }
+        #liabChartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
+        #liabChart { width: 100% !important; height: auto !important; }
 
         .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
         .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
@@ -91,7 +111,7 @@
         .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
         
         /* 當卡片收合時，隱藏列表、標頭行、新增按鈕以及建議標籤 */
-        .collapsed .asset-list, .collapsed .asset-header-row, .category-card.collapsed .btn, .category-card.collapsed .status-tag { display: none !important;}
+        .collapsed .asset-list, .collapsed .asset-header-row, .collapsed .liab-list, .collapsed .liab-header-row, .category-card.collapsed .btn, .liab-card.collapsed .btn, .category-card.collapsed .status-tag { display: none !important;}
 
         /* 讓 footer 的間距在收合時更緊湊（選配） */
         .collapsed .card-footer {margin-top: 5px;padding-top: 10px; border-top: none;}
@@ -200,6 +220,37 @@
         .container {
             padding-bottom: 100px !important;
         }
+
+        /* 自訂 Toast 通知（取代 alert，模擬視窗也能顯示） */
+        #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { padding: 14px 24px; border-radius: 10px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); animation: toastIn 0.3s ease; max-width: 90vw; transition: opacity 0.3s, transform 0.3s; }
+        .toast.success { background: #00C853; color: white; border: 2px solid #009624; }
+        .toast.error { background: #FF5252; color: white; border: 2px solid #D32F2F; }
+        .toast.info { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 自訂確認 Modal（取代 confirm，模擬視窗也能顯示） */
+        #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        #modalOverlay.show { display: flex; animation: fadeIn 0.2s ease; }
+        #confirmModal { background: white; border: 4px solid #1A1A1A; border-radius: var(--radius); padding: 24px; max-width: 320px; width: 100%; box-shadow: 8px 8px 0 #1A1A1A; }
+        #confirmModal .modal-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 16px; color: #1A1A1A; }
+        #confirmModal .modal-btns { display: flex; gap: 12px; margin-top: 20px; }
+        #confirmModal .modal-btn { flex: 1; padding: 12px; font-weight: 900; border-radius: 8px; cursor: pointer; border: 2px solid #1A1A1A; font-size: 0.95rem; }
+        #confirmModal .modal-btn.cancel { background: #f0f0f0; color: #333; }
+        #confirmModal .modal-btn.confirm { background: var(--theme-accent); color: var(--theme-bg); }
+        #confirmModal .modal-btn.danger { background: #FF4444; color: white; border-color: #B30000; }
+
+        /* 總覽頁優化設計 */
+        .dashboard-hero { background: linear-gradient(135deg, var(--theme-bg) 0%, color-mix(in srgb, var(--theme-bg) 85%, black) 100%); color: var(--theme-accent); padding: 28px 20px; border-radius: var(--radius); margin-bottom: 24px; border: 4px solid #1A1A1A; box-shadow: 6px 6px 0 #1A1A1A; text-align: center; }
+        .dashboard-hero .hero-label { font-size: 0.75rem; font-weight: 900; letter-spacing: 2px; opacity: 0.9; margin-bottom: 6px; }
+        .dashboard-hero .hero-value { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
+        .dashboard-hero .hero-value.positive { color: #4CAF50; }
+        .dashboard-hero .hero-value.negative { color: #FF8A80; }
+        .dashboard-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .dashboard-cards .dash-card { padding: 18px 14px; margin: 0; }
+        .dashboard-cards .dash-card .dash-value { font-size: 1.5rem; margin-top: 6px; }
+        .dashboard-cards .dash-card .dash-label { font-size: 0.7rem; }
+        .dashboard-cards .dash-card.wide { grid-column: 1 / -1; }
     </style>
 </head>
 <body>
@@ -219,19 +270,23 @@
     
 <div class="container">
     <div id="home-view" class="page-view">
-            <h1>財務總覽 Dashboard</h1>
-            <div class="dashboard-grid">
+            <h1>財務總覽</h1>
+            <div class="dashboard-hero">
+                <div class="hero-label">淨資產 Net Worth</div>
+                <div id="dash-net-worth" class="hero-value">$0</div>
+            </div>
+            <div class="dashboard-cards">
                 <div class="dash-card" onclick="showPage('assets-view')">
-                    <span class="dash-label">總資產 (Assets)</span>
+                    <span class="dash-label">💰 總資產</span>
                     <span id="dash-total-assets" class="dash-value">$0</span>
                 </div>
                 <div class="dash-card" onclick="showPage('liabilities-view')">
-                    <span class="dash-label">總負債 (Liabilities)</span>
+                    <span class="dash-label">📉 總負債</span>
                     <span id="dash-total-liabilities" class="dash-value" style="color: #FF4444;">$0</span>
                 </div>
-                <div class="dash-card">
-                    <span class="dash-label">淨資產 (Net Worth)</span>
-                    <span id="dash-net-worth" class="dash-value" style="color: #008800;">$0</span>
+                <div class="dash-card wide" style="background: rgba(var(--theme-accent-rgb), 0.12); border-color: var(--theme-accent);" onclick="showPage('assets-view')">
+                    <span class="dash-label">點擊查看詳情</span>
+                    <span style="font-size: 0.85rem; color: #666;">資產 · 負債 · 圖表</span>
                 </div>
             </div>
         </div>
@@ -268,8 +323,42 @@
     </div>    
     
     <div id="liabilities-view" class="page-view" style="display:none;">
-            <h1>負債管理</h1>
-            <p style="text-align:center; color:#888;">尚未開發...</p>
+        <h1>
+            <span style="font-size: 0.8em; letter-spacing: 2px;">Liability Manager</span><br>
+            <span style="font-size: 0.6em;">負債管理</span>
+        </h1>
+
+        <div class="save-status">
+            <div class="status-dot" id="saveDotLiab"></div>
+            <span id="saveTextLiab">自動儲存至本地</span>
+        </div>
+
+        <div class="rebalance-panel">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
+                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Liabilities｜負債總額 (TWD)</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="chart-btn" onclick="toggleLiabChart()">圖表</button>
+                </div>
+            </div>
+            <div id="liabRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div id="liabChartContainer">
+                <canvas id="liabChart"></canvas>
+            </div>
+        </div>
+
+        <div id="liabGrid"></div>
+        <button class="btn" onclick="addLiabCategory()">+ 新增負債類別</button>
+        <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAllLiabilities()">重置負債資料</button>
+    </div>
+</div>
+<div id="toastContainer"></div>
+<div id="modalOverlay">
+    <div id="confirmModal">
+        <div class="modal-title" id="modalTitle">確認</div>
+        <div class="modal-btns">
+            <button class="modal-btn cancel" id="modalCancel">取消</button>
+            <button class="modal-btn confirm" id="modalConfirm">確定</button>
+        </div>
     </div>
 </div>
 <nav class="bottom-nav">
@@ -280,6 +369,30 @@
 <datalist id="stockList"></datalist>
 
 <script>
+    function showToast(msg, type) {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = 'toast ' + (type || 'info');
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-8px)'; setTimeout(() => t.remove(), 300); }, 2500);
+    }
+    function showConfirm(msg, opts) {
+        return new Promise(resolve => {
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const cancelBtn = document.getElementById('modalCancel');
+            const confirmBtn = document.getElementById('modalConfirm');
+            title.textContent = msg || '確認';
+            confirmBtn.textContent = opts?.confirmText || '確定';
+            confirmBtn.className = 'modal-btn ' + (opts?.danger ? 'danger' : 'confirm');
+            overlay.classList.add('show');
+            const close = (ok) => { overlay.classList.remove('show'); resolve(ok); };
+            cancelBtn.onclick = () => close(false);
+            confirmBtn.onclick = () => close(true);
+            overlay.onclick = (e) => { if (e.target === overlay) close(false); };
+        });
+    }
     function showPage(pageId) {
     // 1. 隱藏所有頁面
     document.querySelectorAll('.page-view').forEach(p => {
@@ -293,7 +406,8 @@
     }
     
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
-    let myChart = null, categories = [], stockData = [], usdRate = 32.5;
+    let myChart = null, myLiabChart = null, categories = [], stockData = [], usdRate = 32.5, liabCategories = [];
+    let assetTotal = 0, liabilityTotal = 0;
 
     function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
@@ -304,6 +418,12 @@
         { id: 'cat_3', name: '防守型投資', target: 20 },
         { id: 'cat_4', name: '高股息投資', target: 20 },
         { id: 'cat_5', name: '安全存款', target: 10 }
+    ];
+
+    const LIAB_DEFAULT_CONFIG = [
+        { id: 'debt_1', name: '房貸' },
+        { id: 'debt_2', name: '車貸' },
+        { id: 'debt_3', name: '信用卡' }
     ];
 
     async function loadStockData() {
@@ -405,7 +525,7 @@
         const s = i.querySelector('.asset-name').value.trim().toUpperCase();
         if (s && s !== '點擊輸入') sL.push(s);
     });
-    if (sL.length === 0) return alert("請輸入代號");
+    if (sL.length === 0) { showToast("請先輸入股票代號", "info"); return; }
     try {
         btn.innerText = "⏳..."; btn.disabled = true;
         const resp = await fetch(`${GAS_URL}?symbols=${encodeURIComponent(sL.join(','))}`);
@@ -426,8 +546,8 @@
                 if (vV) { vV.innerText = formatCurrency(nV); vV.classList.remove('empty-placeholder'); }
             }
         });
-        alert(`✅ 股價已更新 目前匯率：${usdRate.toFixed(2)}`);
-    } catch (e) { alert("失敗"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
+        showToast(`股價更新完成！匯率 USD/TWD：${usdRate.toFixed(2)}`, "success");
+    } catch (e) { showToast("股價更新失敗，請檢查網路連線後重試", "error"); } finally { btn.innerText = oT; btn.disabled = false; calculateAll(); }
 }
 
 
@@ -463,18 +583,47 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
-        
+
+        // 將資產總額存成全域變數，給 Dashboard 使用
+        assetTotal = total;
+        updateDashboard();
+
+        updateChart(catSums, total); 
+        forceSave();
+    }
+
+    function calculateAllLiabilities() {
+        let total = 0;
+        document.querySelectorAll('.liab-card').forEach(card => {
+            let sum = 0;
+            card.querySelectorAll('.liab-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
+            const sumDisplay = card.querySelector('.liab-sum-display');
+            if (sumDisplay) sumDisplay.innerText = formatCurrency(sum);
+            total += sum;
+        });
+
+        liabilityTotal = total;
+        const totalEl = document.getElementById('liabRebalanceSummary');
+        if (totalEl) totalEl.innerText = formatCurrency(total);
+
+        updateLiabChart();
+        updateDashboard();
+        forceSaveLiab();
+    }
+
+    function updateDashboard() {
         const dashAssets = document.getElementById('dash-total-assets');
         const dashNet = document.getElementById('dash-net-worth');
         const dashLiabilities = document.getElementById('dash-total-liabilities');
-    
-        // total 是你原本 code 裡算出來的總資產變數
-        if (dashAssets) dashAssets.innerText = formatCurrency(total);
-        if (dashLiabilities) dashLiabilities.innerText = formatCurrency(0); // 目前負債先設 0
-        if (dashNet) dashNet.innerText = formatCurrency(total - 0); 
-    
-        updateChart(catSums, total); 
-        forceSave();
+        const netWorth = assetTotal - liabilityTotal;
+
+        if (dashAssets) dashAssets.innerText = formatCurrency(assetTotal);
+        if (dashLiabilities) dashLiabilities.innerText = formatCurrency(liabilityTotal);
+        if (dashNet) {
+            dashNet.innerText = formatCurrency(netWorth);
+            dashNet.classList.remove('positive', 'negative');
+            dashNet.classList.add(netWorth >= 0 ? 'positive' : 'negative');
+        }
     }
 
     function updateChart(catSums, grandTotal) {
@@ -495,6 +644,42 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
             });
         }
+    }
+
+    function updateLiabChart() {
+        const container = document.getElementById('liabChartContainer');
+        const ctx = document.getElementById('liabChart');
+        if (!ctx || !container) return;
+        const liabSums = {};
+        document.querySelectorAll('.liab-card').forEach(card => {
+            let sum = 0;
+            card.querySelectorAll('.liab-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
+            liabSums[card.id] = sum;
+        });
+        const ids = Object.keys(liabSums).filter(id => liabSums[id] > 0);
+        if (ids.length === 0 && myLiabChart) {
+            myLiabChart.data.labels = ['尚無資料']; myLiabChart.data.datasets[0].data = [1]; myLiabChart.update();
+            return;
+        }
+        if (ids.length === 0) return;
+        const cA = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
+        const cB = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg').trim();
+        const labels = ids.map(id => document.getElementById(id)?.querySelector('.liab-name-text')?.innerText || id);
+        const dataValues = ids.map(id => liabSums[id]);
+        const colors = ids.map((_, i) => interpolateColor(cA, cB, ids.length > 1 ? i / (ids.length - 1) : 0));
+        if (myLiabChart) {
+            myLiabChart.data.labels = labels; myLiabChart.data.datasets[0].data = dataValues; myLiabChart.data.datasets[0].backgroundColor = colors;
+            myLiabChart.update(); myLiabChart.resize();
+        } else {
+            myLiabChart = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: colors, borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
+        }
+    }
+
+    function toggleLiabChart() {
+        const c = document.getElementById('liabChartContainer');
+        if (c) { c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAllLiabilities(); }
     }
 
     function interpolateColor(c1, c2, f) {
@@ -545,7 +730,163 @@
     }
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
-    function deleteCategory(id) { if (confirm('是否確定要刪除？')) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+    async function deleteCategory(id) { if (await showConfirm('是否確定要刪除此投資區域？', { danger: true })) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+
+    // ===== 負債頁面：UI 與資料處理 =====
+    function renderLiabilitiesUI() {
+        const saved = JSON.parse(localStorage.getItem('myLiabilities_v1')) || {};
+        const grid = document.getElementById('liabGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        liabCategories.forEach(cat => {
+            const data = saved[cat.id] || { items: [], collapsed: false };
+            const card = document.createElement('div');
+            card.id = cat.id;
+            card.className = `liab-card ${data.collapsed ? 'collapsed' : ''}`;
+            card.innerHTML = `
+                <button class="btn-delete-card" onclick="deleteLiabCategory('${cat.id}')">×</button>
+                <div class="liab-header" onclick="toggleLiabCategory('${cat.id}')">
+                    <div><span class="chevron">▼</span> <span class="liab-name-text" contenteditable="true" onblur="forceSaveLiab()">${cat.name}</span></div>
+                </div>
+                <div class="liab-header-row">
+                    <span></span><span>名稱</span><span>金額</span>
+                </div>
+                <div class="liab-list" id="liab-list-${cat.id}"></div>
+                <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addLiability('${cat.id}')">+ 新增負債</button>
+                <div class="card-footer">
+                    <div class="footer-row">
+                        <span style="font-size:0.75rem; color:#888;">合計</span>
+                        <span class="liab-sum-display">$0</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(i => addLiability(cat.id, i.name, i.amount));
+            } else {
+                addLiability(cat.id);
+            }
+
+            new Sortable(document.getElementById(`liab-list-${cat.id}`), {
+                animation: 150,
+                delay: 200,
+                delayOnTouchOnly: true,
+                touchStartThreshold: 5,
+                onEnd: () => calculateAllLiabilities()
+            });
+        });
+
+        new Sortable(grid, {
+            animation: 150,
+            handle: '.liab-header',
+            delay: 200,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
+            onEnd: () => calculateAllLiabilities()
+        });
+
+        calculateAllLiabilities();
+    }
+
+    function addLiability(catId, name='', amount=0) {
+        const list = document.getElementById(`liab-list-${catId}`); if (!list) return;
+        const div = document.createElement('div'); div.className = 'liab-item';
+        const amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
+        div.innerHTML = `
+            <button class="btn-delete-left" onclick="this.closest('.liab-item').remove(); calculateAllLiabilities();">×</button>
+            <div>
+                <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
+                <div class="edit-container"><input type="text" class="edit-input liab-name" value="${name}" onblur="autoViewModeLiab(this)"></div>
+            </div>
+            <div>
+                <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
+                <div class="edit-container prefix"><input type="number" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)"></div>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+
+    function addLiabCategory() {
+        liabCategories.push({ id: 'debt_'+Date.now(), name: '新負債' });
+        renderLiabilitiesUI();
+    }
+
+    async function deleteLiabCategory(id) {
+        if (await showConfirm('是否確定要刪除此負債類別？', { danger: true })) {
+            liabCategories = liabCategories.filter(c => c.id !== id);
+            renderLiabilitiesUI();
+            forceSaveLiab();
+        }
+    }
+
+    function toggleLiabCategory(id) {
+        const target = event.target;
+        if (target.tagName === 'INPUT' || target.isContentEditable) {
+            return;
+        }
+        document.getElementById(id).classList.toggle('collapsed');
+        forceSaveLiab();
+    }
+
+    function autoViewModeLiab(iEl) {
+        const view = iEl.parentElement.previousElementSibling;
+        let dV = iEl.value;
+        if (iEl.type === 'number') {
+            if (dV === "" || isNaN(dV) || dV == 0) {
+                view.innerText = "-";
+                view.classList.add('empty-placeholder');
+            } else {
+                view.innerText = formatCurrency(dV);
+                view.classList.remove('empty-placeholder');
+            }
+        } else {
+            view.innerText = dV || "點擊輸入";
+            view.classList.toggle('empty-placeholder', !dV);
+        }
+        setTimeout(() => {
+            iEl.parentElement.style.display = 'none';
+            view.style.display = 'flex';
+            calculateAllLiabilities();
+        }, 150);
+    }
+
+    function forceSaveLiab() {
+        try {
+            const data = {}, newCats = [];
+            document.querySelectorAll('.liab-card').forEach(card => {
+                const items = [];
+                card.querySelectorAll('.liab-item').forEach(item => {
+                    items.push({
+                        name: item.querySelector('.liab-name').value || '',
+                        amount: parseFloat(item.querySelector('.liab-amount').value) || 0
+                    });
+                });
+                newCats.push({ id: card.id, name: card.querySelector('.liab-name-text').innerText });
+                data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
+            });
+            liabCategories = newCats;
+            localStorage.setItem('myLiabilities_v1', JSON.stringify(data));
+            localStorage.setItem('liabConfig_v1', JSON.stringify(liabCategories));
+            const dot = document.getElementById('saveDotLiab');
+            if (dot) {
+                dot.classList.add('active');
+                setTimeout(() => dot.classList.remove('active'), 800);
+            }
+        } catch(e) {}
+    }
+
+    async function clearAllLiabilities() {
+        if (await showConfirm('是否清除所有負債資料並重置？', { danger: true })) {
+            localStorage.removeItem('myLiabilities_v1');
+            localStorage.removeItem('liabConfig_v1');
+            liabCategories = LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+            renderLiabilitiesUI();
+            calculateAllLiabilities();
+        }
+    }
+
     function toggleCategory(id) {
     // 如果點擊的是輸入框 (INPUT) 或正在編輯文字 (contenteditable)，則不觸發收合
         const target = event.target;
@@ -557,9 +898,19 @@
         forceSave();
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
-    function clearAll() { if (confirm('是否清除所有資料並重置？')) { localStorage.clear(); location.reload(); } }
+    async function clearAll() { if (await showConfirm('是否清除所有資料並重置？此操作無法復原。', { danger: true })) { localStorage.clear(); location.reload(); } }
 
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
+    window.onload = () => {
+        loadStockData();
+        const s = localStorage.getItem('catConfig_v5');
+        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        const liabS = localStorage.getItem('liabConfig_v1');
+        liabCategories = liabS ? JSON.parse(liabS) : LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        renderUI();
+        renderLiabilitiesUI();
+        setTheme(localStorage.getItem('userTheme') || 'orange');
+        showPage('home-view');
+    };
 </script>
 </body>
 </html>
