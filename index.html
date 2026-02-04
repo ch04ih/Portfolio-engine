@@ -268,11 +268,23 @@
     </div>    
     
     <div id="liabilities-view" class="page-view" style="display:none;">
-        <h1>負債管理</h1>
+        <h1>
+            <span style="font-size: 0.8em; letter-spacing: 2px;">Debt Management</span><br>
+            <span style="font-size: 0.6em;">負債管理</span>
+        </h1>
         
         <div class="rebalance-panel">
-            <strong>負債總額：</strong>
-            <span id="liabilitiesSummary">$0</span>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
+                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Liabilities｜負債總額 (TWD)</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="chart-btn" onclick="toggleLiabChart()">圖表</button>
+                </div>
+            </div>
+            <div id="liabilitiesSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            
+            <div id="liabChartContainer" style="display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px;">
+                <canvas id="liabilitiesChart"></canvas>
+            </div>
         </div>
     
         <div id="liabilitiesGrid"></div>
@@ -585,50 +597,53 @@
     // 3. 渲染負債畫面
     function renderLiabilities() {
         const grid = document.getElementById('liabilitiesGrid');
+        if (!grid) return;
         grid.innerHTML = '';
         let totalLiab = 0;
+        let catSums = {};
     
         liabilityCategories.forEach(cat => {
             let catSum = 0;
             const card = document.createElement('div');
-            card.className = 'category-card'; // 複用資產頁的卡片樣式
+            card.className = `category-card ${cat.collapsed ? 'collapsed' : ''}`;
             card.id = cat.id;
     
-            // 建立卡片內容 (名稱與金額)
             let itemsHtml = cat.items.map((item, index) => {
                 catSum += parseFloat(item.value) || 0;
                 return `
                     <div class="asset-item">
-                        <input type="text" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="名稱">
-                        <input type="number" class="asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
-                        <button onclick="deleteLiabItem('${cat.id}', ${index})" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
+                        <input type="text" class="edit-input" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="名稱">
+                        <input type="number" class="edit-input asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
+                        <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
                 `;
             }).join('');
     
             card.innerHTML = `
-                <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                <div class="category-header" onclick="toggleLiabCategory('${cat.id}')">
                     <div><span class="chevron">▼</span> <span>${cat.name}</span></div>
                     <div class="cat-sum-display">${formatCurrency(catSum)}</div>
                 </div>
                 <div class="asset-list">
                     ${itemsHtml}
-                    <button class="btn" onclick="addLiabItem('${cat.id}')" style="margin-top:10px;">+ 新增項目</button>
-                </div>
-                <div class="card-footer" style="text-align:right;">
-                    <button onclick="deleteLiabCategory('${cat.id}')" style="font-size:12px; color:#888; background:none; border:none;">刪除整個分類</button>
+                    <button class="btn" style="padding:8px; font-size:0.85rem; margin-top:5px;" onclick="addLiabItem('${cat.id}')">+ 新增項目</button>
+                    <div style="text-align:right; margin-top:15px;">
+                        <button onclick="deleteLiabCategory('${cat.id}')" style="font-size:11px; color:#888; background:none; border:none; cursor:pointer;">🗑️ 刪除分類</button>
+                    </div>
                 </div>
             `;
             grid.appendChild(card);
             totalLiab += catSum;
+            catSums[cat.id] = catSum;
         });
     
         document.getElementById('liabilitiesSummary').innerText = formatCurrency(totalLiab);
-        
-        // 重要：同步到主頁與儲存
         updateDashboardLiabilities(totalLiab);
+        updateLiabChart(catSums, totalLiab); 
         saveLiabilities();
     }
+
+
     
     // 4. 輔助函式：新增/修改/刪除
     function addLiabItem(catId) {
@@ -685,8 +700,63 @@
         // 2. 更新主頁的淨資產 (資產 - 負債)
         if (dashNet) dashNet.innerText = formatCurrency(totalAssets - totalLiab);
     }
+
+    let myLiabChart = null;
+
+    function toggleLiabChart() {
+        const c = document.getElementById('liabChartContainer');
+        c.style.display = c.style.display === 'none' ? 'block' : 'none';
+        renderLiabilities(); 
+    }
     
-    window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
+    function updateLiabChart(catSums, total) {
+        const container = document.getElementById('liabChartContainer');
+        const ctx = document.getElementById('liabilitiesChart');
+        if (!ctx || container.style.display === 'none') return;
+    
+        const ids = Object.keys(catSums);
+        const colors = ids.map((_, i) => interpolateColor("#FF4444", "#800000", i / (ids.length > 1 ? ids.length - 1 : 1)));
+        const labels = ids.map(id => liabilityCategories.find(c => c.id === id).name);
+        const dataValues = ids.map(id => catSums[id]);
+    
+        if (myLiabChart) {
+            myLiabChart.data.labels = labels;
+            myLiabChart.data.datasets[0].data = dataValues;
+            myLiabChart.data.datasets[0].backgroundColor = colors;
+            myLiabChart.update();
+        } else {
+            myLiabChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: colors, borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+    }
+    
+    function toggleLiabCategory(id) {
+        const cat = liabilityCategories.find(c => c.id === id);
+        if (cat) {
+            cat.collapsed = !cat.collapsed;
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('collapsed');
+            saveLiabilities();
+        }
+    }
+    
+    window.onload = () => { 
+        loadStockData(); 
+        const s = localStorage.getItem('catConfig_v5'); 
+        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); 
+        renderUI(); 
+        
+        // 補上載入負債，並給予預設卡片
+        const lData = localStorage.getItem('liabilityData_v1');
+        liabilityCategories = lData ? JSON.parse(lData) : [{ id: 'liab-default', name: '請輸入負債名稱', items: [], collapsed: false }];
+        renderLiabilities();
+        
+        setTheme(localStorage.getItem('userTheme') || 'orange'); 
+        showPage('home-view');
+    };
 </script>
 </body>
 </html>
