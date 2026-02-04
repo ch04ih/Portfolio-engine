@@ -268,8 +268,18 @@
     </div>    
     
     <div id="liabilities-view" class="page-view" style="display:none;">
-            <h1>負債管理</h1>
-            <p style="text-align:center; color:#888;">尚未開發...</p>
+        <h1>負債管理</h1>
+        
+        <div class="rebalance-panel">
+            <strong>負債總額：</strong>
+            <span id="liabilitiesSummary">$0</span>
+        </div>
+    
+        <div id="liabilitiesGrid"></div>
+    
+        <button class="btn" onclick="addLiabilityCategory()" style="width:100%; margin-top:20px; background:#1A1A1A; color:white;">
+            ➕ 新增負債分類
+        </button>
     </div>
 </div>
 <nav class="bottom-nav">
@@ -558,7 +568,124 @@
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     function clearAll() { if (confirm('是否清除所有資料並重置？')) { localStorage.clear(); location.reload(); } }
+  
+    
+    // 1. 負債數據結構
+    let liabilityCategories = [];
+    
+    // 2. 新增負債分類
+    function addLiabilityCategory() {
+        const name = prompt("請輸入負債分類名稱（例如：銀行貸款、信用卡、私人借貸）");
+        if (!name) return;
+        const id = 'liab-' + Date.now();
+        liabilityCategories.push({ id: id, name: name, items: [] });
+        renderLiabilities();
+    }
+    
+    // 3. 渲染負債畫面
+    function renderLiabilities() {
+        const grid = document.getElementById('liabilitiesGrid');
+        grid.innerHTML = '';
+        let totalLiab = 0;
+    
+        liabilityCategories.forEach(cat => {
+            let catSum = 0;
+            const card = document.createElement('div');
+            card.className = 'category-card'; // 複用資產頁的卡片樣式
+            card.id = cat.id;
+    
+            // 建立卡片內容 (名稱與金額)
+            let itemsHtml = cat.items.map((item, index) => {
+                catSum += parseFloat(item.value) || 0;
+                return `
+                    <div class="asset-item">
+                        <input type="text" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="名稱">
+                        <input type="number" class="asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
+                        <button onclick="deleteLiabItem('${cat.id}', ${index})" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
+                    </div>
+                `;
+            }).join('');
+    
+            card.innerHTML = `
+                <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                    <div><span class="chevron">▼</span> <span>${cat.name}</span></div>
+                    <div class="cat-sum-display">${formatCurrency(catSum)}</div>
+                </div>
+                <div class="asset-list">
+                    ${itemsHtml}
+                    <button class="btn" onclick="addLiabItem('${cat.id}')" style="margin-top:10px;">+ 新增項目</button>
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button onclick="deleteLiabCategory('${cat.id}')" style="font-size:12px; color:#888; background:none; border:none;">刪除整個分類</button>
+                </div>
+            `;
+            grid.appendChild(card);
+            totalLiab += catSum;
+        });
+    
+        document.getElementById('liabilitiesSummary').innerText = formatCurrency(totalLiab);
+        
+        // 重要：同步到主頁與儲存
+        updateDashboardLiabilities(totalLiab);
+        saveLiabilities();
+    }
+    
+    // 4. 輔助函式：新增/修改/刪除
+    function addLiabItem(catId) {
+        const cat = liabilityCategories.find(c => c.id === catId);
+        cat.items.push({ name: '', value: 0 });
+        renderLiabilities();
+    }
+    
+    function updateLiabItem(catId, index, key, val) {
+        const cat = liabilityCategories.find(c => c.id === catId);
+        cat.items[index][key] = val;
+        renderLiabilities();
+    }
+    
+    function deleteLiabItem(catId, index) {
+        const cat = liabilityCategories.find(c => c.id === catId);
+        cat.items.splice(index, 1);
+        renderLiabilities();
+    }
+    
+    function deleteLiabCategory(catId) {
+        if(confirm("確定要刪除整個分類嗎？")) {
+            liabilityCategories = liabilityCategories.filter(c => c.id !== catId);
+            renderLiabilities();
+        }
+    }
+    
+    // 5. 儲存功能
+    function saveLiabilities() {
+        localStorage.setItem('liabilityData_v1', JSON.stringify(liabilityCategories));
+    }
+    
+    // 6. 載入功能 (放在 window.onload 裡面)
+    function loadLiabilities() {
+        const data = localStorage.getItem('liabilityData_v1');
+        if (data) {
+            liabilityCategories = JSON.parse(data);
+            renderLiabilities();
+        }
+    }
 
+    // 補上這一段，主頁數字才會動
+    function updateDashboardLiabilities(totalLiab) {
+        const dashLiab = document.getElementById('dash-total-liabilities');
+        const dashNet = document.getElementById('dash-net-worth');
+        const dashAssets = document.getElementById('dash-total-assets');
+    
+        // 從主頁抓取目前的資產數字（把 $ 和 , 拿掉轉成純數字）
+        const totalAssets = parseFloat(dashAssets.innerText.replace(/[$,]/g, '')) || 0;
+    
+        // 1. 更新主頁的總負債文字
+        if (dashLiab) dashLiab.innerText = formatCurrency(totalLiab);
+        
+        // 2. 更新主頁的淨資產 (資產 - 負債)
+        if (dashNet) dashNet.innerText = formatCurrency(totalAssets - totalLiab);
+    }
+    
     window.onload = () => { loadStockData(); const s = localStorage.getItem('catConfig_v5'); categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name })); renderUI(); setTheme(localStorage.getItem('userTheme') || 'orange'); showPage('home-view');};
 </script>
 </body>
