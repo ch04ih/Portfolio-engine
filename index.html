@@ -666,16 +666,12 @@
             card.id = cat.id;
     
             let itemsHtml = cat.items.map((item, index) => {
+                const displayVal = item.value ? parseFloat(item.value).toLocaleString() : '0';
                 return `
                     <div class="asset-item">
-                        <input type="text" class="liab-edit-name" value="${item.name}" 
-                               onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
+                        <input type="text" class="liab-edit-name" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
                         <div class="liab-input-wrapper">
-                                // 找到 renderLiabilities 裡金額輸入框那一行，改成這樣：
-                                <input type="number" class="liab-edit-value asset-value" value="${item.value}" 
-                                       oninput="updateLiabItemValue('${cat.id}', ${index}, this.value)" 
-                                       onkeydown="if(event.key==='Enter') { this.blur(); event.preventDefault(); }"
-                                       onblur="renderLiabilities()" placeholder="0">
+                            <input type="number" class="liab-edit-value" value="${item.value}" onchange="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="0">
                         </div>
                         <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
@@ -706,41 +702,6 @@
         updateDashboardLiabilities(totalLiab);
         updateLiabChart(catSums, totalLiab); 
         saveLiabilities();
-    }
-
-    function updateLiabItemValue(catId, index, val) {
-        const cat = liabilityCategories.find(c => c.id === catId);
-        if (!cat) return;
-    
-        // [重要] 確保存進去的是數字，否則加總會變字串相加
-        cat.items[index].value = parseFloat(val) || 0; 
-        
-        // 計算卡片小計
-        let catSum = 0;
-        cat.items.forEach(item => {
-            catSum += parseFloat(item.value) || 0;
-        });
-    
-        // 即時更新卡片顯示
-        const card = document.getElementById(catId);
-        if (card) {
-            const catSumEl = card.querySelector('.cat-sum-display');
-            if (catSumEl) catSumEl.innerText = formatCurrency(catSum);
-        }
-    
-        // 計算總額
-        let totalLiab = 0;
-        liabilityCategories.forEach(c => {
-            c.items.forEach(item => {
-                totalLiab += parseFloat(item.value) || 0;
-            });
-        });
-    
-        const summaryEl = document.getElementById('liabilitiesSummary');
-        if (summaryEl) summaryEl.innerText = formatCurrency(totalLiab);
-        
-        updateDashboardLiabilities(totalLiab);
-        saveLiabilities(); // 確保這裡有執行儲存
     }
 
     function updateLiabCatName(id, newName) {
