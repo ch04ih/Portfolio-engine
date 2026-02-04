@@ -210,65 +210,20 @@
             margin-bottom: 8px;
         }
         
-        /* 負債頁面輸入框簡約化 */
         #liabilitiesGrid .edit-input {
             width: 100%;
             border: none;
             border-bottom: 1px solid #CCC; /* 改為細底線 */
-           /* border-radius: 0;*/             /* 移除圓角 */
+            border-radius: 0;             /* 移除圓角 */
             padding: 8px 4px;
             font-weight: 500;
             background: transparent;      /* 背景透明 */
             transition: border-color 0.3s, background 0.3s;
         }
-        
-        /* 點擊輸入時的狀態 */
-        #liabilitiesGrid .edit-input:focus {
-            outline: none;
-            border-bottom: 2px solid var(--theme-accent); /* 變換主題色底線 */
-            background: rgba(var(--theme-accent-rgb), 0.05); /* 極淺的主題色背景 */
-        }
-        
-        /* 讓負債項目的外層容器可以定位叉叉 */
-        #liabilitiesGrid .asset-item {
-            position: relative; /* 重要：讓叉叉可以根據這層定位 */
-            display: grid;
-            grid-template-columns: 1.2fr 1.1fr; /* 移除原本最後一欄的 45px */
-            gap: 15px;
-            background: #fdfdfd; /* 給項目一點淡淡的底色，方便看清邊界 */
-            padding: 20px 15px 10px 15px; /* 增加頂部空間給叉叉 */
-            margin-bottom: 15px;
-            border: 1px solid #EEE;
-            border-radius: 8px;
-        }
-        
-        /* 負債項目專用的右上角小叉叉 */
-        #liabilitiesGrid .asset-item .btn-delete-item {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--theme-accent);
-            color: var(--theme-bg);
-            border: 2px solid #1A1A1A;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 2px 2px 0px #000;
-            z-index: 5;
-        }
-        
-        
-        /* 針對負債頁面的標題增加底部間距 */
         #liabilities-view h1 {
             margin-bottom: 30px !important;
         }
-
+        
     </style>
 </head>
 <body>
@@ -677,21 +632,13 @@
             card.className = `category-card ${cat.collapsed ? 'collapsed' : ''}`;
             card.id = cat.id;
     
-            // 在 renderLiabilities() 函式內尋找這段修改
             let itemsHtml = cat.items.map((item, index) => {
                 catSum += parseFloat(item.value) || 0;
                 return `
                     <div class="asset-item">
-                        <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-item">×</button>
-                        
-                        <div>
-                            <input type="text" class="edit-input" value="${item.name}" 
-                                onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="項目名稱">
-                        </div>
-                        <div>
-                            <input type="number" class="edit-input asset-value" value="${item.value}" 
-                                oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
-                        </div>
+                        <input type="text" class="edit-input" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="名稱">
+                        <input type="number" class="edit-input asset-value" value="${item.value}" oninput="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="金額">
+                        <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
                 `;
             }).join('');
