@@ -97,6 +97,108 @@
         .collapsed .card-footer {margin-top: 5px;padding-top: 10px; border-top: none;}
         .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; tranform: rotate(0deg);}
         .collapsed .chevron { transform: rotate(-90deg); }
+
+        /* 1. 每一頁的共同設定：預設隱藏，填滿空間 */
+        .page-view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out; /* 換頁時有個淡入效果 */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 2. 首頁標題樣式 (直接套用你原本最漂亮的設計) */
+        .dashboard-title {
+            border: 4px solid #1A1A1A;
+            text-align: center;
+            background: var(--theme-accent);
+            padding: 15px 12px;
+            box-shadow: 6px 6px 0px #000;
+            border-radius: var(--radius);
+            color: var(--theme-bg);
+            font-weight: 900;
+            margin-bottom: 30px;
+        }
+        
+        /* 3. Dashboard 卡片網格 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* 手機上一列一個 */
+            gap: 20px;
+        }
+        
+        /* 4. 單張卡片設計 */
+        .dash-card {
+            background: white;
+            border: 4px solid #1A1A1A;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: 6px 6px 0px #1A1A1A;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        /* 點擊時的下壓感 */
+        .dash-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0px #1A1A1A;
+        }
+        
+        .dash-label {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .dash-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-top: 10px;
+            color: var(--theme-bg); /* 讓數字顏色跟主題走 */
+        }
+        
+        /* 淨資產卡片特別強調 */
+        .dash-card.net-worth {
+            background: #f8f9fa;
+            border-style: double; /* 雙線邊框更有質感 */
+        }
+        /* 底部導覽列：像手機 App 一樣固定 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 4px solid #1A1A1A;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .bottom-nav div {
+            font-weight: 900;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #1A1A1A;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* 讓 container 底部留白，不然內容會被導覽列遮住 */
+        .container {
+            padding-bottom: 100px !important;
+        }
     </style>
 </head>
 <body>
