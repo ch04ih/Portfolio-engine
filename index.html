@@ -666,12 +666,14 @@
             card.id = cat.id;
     
             let itemsHtml = cat.items.map((item, index) => {
-                const displayVal = item.value ? parseFloat(item.value).toLocaleString() : '0';
                 return `
                     <div class="asset-item">
-                        <input type="text" class="liab-edit-name" value="${item.name}" onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
+                        <input type="text" class="liab-edit-name" value="${item.name}" 
+                               onchange="updateLiabItem('${cat.id}', ${index}, 'name', this.value)" placeholder="債務名稱">
                         <div class="liab-input-wrapper">
-                            <input type="number" class="liab-edit-value" value="${item.value}" onchange="updateLiabItem('${cat.id}', ${index}, 'value', this.value)" placeholder="0">
+                            <input type="number" class="liab-edit-value asset-value" value="${item.value}" 
+                                   oninput="updateLiabItemValue('${cat.id}', ${index}, this.value)" 
+                                   onblur="renderLiabilities()" placeholder="0">
                         </div>
                         <button onclick="deleteLiabItem('${cat.id}', ${index})" class="btn-delete-left">×</button>
                     </div>
@@ -702,6 +704,31 @@
         updateDashboardLiabilities(totalLiab);
         updateLiabChart(catSums, totalLiab); 
         saveLiabilities();
+    }
+
+    function updateLiabItemValue(catId, index, val) {
+        const cat = liabilityCategories.find(c => c.id === catId);
+        if (cat) {
+            cat.items[index].value = val;
+            
+            // 1. 重新計算所有負債總額
+            let totalLiab = 0;
+            liabilityCategories.forEach(c => {
+                c.items.forEach(item => {
+                    totalLiab += parseFloat(item.value) || 0;
+                });
+            });
+    
+            // 2. 只更新畫面上顯示金額的數字，不重畫整個 HTML
+            const summaryEl = document.getElementById('liabilitiesSummary');
+            if (summaryEl) summaryEl.innerText = formatCurrency(totalLiab);
+            
+            // 3. 同步到主頁 Dashboard
+            updateDashboardLiabilities(totalLiab);
+            
+            // 4. 背景默默儲存
+            saveLiabilities();
+        }
     }
 
     function updateLiabCatName(id, newName) {
