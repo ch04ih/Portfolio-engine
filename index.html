@@ -248,6 +248,32 @@
             color: var(--theme-bg);
             box-shadow: 3px 3px 0 #1A1A1A;
         }
+        .nav-dropdown {
+            position: fixed;
+            bottom: 64px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 3px solid #1A1A1A;
+            border-radius: 12px;
+            box-shadow: 6px 6px 0 #1A1A1A;
+            display: none;
+            z-index: 1000;
+            padding: 8px;
+            min-width: 220px;
+        }
+        .nav-dropdown .item {
+            padding: 10px 12px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .nav-dropdown .item:hover {
+            background: rgba(var(--theme-accent-rgb), 0.15);
+            color: var(--theme-bg);
+        }
+        .theme-panel { padding: 0 12px; }
+        .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; margin-top: 8px; }
         /* 卡片內的「新增」按鈕弱化（維持置中與全寬） */
         .category-card .btn, .liab-card .btn, .simple-asset-card .btn {
             width: 100%;
@@ -308,6 +334,7 @@
 
     <div class="theme-panel" id="themePanel">
         <div class="theme-toggle-icon" onclick="toggleThemePanel()">🎨 主題配色</div>
+        <div class="hide-toggle-icon" id="hideToggleBtn" onclick="toggleHideAmounts()">🙈 隱藏金額</div>
         <div class="theme-options">
             <button style="background: #3D2B1F; --btn-accent: #FF8C42" onclick="setTheme('orange')"></button>
             <button style="background: #293d0b; --btn-accent: #dac4fc" onclick="setTheme('forest')"></button>
@@ -464,11 +491,14 @@
 </div>
 <nav class="bottom-nav">
         <div id="nav-home" class="item" onclick="showPage('home-view')">🏠 總覽</div>
-        <div id="nav-assets" class="item" onclick="showPage('assets-view')">💰 流動資產</div>
-        <div id="nav-fixed" class="item" onclick="showPage('fixed-assets-view')">🏗️ 固定資產</div>
-        <div id="nav-recv" class="item" onclick="showPage('receivables-view')">🧾 應收帳款</div>
+        <div id="nav-assets" class="item" onclick="toggleAssetsMenu()">💰 資產 ▾</div>
         <div id="nav-liab" class="item" onclick="showPage('liabilities-view')">📉 負債</div>
     </nav>
+<div id="assetsMenu" class="nav-dropdown">
+    <div class="item" onclick="showPage('assets-view'); hideAssetsMenu()">流動資產</div>
+    <div class="item" onclick="showPage('fixed-assets-view'); hideAssetsMenu()">固定資產</div>
+    <div class="item" onclick="showPage('receivables-view'); hideAssetsMenu()">應收帳款</div>
+</div>
 <datalist id="stockList"></datalist>
 
 <script>
@@ -510,8 +540,8 @@
     const navMap = {
         'home-view':'nav-home',
         'assets-view':'nav-assets',
-        'fixed-assets-view':'nav-fixed',
-        'receivables-view':'nav-recv',
+        'fixed-assets-view':'nav-assets',
+        'receivables-view':'nav-assets',
         'liabilities-view':'nav-liab'
     };
     document.querySelectorAll('.bottom-nav .item').forEach(i => i.classList.remove('active'));
@@ -524,12 +554,13 @@
     
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxy9lgNdsTEW4fCpEmyYeAlAsYhQzHNlXfWFztXdx_W5Qn6vNBgNcRU-THXesDopY_k/exec"; 
     let myChart = null, myLiabChart = null, myOverviewChart = null;
+    let hideAmounts = false;
     let categories = [], stockData = [], usdRate = 32.5;
     let liabCategories = [], fixedCategories = [], recvCategories = [];
     let assetTotal = 0, liabilityTotal = 0, fixedTotal = 0, receivableTotal = 0;
 
     function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
-    function formatCurrency(num) { return "$" + Math.round(num || 0).toLocaleString('en-US'); }
+    function formatCurrency(num) { return hideAmounts ? "***" : ("$" + Math.round(num || 0).toLocaleString('en-US')); }
 
     const DEFAULT_CONFIG = [
         { id: 'cat_1', name: '成長型投資', target: 40 },
@@ -1338,6 +1369,40 @@
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     async function clearAll() { if (await showConfirm('是否清除所有資料並重置？此操作無法復原。', { danger: true })) { localStorage.clear(); location.reload(); } }
 
+    function toggleHideAmounts() {
+        hideAmounts = !hideAmounts;
+        localStorage.setItem('hideAmounts', hideAmounts ? '1' : '0');
+        const btn = document.getElementById('hideToggleBtn');
+        if (btn) btn.textContent = hideAmounts ? '👁️ 顯示金額' : '🙈 隱藏金額';
+        calculateAll();
+        calculateAllFixedAssets();
+        calculateAllReceivables();
+        calculateAllLiabilities();
+        updateDashboard();
+    }
+    function initHideAmounts() {
+        hideAmounts = localStorage.getItem('hideAmounts') === '1';
+        const btn = document.getElementById('hideToggleBtn');
+        if (btn) btn.textContent = hideAmounts ? '👁️ 顯示金額' : '🙈 隱藏金額';
+    }
+    function toggleAssetsMenu() {
+        const m = document.getElementById('assetsMenu');
+        if (!m) return;
+        m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+    }
+    function hideAssetsMenu() {
+        const m = document.getElementById('assetsMenu');
+        if (m) m.style.display = 'none';
+    }
+    document.addEventListener('click', (e) => {
+        const m = document.getElementById('assetsMenu');
+        const navAssets = document.getElementById('nav-assets');
+        if (!m || !navAssets) return;
+        if (m.style.display === 'block' && !m.contains(e.target) && e.target !== navAssets) {
+            m.style.display = 'none';
+        }
+    });
+
     window.onload = () => {
         loadStockData();
         const s = localStorage.getItem('catConfig_v5');
@@ -1353,6 +1418,7 @@
         renderFixedAssetsUI();
         renderReceivablesUI();
         setTheme(localStorage.getItem('userTheme') || 'orange');
+        initHideAmounts();
         showPage('home-view');
     };
 </script>
