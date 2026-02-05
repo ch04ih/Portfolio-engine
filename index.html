@@ -87,11 +87,15 @@
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 28px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
-        .edit-container.prefix::before { content: '$'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
-        .edit-container.suffix::after { content: '%'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 11px; color: #1A1A1A; z-index: 2; }
-        .edit-input[type="number"] { text-align: right; padding-right: 22px; }
-        .edit-container.prefix .edit-input { padding-left: 24px; }
-        .edit-container.suffix .edit-input { padding-right: 26px; }
+        .edit-container.prefix::before { content: '$'; position: absolute; left: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
+        .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
+        .edit-input[type="number"] { text-align: center; padding-right: 0; }
+        .edit-container.prefix .edit-input { padding-left: 16px; }
+        .edit-container.suffix .edit-input { padding-right: 16px; }
+        /* 僅在固定資產、應收帳款與負債頁面使用右對齊與加大內距 */
+        .simple-asset-card .edit-input[type="number"], .liab-card .edit-input[type="number"] { text-align: right; padding-right: 24px; }
+        .simple-asset-card .edit-container.prefix::before, .liab-card .edit-container.prefix::before { left: 10px; font-size: 11px; }
+        .simple-asset-card .edit-container.prefix .edit-input, .liab-card .edit-container.prefix .edit-input { padding-left: 32px; }
 
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
         .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
@@ -243,6 +247,17 @@
             background: var(--theme-accent);
             color: var(--theme-bg);
             box-shadow: 3px 3px 0 #1A1A1A;
+        }
+        /* 卡片內的「新增」按鈕弱化（維持置中與全寬） */
+        .category-card .btn, .liab-card .btn, .simple-asset-card .btn {
+            width: 100%;
+            display: block;
+            background: #f3f3f3;
+            color: #666;
+            border-color: #bbb;
+            box-shadow: none;
+            padding: 8px 10px;
+            font-size: 0.85rem;
         }
         
         /* 讓 container 底部留白，不然內容會被導覽列遮住 */
