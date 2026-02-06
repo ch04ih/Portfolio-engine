@@ -11,6 +11,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
@@ -31,26 +32,39 @@
         body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
         .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
 
-        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 6px 6px 0px #000; border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
+        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
         #home-view h1 { margin-bottom: 12px; }
         
         .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
         .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
-        .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); }
-        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 10px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px #1A1A1A; white-space: nowrap; flex-shrink: 0; }
+        .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); border-radius: var(--radius); }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 10px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: none; white-space: nowrap; flex-shrink: 0; }
 
-        .category-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
-        .category-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
+        .category-card { background: #fff; border: 4px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 8px 22px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
+        .category-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
+        .category-card:not(.collapsed) .category-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
+        .category-card:not(.collapsed) .category-header > div:nth-child(1) { flex: 0 0 auto; }
+        .category-card:not(.collapsed) .category-header > div:nth-child(2) { flex: 1 1 auto; text-align: center; font-weight: 900; }
+        .category-header .cat-name-text { font-size: 0.9rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 7em; max-width: 7em; display: inline-block; }
+        .simple-asset-header .fixed-name-text, .simple-asset-header .recv-name-text, .liab-header .liab-name-text { font-size: 0.9rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 7em; max-width: 7em; display: inline-block; }
+        .category-card:not(.collapsed) .category-header > div:nth-child(3) { flex: 0 0 auto; text-align: right; }
+        .card-subtitle { font-size: 10px; color: #888; margin-top: -2px; display: none; text-align: center; }
+        .category-card.collapsed .card-subtitle { display: none; }
+        .category-header .target-edit { margin-top: 0; }
 
         /* 卡片樣式（負債與簡易資產共享） */
-        .liab-card, .simple-asset-card { background: #fff; border: 4px solid #1A1A1A; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #1A1A1A; border-radius: var(--radius); position: relative; }
-        .liab-header, .simple-asset-header { background: var(--theme-bg); color: var(--theme-accent); padding: 12px 15px; margin: -15px -15px 10px -15px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: grab; }
+        .liab-card, .simple-asset-card { background: #fff; border: 4px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 6px 18px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
+        .liab-header, .simple-asset-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 6px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
+        .liab-card:not(.collapsed) .liab-header, .simple-asset-card:not(.collapsed) .simple-asset-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
 
-        .btn-delete-card { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        .btn-delete-card { position: absolute; top: -16px; right: -16px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: none; z-index: 20; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .category-card:hover .btn-delete-card, .liab-card:hover .btn-delete-card, .simple-asset-card:hover .btn-delete-card, .show-delete .btn-delete-card { opacity: 1; pointer-events: auto; }
 
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
+        .target-display { font-size: 10px; color: #888; }
+        .category-card.collapsed .target-edit { display: none; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
         .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
@@ -97,25 +111,76 @@
         .simple-asset-card .edit-container.prefix::before, .liab-card .edit-container.prefix::before { left: 10px; font-size: 11px; }
         .simple-asset-card .edit-container.prefix .edit-input, .liab-card .edit-container.prefix .edit-input { padding-left: 32px; }
 
+        /* 收合磁貼三欄排版與卡片寬度控制 */
+        #mainGrid, #fixedGrid, #recvGrid, #liabGrid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            column-gap: 18px;
+            row-gap: 18px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #mainGrid + .btn { margin-top: 18px; }
+        #fixedGrid + .btn { margin-top: 18px; }
+        #recvGrid + .btn { margin-top: 18px; }
+        #liabGrid + .btn { margin-top: 18px; }
+        .category-card, .liab-card, .simple-asset-card { grid-column: 1 / -1; }
+        .category-card.collapsed, .liab-card.collapsed, .simple-asset-card.collapsed { grid-column: span 1; padding: 7px; min-height: 80px; width: 100%; border-width: 3px; }
+        .category-card.collapsed .category-header, .liab-card.collapsed .liab-header, .simple-asset-card.collapsed .simple-asset-header { padding: 5px 9px; }
+        .category-card.collapsed .card-footer, .liab-card.collapsed .card-footer, .simple-asset-card.collapsed .card-footer { margin-top: 5px; padding-top: 5px; }
+        .card-emoji { margin: 0 6px; }
+        .card-icon { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+        .card-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
+        .sheet #sheetContent { padding: 8px 12px 16px; }
+        .sheet-tools { background: transparent; border-top: none; color: inherit; }
+        .icon-grid, .color-grid { background: transparent; border: 3px solid #1A1A1A; border-radius: 12px; }
+        .icon-dot { background: #fff; }
+        .color-dot { width: 28px; height: 28px; border: 1px solid #1A1A1A; border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0 #1A1A1A; }
+        .sheet .in-sheet { border-width: 3px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .sheet .in-sheet .category-header, .sheet .in-sheet .liab-header, .sheet .in-sheet .simple-asset-header { padding: 10px 12px; margin-bottom: 8px; }
+        .sheet .in-sheet .asset-list, .sheet .in-sheet .liab-list, .sheet .in-sheet .simple-asset-list { max-height: 48vh; overflow: auto; border: 1px solid #EEE; border-radius: 8px; padding: 4px 8px; }
+        .sheet .in-sheet .card-footer { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #E5E5E5; }
+
         .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
-        .card-footer { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #DDD; }
-        .footer-row { display: flex; justify-content: space-between; align-items: center; }
-        .cat-sum-display { font-size: 1.1rem; font-weight: 900; }
+        .card-footer { margin-top: 14px; padding-top: 14px; border-top: 2px dashed #DDD; }
+        .footer-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .category-card .footer-row { flex-direction: column; align-items: center; gap: 4px; }
+        .liab-card .footer-row, .simple-asset-card .footer-row { flex-direction: column; align-items: center; gap: 4px; }
+        .cat-sum-display { font-size: 1.15rem; font-weight: 900; }
+        .liab-sum-display, .fixed-sum-display, .recv-sum-display { font-size: 1.15rem; font-weight: 900; }
         
-        /* 合計百分比字體縮小 */
-        .current-p { font-size: 0.85rem; font-weight: 700; color: #555; }
+        .current-p { font-size: 0.75rem; font-weight: 700; color: #555; margin-top: 2px; }
+        .category-card .current-p, .liab-card .current-p, .simple-asset-card .current-p { font-size: 0.7rem; color: #999; opacity: 0.9; margin-top: 0; }
+        .current-p.p-high { color: #5A7EA8; opacity: 0.85; }
+        .current-p.p-low  { color: #B86B6B; opacity: 0.85; }
+        .sum-label { font-size: 0.75rem; font-weight: 800; color: #555; }
+        .category-card.collapsed .sum-label, .liab-card.collapsed .sum-label, .simple-asset-card.collapsed .sum-label { display: none; }
+        .category-card:not(.collapsed) .footer-row, .liab-card:not(.collapsed) .footer-row, .simple-asset-card:not(.collapsed) .footer-row { flex-direction: row; align-items: center; justify-content: space-between; }
+        .category-card:not(.collapsed) .cat-sum-display, .liab-card:not(.collapsed) .liab-sum-display, .simple-asset-card:not(.collapsed) .fixed-sum-display { flex: 1; text-align: center; }
+        .category-card:not(.collapsed) .current-p, .liab-card:not(.collapsed) .current-p, .simple-asset-card:not(.collapsed) .current-p { flex: 0 0 auto; text-align: right; }
+
+        .category-card.collapsed .cat-name-text, .liab-card.collapsed .liab-name-text, .simple-asset-card.collapsed .fixed-name-text, .simple-asset-card.collapsed .recv-name-text {
+            pointer-events: none;
+            user-select: none;
+        }
 
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
-        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: 4px 4px 0px #000; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
+        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
+        .btn-subtle { background: #fff; color: #555; border: 2px solid #1A1A1A; font-weight: 700; }
         
         #chartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #portfolioChart { width: 100% !important; height: auto !important; }
         #liabChartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #liabChart { width: 100% !important; height: auto !important; }
+        #rebalanceSummary, #fixedRebalanceSummary, #recvRebalanceSummary, #liabRebalanceSummary { font-size: clamp(1.6rem, 7.5vw, 2.2rem) !important; }
+        @media (max-width: 380px) {
+            .cat-sum-display, .liab-sum-display, .fixed-sum-display, .recv-sum-display { font-size: 1rem; }
+            .asset-item div:nth-child(5) .static-view { font-size: 11px; }
+        }
 
-        .theme-panel { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 10px; }
-        .theme-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; }
-        .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: 4px 4px 0px #000; z-index: 100; }
+        .theme-panel { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; background: rgba(var(--theme-accent-rgb), 0.12); border-radius: 12px; padding: 8px 12px; }
+        .theme-toggle-icon, .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 6px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: none; display: inline-flex; align-items: center; }
+        .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: none; z-index: 100; }
         .theme-panel.active .theme-options { display: flex; }
         
         /* 雙色主題預覽按鍵 */
@@ -131,8 +196,18 @@
 
         /* 讓 footer 的間距在收合時更緊湊（選配） */
         .collapsed .card-footer {margin-top: 5px;padding-top: 10px; border-top: none;}
-        .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; tranform: rotate(0deg);}
+        .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; transform: rotate(0deg);}
         .collapsed .chevron { transform: rotate(-90deg); }
+        
+        /* 底部滑出細節頁樣式 */
+        .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1500; display: none; }
+        .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid #1A1A1A; box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: hidden; opacity: 0; pointer-events: none; }
+        .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+        .sheet-grabber { width: 40px; height: 4px; background: #ccc; border-radius: 4px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
+        .sheet-close { position: absolute; right: 12px; top: 8px; border: 2px solid #1A1A1A; background: #fff; border-radius: 8px; padding: 4px 8px; font-weight: 900; cursor: pointer; }
+        .icon-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--theme-accent); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
+        .icon-dot svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--dot); box-shadow: none; cursor: pointer; }
 
         /* 1. 每一頁的共同設定：預設隱藏，填滿空間 */
         .page-view {
@@ -214,7 +289,7 @@
             width: 100%;
             max-width: 500px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             padding: 10px 12px;
             border-top: 2px solid #1A1A1A;
             z-index: 1000;
@@ -225,7 +300,7 @@
             gap: 10px;
         }
         .bottom-nav .item {
-            flex: 0 0 auto;
+            flex: 1 1 0;
             font-weight: 800;
             font-size: 0.85rem;
             cursor: pointer;
@@ -238,6 +313,7 @@
             transition: transform 0.08s, box-shadow 0.08s, background 0.08s;
             white-space: nowrap;
             gap: 6px;
+            justify-content: center;
         }
         .bottom-nav .item:active {
             transform: translateY(1px);
@@ -273,7 +349,6 @@
             color: var(--theme-bg);
         }
         .theme-panel { padding: 0 12px; }
-        .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 5px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 2px 2px 0px #000; margin-top: 8px; }
         /* 卡片內的「新增」按鈕弱化（維持置中與全寬） */
         .category-card .btn, .liab-card .btn, .simple-asset-card .btn {
             width: 100%;
@@ -311,13 +386,13 @@
         #confirmModal .modal-btn.danger { background: #FF4444; color: white; border-color: #B30000; }
 
         /* 總覽頁優化設計 */
-        .dashboard-hero { background: #fff; color: var(--theme-accent); padding: 22px 18px; border-radius: var(--radius); margin-bottom: 18px; border: 3px solid #1A1A1A; box-shadow: 4px 4px 0 #1A1A1A; text-align: center; }
+        .dashboard-hero { background: #fff; color: var(--theme-accent); padding: 22px 18px; border-radius: var(--radius); margin-bottom: 18px; border: 3px solid #1A1A1A; box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
         .dashboard-hero .hero-label { font-size: 0.9rem; font-weight: 900; letter-spacing: 1px; opacity: 1; margin-bottom: 6px; color: #1A1A1A; }
         .dashboard-hero .hero-value { font-size: 2.6rem; font-weight: 900; letter-spacing: -1px; color: var(--theme-bg); display: inline-block; }
         .dashboard-hero .hero-value.positive { border-bottom: 3px solid #4CAF50; }
         .dashboard-hero .hero-value.negative { border-bottom: 3px solid #FF8A80; }
         .dashboard-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .dashboard-cards .dash-card { padding: 22px 16px; margin: 0; border-width: 3px; box-shadow: 4px 4px 0 #1A1A1A; }
+        .dashboard-cards .dash-card { padding: 22px 16px; margin: 0; border-width: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
         .dashboard-cards .dash-card .dash-value { font-size: 1.4rem; margin-top: 6px; color: #666; }
         .dashboard-cards .dash-card .dash-label { font-size: 0.7rem; color: #999; }
         #dash-total-liabilities { color: #b45a5a !important; }
@@ -400,7 +475,7 @@
         </div>
     
         <div id="mainGrid"></div>
-        <button class="btn" onclick="addCategory()">+ 新增投資區域</button>
+        <button class="btn btn-subtle" onclick="addCategory()">+ 新增投資區域</button>
         <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAll()">重置資料</button>
     </div>    
     
@@ -423,7 +498,7 @@
         </div>
 
         <div id="fixedGrid"></div>
-        <button class="btn" onclick="addFixedCategory()">+ 新增固定資產類別</button>
+        <button class="btn btn-subtle" onclick="addFixedCategory()">+ 新增固定資產類別</button>
         <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAllFixed()">重置固定資產資料</button>
     </div>
 
@@ -446,7 +521,7 @@
         </div>
 
         <div id="recvGrid"></div>
-        <button class="btn" onclick="addRecvCategory()">+ 新增應收帳款類別</button>
+        <button class="btn btn-subtle" onclick="addRecvCategory()">+ 新增應收帳款類別</button>
         <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAllRecv()">重置應收帳款資料</button>
     </div>
     
@@ -475,11 +550,26 @@
         </div>
 
         <div id="liabGrid"></div>
-        <button class="btn" onclick="addLiabCategory()">+ 新增負債類別</button>
+        <button class="btn btn-subtle" onclick="addLiabCategory()">+ 新增負債類別</button>
         <button class="btn" style="background:#ddd; border-color:#bbb; color:#888; box-shadow:3px 3px 0px #999; font-size:0.8rem;" onclick="clearAllLiabilities()">重置負債資料</button>
     </div>
 </div>
 <div id="toastContainer"></div>
+<!-- 底部滑出細節頁 -->
+<div id="sheetBackdrop" class="sheet-backdrop" onclick="closeSheet()"></div>
+    <div id="detailSheet" class="sheet">
+    <div class="sheet-grabber"></div>
+    <button class="sheet-close" onclick="closeSheet()">×</button>
+    <div class="sheet-tools" style="display:flex; gap:8px; align-items:center; padding: 8px 12px 8px 12px; flex-wrap: wrap;">
+        <div id="pickerPreview" style="display:flex; align-items:center; gap:4px; min-height:40px; width:100%;">
+            <button class="icon-dot" onclick="toggleColorGrid()" title="Icon 底色"><i data-lucide="palette"></i></button>
+        </div>
+        <div id="iconGrid" class="icon-grid" style="display:none; width:100%; grid-template-columns: repeat(6, 1fr); gap:8px; padding:8px 8px;"></div>
+        <div id="colorGrid" class="color-grid" style="display:none; width:100%; grid-template-columns: repeat(8, 1fr); gap:8px; padding:8px 8px;"></div>
+    </div>
+    <div id="sheetContent"></div>
+    <div style="height:20px"></div>
+</div>
 <div id="modalOverlay">
     <div id="confirmModal">
         <div class="modal-title" id="modalTitle">確認</div>
@@ -558,10 +648,38 @@
     let categories = [], stockData = [], usdRate = 32.5;
     let liabCategories = [], fixedCategories = [], recvCategories = [];
     let assetTotal = 0, liabilityTotal = 0, fixedTotal = 0, receivableTotal = 0;
+    const iconList = [
+        'wallet','credit-card','banknote','coins','landmark','briefcase','trending-up','trending-down','pie-chart','bar-chart','activity',
+        'shopping-bag','shopping-cart','home','car','plane','gift','coffee','utensils','heart','star','user','users','settings','lock','unlock',
+        'key','shield','bell','calendar','clock','mail','phone','camera','image','music','video','globe','map-pin','navigation','cloud','sun',
+        'moon','zap','anchor','award','bookmark','box','cpu','database','gem','hard-hat','layers'
+    ];
+    const recommendedColors = ['#F2C94C','#2D9CDB','#9B51E0','#F2994A','#27AE60','#EB5757','#828282','#6FCF97'];
 
     function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return hideAmounts ? "***" : ("$" + Math.round(num || 0).toLocaleString('en-US')); }
 
+    function sanitizeIconName(name) {
+        const fallback = 'wallet';
+        const map = { '💳':'credit-card','💰':'coins','💵':'banknote','💸':'banknote','🪙':'coins','🏦':'landmark' };
+        const n = map[name] || name || fallback;
+        if (window.lucide && window.lucide.icons && window.lucide.icons[n]) return n;
+        return fallback;
+    }
+    function getIconHTML(name, color) {
+        const n = sanitizeIconName(name);
+        const c = color || getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
+        return `<span class="card-icon" style="background:${c}"><i data-lucide="${n}"></i></span>`;
+    }
+    function refreshIcons(scopeEl) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            try {
+                window.lucide.createIcons(scopeEl || document.body);
+            } catch (e) {
+                setTimeout(() => { window.lucide.createIcons(scopeEl || document.body); }, 0);
+            }
+        }
+    }
     const DEFAULT_CONFIG = [
         { id: 'cat_1', name: '成長型投資', target: 40 },
         { id: 'cat_2', name: '進攻型投資', target: 10 },
@@ -608,7 +726,7 @@
                         targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.cat-name-text').innerText });
+                newCats.push({ id: card.id, name: card.querySelector('.cat-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
                 data[card.id] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
             });
             categories = newCats;
@@ -723,7 +841,14 @@
             const target = parseFloat(card.querySelector('.target-input').value) || 0, curP = total > 0 ? (catSums[card.id] / total * 100) : 0;
             card.querySelector('.target-amount-label').innerText = formatCurrency(total * (target / 100));
             card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[card.id]);
-            card.querySelector('.current-p').innerText = curP.toFixed(1) + "%";
+            const curEl = card.querySelector('.current-p');
+            curEl.innerText = curP.toFixed(1) + "%";
+            curEl.classList.remove('p-high','p-low');
+            if (target > 0 && total > 0) {
+                if (curP < target) curEl.classList.add('p-low');
+                else if (curP > target) curEl.classList.add('p-high');
+            }
+            const td = card.querySelector('.target-display'); if (td) td.innerText = `目標 ${target}%`;
             const tag = card.querySelector('.status-alert'), diff = catSums[card.id] - (total * (target / 100));
             if (total === 0) tag.innerText = "✅ 等待資料";
             else if (Math.abs(curP - target) <= 3) tag.innerText = "✅ 比例理想";
@@ -776,14 +901,16 @@
         if (!grid) return;
         grid.innerHTML = '';
         fixedCategories.forEach(cat => {
-            const data = saved[cat.id] || { items: [], collapsed: false };
+            const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
-            card.className = `simple-asset-card ${data.collapsed ? 'collapsed' : ''}`;
+            card.className = `simple-asset-card collapsed`;
+            const iconHTML = getIconHTML(cat.icon || 'home', cat.color || '');
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteFixedCategory('${cat.id}')">×</button>
                 <div class="simple-asset-header" onclick="toggleFixedCategory('${cat.id}')">
-                    <div><span class="chevron">▼</span> <span class="fixed-name-text" contenteditable="true" onblur="forceSaveFixed()">${cat.name}</span></div>
+                    <div>${iconHTML}</div>
+                    <div><span class="fixed-name-text" contenteditable="true" onblur="forceSaveFixed()">${cat.name}</span></div>
                 </div>
                 <div class="simple-asset-header-row">
                     <span></span><span>名稱</span><span>金額</span>
@@ -792,12 +919,16 @@
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addFixedAsset('${cat.id}')">+ 新增資產</button>
                 <div class="card-footer">
                     <div class="footer-row">
-                        <span style="font-size:0.75rem; color:#888;">合計</span>
+                        <span class="sum-label">合計</span>
                         <span class="fixed-sum-display">$0</span>
+                        <span class="current-p" style="visibility:hidden">0%</span>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
+            attachLongPressDelete(card);
+            if (cat.color) card.setAttribute('data-color', cat.color);
+            if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.items && data.items.length > 0) data.items.forEach(i => addFixedAsset(cat.id, i.name, i.amount));
             else addFixedAsset(cat.id);
             new Sortable(document.getElementById(`fixed-list-${cat.id}`), {
@@ -810,6 +941,7 @@
             onEnd: () => calculateAllFixedAssets()
         });
         calculateAllFixedAssets();
+        refreshIcons(grid);
     }
     function addFixedAsset(catId, name='', amount=0) {
         const list = document.getElementById(`fixed-list-${catId}`); if (!list) return;
@@ -823,7 +955,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)"></div>
             </div>
         `;
         list.appendChild(div);
@@ -863,8 +995,7 @@
     function toggleFixedCategory(id) {
         const target = event.target;
         if (target.tagName === 'INPUT' || target.isContentEditable) return;
-        document.getElementById(id).classList.toggle('collapsed');
-        forceSaveFixed();
+        openSheetWithCard(id);
     }
     function forceSaveFixed() {
         try {
@@ -877,7 +1008,7 @@
                         amount: parseFloat(item.querySelector('.fixed-amount').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.fixed-name-text').innerText });
+                newCats.push({ id: card.id, name: card.querySelector('.fixed-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
                 data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
             });
             fixedCategories = newCats;
@@ -921,14 +1052,16 @@
         if (!grid) return;
         grid.innerHTML = '';
         recvCategories.forEach(cat => {
-            const data = saved[cat.id] || { items: [], collapsed: false };
+            const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
-            card.className = `simple-asset-card ${data.collapsed ? 'collapsed' : ''}`;
+            card.className = `simple-asset-card collapsed`;
+            const iconHTML = getIconHTML(cat.icon || 'file', cat.color || '');
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteRecvCategory('${cat.id}')">×</button>
                 <div class="simple-asset-header" onclick="toggleRecvCategory('${cat.id}')">
-                    <div><span class="chevron">▼</span> <span class="recv-name-text" contenteditable="true" onblur="forceSaveRecv()">${cat.name}</span></div>
+                    <div>${iconHTML}</div>
+                    <div><span class="recv-name-text" contenteditable="true" onblur="forceSaveRecv()">${cat.name}</span></div>
                 </div>
                 <div class="simple-asset-header-row">
                     <span></span><span>名稱</span><span>金額</span>
@@ -937,12 +1070,16 @@
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addRecvAsset('${cat.id}')">+ 新增應收</button>
                 <div class="card-footer">
                     <div class="footer-row">
-                        <span style="font-size:0.75rem; color:#888;">合計</span>
+                        <span class="sum-label">合計</span>
                         <span class="recv-sum-display">$0</span>
+                        <span class="current-p" style="visibility:hidden">0%</span>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
+            attachLongPressDelete(card);
+            if (cat.color) card.setAttribute('data-color', cat.color);
+            if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.items && data.items.length > 0) data.items.forEach(i => addRecvAsset(cat.id, i.name, i.amount));
             else addRecvAsset(cat.id);
             new Sortable(document.getElementById(`recv-list-${cat.id}`), {
@@ -955,6 +1092,7 @@
             onEnd: () => calculateAllReceivables()
         });
         calculateAllReceivables();
+        refreshIcons(grid);
     }
     function addRecvAsset(catId, name='', amount=0) {
         const list = document.getElementById(`recv-list-${catId}`); if (!list) return;
@@ -968,7 +1106,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)"></div>
             </div>
         `;
         list.appendChild(div);
@@ -1008,8 +1146,7 @@
     function toggleRecvCategory(id) {
         const target = event.target;
         if (target.tagName === 'INPUT' || target.isContentEditable) return;
-        document.getElementById(id).classList.toggle('collapsed');
-        forceSaveRecv();
+        openSheetWithCard(id);
     }
     function forceSaveRecv() {
         try {
@@ -1022,7 +1159,7 @@
                         amount: parseFloat(item.querySelector('.recv-amount').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.recv-name-text').innerText });
+                newCats.push({ id: card.id, name: card.querySelector('.recv-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
                 data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
             });
             recvCategories = newCats;
@@ -1157,29 +1294,202 @@
         return `rgb(${Math.round(r1 + f * (r2-r1))}, ${Math.round(g1 + f * (g2-g1))}, ${Math.round(b1 + f * (b2-b1))})`;
     }
 
+    // === 底部滑出細節頁 ===
+    let sheetCardEl = null, sheetOriginalParent = null, sheetPlaceholder = null;
+    function openSheetWithCard(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        sheetCardEl = card;
+        sheetOriginalParent = card.parentElement;
+        sheetPlaceholder = document.createElement('div');
+        sheetPlaceholder.id = `sheet-placeholder-${cardId}`;
+        sheetPlaceholder.style.display = 'none';
+        sheetOriginalParent.insertBefore(sheetPlaceholder, card);
+        card.classList.remove('collapsed');
+        card.classList.add('in-sheet');
+        document.getElementById('sheetContent').appendChild(card);
+        document.getElementById('sheetBackdrop').style.display = 'block';
+        document.getElementById('detailSheet').classList.add('open');
+        refreshIcons(document.getElementById('detailSheet'));
+        const ig = document.getElementById('iconGrid');
+        const cg = document.getElementById('colorGrid');
+        if (ig) ig.innerHTML = '';
+        if (cg) cg.innerHTML = '';
+        buildIconGrid();
+        buildColorGrid();
+        const ic = sheetCardEl.getAttribute('data-icon') || 'wallet';
+        const col = sheetCardEl.getAttribute('data-color') || getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
+        const pv = document.getElementById('pickerIconPreview');
+        if (pv) { pv.innerHTML = `<i data-lucide="${ic}"></i>`; refreshIcons(pv); pv.style.background = col; }
+    }
+    function closeSheet() {
+        const sheet = document.getElementById('detailSheet');
+        const backdrop = document.getElementById('sheetBackdrop');
+        sheet.classList.remove('open');
+        backdrop.style.display = 'none';
+        if (sheetCardEl && sheetOriginalParent) {
+            sheetCardEl.classList.remove('in-sheet');
+            sheetCardEl.classList.add('collapsed');
+            let container = null;
+            if (sheetCardEl.classList.contains('category-card')) container = document.getElementById('mainGrid');
+            else if (sheetCardEl.classList.contains('liab-card')) container = document.getElementById('liabGrid');
+            else if (sheetCardEl.classList.contains('simple-asset-card')) {
+                // 判斷屬於固定資產或應收帳款
+                const isFixed = sheetCardEl.querySelector('.simple-asset-header-row')?.textContent?.includes('名稱') && sheetCardEl.id.startsWith('fixed_');
+                container = isFixed ? document.getElementById('fixedGrid') : document.getElementById('recvGrid');
+            }
+            if (!container) container = sheetOriginalParent;
+            if (sheetPlaceholder && sheetPlaceholder.parentElement) {
+                const parentForReplace = sheetPlaceholder.parentElement;
+                parentForReplace.replaceChild(sheetCardEl, sheetPlaceholder);
+            } else {
+                container.appendChild(sheetCardEl);
+            }
+            sheetCardEl = null; sheetOriginalParent = null; sheetPlaceholder = null;
+        }
+    }
+    function applyIconToCard(card, iconName) {
+        const icon = sanitizeIconName(iconName);
+        card.setAttribute('data-icon', icon);
+        const holder = card.querySelector('.card-icon');
+        const color = card.getAttribute('data-color') || '';
+        if (holder) holder.outerHTML = getIconHTML(icon, color);
+        refreshIcons(card);
+    }
+    function applyColorToCard(card, color) {
+        card.setAttribute('data-color', color);
+        const holder = card.querySelector('.card-icon');
+        const icon = card.getAttribute('data-icon') || 'wallet';
+        if (holder) holder.outerHTML = getIconHTML(icon, color);
+        refreshIcons(card);
+    }
+    function persistCardStyle(card) {
+        if (card.classList.contains('category-card')) forceSave();
+        else if (card.classList.contains('liab-card')) forceSaveLiab();
+        else if (card.classList.contains('simple-asset-card')) {
+            const pid = card.parentElement?.id || '';
+            if (pid.startsWith('fixed')) forceSaveFixed(); else forceSaveRecv();
+        }
+    }
+    function setSheetCardIcon(iconName) {
+        if (!sheetCardEl) return;
+        applyIconToCard(sheetCardEl, iconName);
+        const pv = document.getElementById('pickerIconPreview');
+        if (pv) { pv.innerHTML = `<i data-lucide="${iconName}"></i>`; refreshIcons(pv); }
+        persistCardStyle(sheetCardEl);
+    }
+    function setSheetCardColor(color) {
+        if (!sheetCardEl) return;
+        applyColorToCard(sheetCardEl, color);
+        const pv = document.getElementById('pickerIconPreview');
+        if (pv) { pv.style.background = color; }
+        persistCardStyle(sheetCardEl);
+        const g = document.getElementById('colorGrid');
+        if (g) g.style.display = 'none';
+    }
+    function toggleIconGrid() {
+        const g = document.getElementById('iconGrid');
+        if (!g) return;
+        const willShow = g.style.display === 'none';
+        if (willShow) {
+            buildIconGrid();
+            g.style.display = 'grid';
+            refreshIcons(g);
+        } else {
+            g.style.display = 'none';
+        }
+    }
+    function toggleColorGrid() {
+        const g = document.getElementById('colorGrid');
+        if (!g) return;
+        const willShow = g.style.display === 'none';
+        if (willShow) {
+            if (g.childElementCount === 0) buildColorGrid();
+            g.style.display = 'grid';
+        } else {
+            g.style.display = 'none';
+        }
+    }
+    function buildIconGrid() {
+        const g = document.getElementById('iconGrid'); if (!g) return;
+        g.innerHTML = '';
+        const names = (window.lucide && window.lucide.icons) ? iconList.filter(n => window.lucide.icons[n]) : iconList;
+        names.forEach(n => {
+            const b = document.createElement('button');
+            b.className = 'icon-dot';
+            b.innerHTML = `<i data-lucide="${n}"></i>`;
+            b.onclick = () => setSheetCardIcon(n);
+            g.appendChild(b);
+        });
+        refreshIcons(g);
+    }
+    function buildColorGrid() {
+        const g = document.getElementById('colorGrid'); if (!g) return;
+        g.innerHTML = '';
+        const colors = ['#111','#222','#333','#555','#777','#999','#B4D355','#FF8C42','#304FFE','#00C853','#FF6D00','#6A1B9A','#F0F0F0','#e4d9c4','#80C5DE','#dac4fc','#b45a5a','#1976d2'];
+        recommendedColors.forEach(c => {
+            const b = document.createElement('button');
+            b.className = 'color-dot';
+            b.style.background = c;
+            b.title = '推薦主題色';
+            b.onclick = () => setSheetCardColor(c);
+            g.appendChild(b);
+        });
+        colors.forEach(c => {
+            const b = document.createElement('button');
+            b.className = 'color-dot';
+            b.style.background = c;
+            b.onclick = () => setSheetCardColor(c);
+            g.appendChild(b);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+    function attachLongPressDelete(card) {
+        let timer = null;
+        const start = () => { timer = setTimeout(() => { card.classList.add('show-delete'); }, 600); };
+        const clear = () => { if (timer) { clearTimeout(timer); timer = null; } };
+        card.addEventListener('touchstart', start, { passive: true });
+        card.addEventListener('touchend', clear);
+        card.addEventListener('touchcancel', clear);
+        card.addEventListener('mousedown', start);
+        card.addEventListener('mouseup', clear);
+        card.addEventListener('mouseleave', clear);
+    }
+
     function renderUI() {
         const saved = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {}, grid = document.getElementById('mainGrid'); grid.innerHTML = '';
         categories.forEach(cat => {
-            const data = saved[cat.id] || { target: 20, assets: [], collapsed: false };
-            const card = document.createElement('div'); card.id = cat.id; card.className = `category-card ${data.collapsed ? 'collapsed' : ''}`;
+            const data = saved[cat.id] || { target: 20, assets: [], collapsed: true };
+            const card = document.createElement('div'); card.id = cat.id; card.className = `category-card collapsed`;
+            const iconHTML = getIconHTML(cat.icon || 'wallet', cat.color || '');
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteCategory('${cat.id}')">×</button>
                 <div class="category-header" onclick="toggleCategory('${cat.id}')">
-                    <div><span class="chevron">▼</span> <span class="cat-name-text" contenteditable="true" onblur="forceSave()">${cat.name}</span></div>
-                    <div onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
+                    <div>${iconHTML}</div>
+                    <div><span class="cat-name-text" contenteditable="true" onblur="forceSave()">${cat.name}</span></div>
+                    <div class="card-subtitle"><span class="target-display">目標 ${data.target}%</span></div>
+                    <div class="target-edit" onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
                 </div>
                 <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span></span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
-                <div class="card-footer"><div class="footer-row"><span style="font-size:0.75rem; color:#888;">合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
+                <div class="card-footer"><div class="footer-row"><span class="sum-label">合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
             `;
             grid.appendChild(card);
+            attachLongPressDelete(card);
+            if (cat.color) card.setAttribute('data-color', cat.color);
+            if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
             new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
         });
         new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
         calculateAll();
+        refreshIcons(grid);
     }
 
     function addAsset(catId, name='', value=0, targetP=0, qty='', price='') {
@@ -1190,8 +1500,8 @@
             <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
             <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" inputmode="numeric" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" inputmode="decimal" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" step="any" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
+            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" inputmode="numeric" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
             <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
         `;
@@ -1209,14 +1519,16 @@
         grid.innerHTML = '';
 
         liabCategories.forEach(cat => {
-            const data = saved[cat.id] || { items: [], collapsed: false };
+            const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
-            card.className = `liab-card ${data.collapsed ? 'collapsed' : ''}`;
+            card.className = `liab-card collapsed`;
+            const iconHTML = getIconHTML(cat.icon || 'card', cat.color || '');
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteLiabCategory('${cat.id}')">×</button>
                 <div class="liab-header" onclick="toggleLiabCategory('${cat.id}')">
-                    <div><span class="chevron">▼</span> <span class="liab-name-text" contenteditable="true" onblur="forceSaveLiab()">${cat.name}</span></div>
+                    <div>${iconHTML}</div>
+                    <div><span class="liab-name-text" contenteditable="true" onblur="forceSaveLiab()">${cat.name}</span></div>
                 </div>
                 <div class="liab-header-row">
                     <span></span><span>名稱</span><span>金額</span>
@@ -1225,12 +1537,16 @@
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addLiability('${cat.id}')">+ 新增負債</button>
                 <div class="card-footer">
                     <div class="footer-row">
-                        <span style="font-size:0.75rem; color:#888;">合計</span>
+                        <span class="sum-label">合計</span>
                         <span class="liab-sum-display">$0</span>
+                        <span class="current-p" style="visibility:hidden">0%</span>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
+            attachLongPressDelete(card);
+            if (cat.color) card.setAttribute('data-color', cat.color);
+            if (cat.icon) card.setAttribute('data-icon', cat.icon);
 
             if (data.items && data.items.length > 0) {
                 data.items.forEach(i => addLiability(cat.id, i.name, i.amount));
@@ -1257,6 +1573,7 @@
         });
 
         calculateAllLiabilities();
+        refreshIcons(grid);
     }
 
     function addLiability(catId, name='', amount=0) {
@@ -1271,7 +1588,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)"></div>
             </div>
         `;
         list.appendChild(div);
@@ -1295,8 +1612,7 @@
         if (target.tagName === 'INPUT' || target.isContentEditable) {
             return;
         }
-        document.getElementById(id).classList.toggle('collapsed');
-        forceSaveLiab();
+        openSheetWithCard(id);
     }
 
     function autoViewModeLiab(iEl) {
@@ -1332,7 +1648,7 @@
                         amount: parseFloat(item.querySelector('.liab-amount').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.liab-name-text').innerText });
+                newCats.push({ id: card.id, name: card.querySelector('.liab-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
                 data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
             });
             liabCategories = newCats;
@@ -1357,14 +1673,9 @@
     }
 
     function toggleCategory(id) {
-    // 如果點擊的是輸入框 (INPUT) 或正在編輯文字 (contenteditable)，則不觸發收合
         const target = event.target;
-        if (target.tagName === 'INPUT' || target.isContentEditable) {
-            return;
-        }
-    
-        document.getElementById(id).classList.toggle('collapsed');
-        forceSave();
+        if (target.tagName === 'INPUT' || target.isContentEditable) return;
+        openSheetWithCard(id);
     }
     function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
     async function clearAll() { if (await showConfirm('是否清除所有資料並重置？此操作無法復原。', { danger: true })) { localStorage.clear(); location.reload(); } }
@@ -1406,13 +1717,13 @@
     window.onload = () => {
         loadStockData();
         const s = localStorage.getItem('catConfig_v5');
-        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'wallet' }));
         const liabS = localStorage.getItem('liabConfig_v1');
-        liabCategories = liabS ? JSON.parse(liabS) : LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        liabCategories = liabS ? JSON.parse(liabS) : LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'card' }));
         const fixedS = localStorage.getItem('fixedConfig_v1');
-        fixedCategories = fixedS ? JSON.parse(fixedS) : FIXED_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        fixedCategories = fixedS ? JSON.parse(fixedS) : FIXED_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'home' }));
         const recvS = localStorage.getItem('recvConfig_v1');
-        recvCategories = recvS ? JSON.parse(recvS) : RECV_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+        recvCategories = recvS ? JSON.parse(recvS) : RECV_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'file' }));
         renderUI();
         renderLiabilitiesUI();
         renderFixedAssetsUI();
