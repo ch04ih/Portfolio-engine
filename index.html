@@ -41,7 +41,8 @@
         .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
         .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
-        .rebalance-panel { background: white; border: 4px solid var(--border-dark); padding: 20px; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); border-radius: var(--radius); }
+        .rebalance-panel { background: white; border: 4px solid var(--border-dark); padding: 20px 20px 8px 20px; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); border-radius: var(--radius); }
+        #assets-view .rebalance-panel { padding-bottom: 2px; }
         .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid var(--border-dark); padding: 5px 10px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: none; white-space: nowrap; flex-shrink: 0; }
 
         .category-card { background: #fff; border: 4px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 8px 22px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
@@ -81,15 +82,21 @@
         .liab-header-row span:nth-child(3), .simple-asset-header-row span:nth-child(3) { padding-left: 4px; }
 
         .liab-list, .simple-asset-list { margin-bottom: 15px; min-height: 5px; }
-        .liab-item, .simple-asset-item { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 8px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
+        .simple-asset-item-wrap, .liab-item-wrap { position: relative; overflow: hidden; border-bottom: 1px solid #F2F2F2; }
+        .simple-asset-item-delete-reveal, .liab-item-delete-reveal { position: absolute; right: 0; top: 0; bottom: 0; width: 56px; background: #e57373; display: flex; align-items: center; justify-content: center; z-index: 0; }
+        .simple-asset-item-delete-reveal .asset-item-delete-btn, .liab-item-delete-reveal .asset-item-delete-btn { background: transparent; border: none; color: #fff; font-size: 0.8rem; font-weight: 800; cursor: pointer; padding: 8px; }
+        .simple-asset-item-wrap .simple-asset-item, .liab-item-wrap .liab-item { position: relative; z-index: 1; background: #fff; transition: transform 0.2s ease-out; }
+        .simple-asset-item-wrap.reveal .simple-asset-item, .simple-asset-item-wrap.swiped .simple-asset-item,
+        .liab-item-wrap.reveal .liab-item, .liab-item-wrap.swiped .liab-item { transform: translateX(-56px); }
+        .liab-item, .simple-asset-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 0; align-items: center; cursor: grab; }
+        .liab-item div:nth-child(1) .static-view,
+        .liab-item div:nth-child(1) .edit-input,
+        .simple-asset-item div:nth-child(1) .static-view,
+        .simple-asset-item div:nth-child(1) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
         .liab-item div:nth-child(2) .static-view,
         .liab-item div:nth-child(2) .edit-input,
         .simple-asset-item div:nth-child(2) .static-view,
         .simple-asset-item div:nth-child(2) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
-        .liab-item div:nth-child(3) .static-view,
-        .liab-item div:nth-child(3) .edit-input,
-        .simple-asset-item div:nth-child(3) .static-view,
-        .simple-asset-item div:nth-child(3) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
         .asset-item-wrap { position: relative; overflow: hidden; border-bottom: 1px solid #F2F2F2; }
@@ -238,8 +245,12 @@
         #portfolioChart { width: 100% !important; height: auto !important; }
         #liabChartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #liabChart { width: 100% !important; height: auto !important; }
-        #rebalanceSummary, #fixedRebalanceSummary, #recvRebalanceSummary, #liabRebalanceSummary { font-size: clamp(1.6rem, 7.5vw, 2.2rem) !important; }
-        .summary-with-trend { position: relative; display: inline-block; min-height: 1.8em; padding-right: 1.4em; }
+        #rebalanceSummary, #fixedRebalanceSummary, #recvRebalanceSummary, #liabRebalanceSummary { font-size: clamp(1.6rem, 7.5vw, 2.2rem) !important; line-height: 1.1; display: inline-block; margin: -0.15em 0; }
+        .rebalance-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; min-height: 32px; }
+        .rebalance-panel-header .panel-title { font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1; }
+        .rebalance-summary-block { min-height: 44px; padding-bottom: 10px; }
+        .summary-with-trend { position: relative; display: inline-block; min-height: 1.2em; padding-right: 1.4em; margin: -0.2em 0; margin-top: 0.25em; }
+        #assets-view .rebalance-panel > div:first-of-type { margin-bottom: 6px; }
         .summary-trend { position: absolute; right: 0; bottom: 2px; font-size: 0.9rem; line-height: 1; font-weight: 900; }
         .summary-trend.up { color: #2E7D32; opacity: 0.65; }
         .summary-trend.down { color: #C62828; opacity: 0.65; }
@@ -599,9 +610,9 @@
     </div>    
     
     <div id="fixed-assets-view" class="page-view" style="display:none;">
-        <h1>
-            <span style="font-size: 0.8em; letter-spacing: 2px;">Fixed Assets</span><br>
-            <span style="font-size: 0.6em;">固定資產</span>
+        <h1 class="dual-title">
+            <span class="title-en">Fixed Assets</span><br>
+            <span class="title-zh">固定資產</span>
         </h1>
 
         <div class="save-status">
@@ -610,10 +621,12 @@
         </div>
 
         <div class="rebalance-panel">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Fixed Assets｜固定資產總額 (TWD)</div>
+            <div class="rebalance-panel-header">
+                <div class="panel-title">Total Fixed Assets｜固定資產總額 (TWD)</div>
             </div>
-            <div class="summary-with-trend"><span id="fixedRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="fixedRebalanceSummaryTrend" class="summary-trend"></span></div>
+            <div class="rebalance-summary-block">
+                <div class="summary-with-trend"><span id="fixedRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="fixedRebalanceSummaryTrend" class="summary-trend"></span></div>
+            </div>
         </div>
 
         <div id="fixedGrid"></div>
@@ -622,9 +635,9 @@
     </div>
 
     <div id="receivables-view" class="page-view" style="display:none;">
-        <h1>
-            <span style="font-size: 0.8em; letter-spacing: 2px;">Accounts Receivable</span><br>
-            <span style="font-size: 0.6em;">應收帳款</span>
+        <h1 class="dual-title">
+            <span class="title-en">Accounts Receivable</span><br>
+            <span class="title-zh">應收帳款</span>
         </h1>
 
         <div class="save-status">
@@ -633,10 +646,12 @@
         </div>
 
         <div class="rebalance-panel">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Receivables｜應收帳款總額 (TWD)</div>
+            <div class="rebalance-panel-header">
+                <div class="panel-title">Total Receivables｜應收帳款總額 (TWD)</div>
             </div>
-            <div class="summary-with-trend"><span id="recvRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="recvRebalanceSummaryTrend" class="summary-trend"></span></div>
+            <div class="rebalance-summary-block">
+                <div class="summary-with-trend"><span id="recvRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="recvRebalanceSummaryTrend" class="summary-trend"></span></div>
+            </div>
         </div>
 
         <div id="recvGrid"></div>
@@ -645,9 +660,9 @@
     </div>
     
     <div id="liabilities-view" class="page-view" style="display:none;">
-        <h1>
-            <span style="font-size: 0.8em; letter-spacing: 2px;">Liability Manager</span><br>
-            <span style="font-size: 0.6em;">負債管理</span>
+        <h1 class="dual-title">
+            <span class="title-en">Liability Manager</span><br>
+            <span class="title-zh">負債管理</span>
         </h1>
 
         <div class="save-status">
@@ -656,13 +671,15 @@
         </div>
 
         <div class="rebalance-panel">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-                <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Liabilities｜負債總額 (TWD)</div>
+            <div class="rebalance-panel-header">
+                <div class="panel-title">Total Liabilities｜負債總額 (TWD)</div>
                 <div style="display:flex; gap:8px;">
                     <button class="chart-btn" onclick="toggleLiabChart()">圖表</button>
                 </div>
             </div>
-            <div class="summary-with-trend"><span id="liabRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="liabRebalanceSummaryTrend" class="summary-trend"></span></div>
+            <div class="rebalance-summary-block">
+                <div class="summary-with-trend"><span id="liabRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="liabRebalanceSummaryTrend" class="summary-trend"></span></div>
+            </div>
             <div id="liabChartContainer">
                 <canvas id="liabChart"></canvas>
             </div>
@@ -1127,7 +1144,7 @@
             else addFixedAsset(cat.id);
             new Sortable(document.getElementById(`fixed-list-${cat.id}`), {
                 animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
-                group: { name: 'fixed-items', put: ['fixed-items'] },
+                group: { name: 'fixed-items', put: ['fixed-items'] }, draggable: '.simple-asset-item-wrap',
                 onMove: function(evt){ return !evt.dragged.classList.contains('simple-asset-card'); },
                 onEnd: () => calculateAllFixedAssets()
             });
@@ -1143,20 +1160,23 @@
     }
     function addFixedAsset(catId, name='', amount=0) {
         const list = document.getElementById(`fixed-list-${catId}`); if (!list) return;
-        const div = document.createElement('div'); div.className = 'simple-asset-item';
         const amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
-        div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.simple-asset-item').remove(); calculateAllFixedAssets();">×</button>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
-                <div class="edit-container"><input type="text" class="edit-input fixed-name" value="${name}" onblur="autoViewModeFixed(this)"></div>
-            </div>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)" oninput="calculateAllFixedAssets()"></div>
+        const wrap = document.createElement('div'); wrap.className = 'simple-asset-item-wrap';
+        wrap.innerHTML = `
+            <div class="simple-asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
+            <div class="simple-asset-item">
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
+                    <div class="edit-container"><input type="text" class="edit-input fixed-name" value="${name}" onblur="autoViewModeFixed(this)"></div>
+                </div>
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
+                    <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)" oninput="calculateAllFixedAssets()"></div>
+                </div>
             </div>
         `;
-        list.appendChild(div);
+        list.appendChild(wrap);
+        attachSwipeRevealDelete(wrap, '.simple-asset-item', function() { calculateAllFixedAssets(); });
     }
     function autoViewModeFixed(iEl) {
         const view = iEl.parentElement.previousElementSibling;
@@ -1291,7 +1311,7 @@
             else addRecvAsset(cat.id);
             new Sortable(document.getElementById(`recv-list-${cat.id}`), {
                 animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
-                group: { name: 'recv-items', put: ['recv-items'] },
+                group: { name: 'recv-items', put: ['recv-items'] }, draggable: '.simple-asset-item-wrap',
                 onMove: function(evt){ return !evt.dragged.classList.contains('simple-asset-card'); },
                 onEnd: () => calculateAllReceivables()
             });
@@ -1307,20 +1327,23 @@
     }
     function addRecvAsset(catId, name='', amount=0) {
         const list = document.getElementById(`recv-list-${catId}`); if (!list) return;
-        const div = document.createElement('div'); div.className = 'simple-asset-item';
         const amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
-        div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.simple-asset-item').remove(); calculateAllReceivables();">×</button>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
-                <div class="edit-container"><input type="text" class="edit-input recv-name" value="${name}" onblur="autoViewModeRecv(this)"></div>
-            </div>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)" oninput="calculateAllReceivables()"></div>
+        const wrap = document.createElement('div'); wrap.className = 'simple-asset-item-wrap';
+        wrap.innerHTML = `
+            <div class="simple-asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
+            <div class="simple-asset-item">
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
+                    <div class="edit-container"><input type="text" class="edit-input recv-name" value="${name}" onblur="autoViewModeRecv(this)"></div>
+                </div>
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
+                    <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)" oninput="calculateAllReceivables()"></div>
+                </div>
             </div>
         `;
-        list.appendChild(div);
+        list.appendChild(wrap);
+        attachSwipeRevealDelete(wrap, '.simple-asset-item', function() { calculateAllReceivables(); });
     }
     function autoViewModeRecv(iEl) {
         const view = iEl.parentElement.previousElementSibling;
@@ -1912,13 +1935,53 @@
             if (row) row.style.transform = '';
         });
     }
+    function attachSwipeRevealDelete(wrapEl, rowSelector, onDelete) {
+        if (!wrapEl || !wrapEl.querySelector(rowSelector)) return;
+        var row = wrapEl.querySelector(rowSelector);
+        var startX = 0, didSwipePastThreshold = false;
+        var hoverTimer = null;
+        var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        if (!isTouchDevice) {
+            wrapEl.addEventListener('mouseenter', function() {
+                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
+            });
+            wrapEl.addEventListener('mouseleave', function() {
+                if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+                wrapEl.classList.remove('reveal');
+            });
+        }
+        wrapEl.addEventListener('focusin', function(e) {
+            if (e.target.matches('input, [contenteditable="true"]')) { wrapEl.classList.remove('reveal', 'swiped'); row.style.transform = ''; if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; } }
+        });
+        wrapEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; didSwipePastThreshold = false; }, { passive: true });
+        wrapEl.addEventListener('touchmove', function(e) {
+            var delta = startX - e.touches[0].clientX;
+            if (delta > 56) didSwipePastThreshold = true;
+            if (delta > 28) row.style.transform = 'translateX(-' + Math.min(delta, 56) + 'px)';
+            else row.style.transform = '';
+        }, { passive: true });
+        wrapEl.addEventListener('touchend', function(e) {
+            row.style.transform = '';
+            if (didSwipePastThreshold) wrapEl.classList.add('swiped');
+        }, { passive: true });
+        var btn = wrapEl.querySelector('.asset-item-delete-btn');
+        if (btn) btn.onclick = function() { wrapEl.remove(); onDelete(); };
+    }
+    function closeAllSwipeReveal() {
+        closeAllAssetItemReveal();
+        document.querySelectorAll('.simple-asset-item-wrap.reveal, .simple-asset-item-wrap.swiped, .liab-item-wrap.reveal, .liab-item-wrap.swiped').forEach(function(w) {
+            w.classList.remove('reveal', 'swiped');
+            var row = w.querySelector('.simple-asset-item') || w.querySelector('.liab-item');
+            if (row) row.style.transform = '';
+        });
+    }
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.asset-item-delete-reveal') || e.target.closest('.asset-item-delete-btn')) return;
-        if (document.querySelector('.asset-item-wrap.reveal, .asset-item-wrap.swiped')) closeAllAssetItemReveal();
+        if (e.target.closest('.asset-item-delete-reveal') || e.target.closest('.asset-item-delete-btn') || e.target.closest('.simple-asset-item-delete-reveal') || e.target.closest('.liab-item-delete-reveal')) return;
+        if (document.querySelector('.asset-item-wrap.reveal, .asset-item-wrap.swiped, .simple-asset-item-wrap.reveal, .simple-asset-item-wrap.swiped, .liab-item-wrap.reveal, .liab-item-wrap.swiped')) closeAllSwipeReveal();
     });
     document.addEventListener('touchend', function(e) {
-        if (e.target.closest('.asset-item-delete-reveal') || e.target.closest('.asset-item-delete-btn')) return;
-        if (!e.target.closest('.asset-item-wrap') && document.querySelector('.asset-item-wrap.reveal, .asset-item-wrap.swiped')) closeAllAssetItemReveal();
+        if (e.target.closest('.asset-item-delete-reveal') || e.target.closest('.asset-item-delete-btn') || e.target.closest('.simple-asset-item-delete-reveal') || e.target.closest('.liab-item-delete-reveal')) return;
+        if (!e.target.closest('.asset-item-wrap') && !e.target.closest('.simple-asset-item-wrap') && !e.target.closest('.liab-item-wrap') && document.querySelector('.asset-item-wrap.reveal, .asset-item-wrap.swiped, .simple-asset-item-wrap.reveal, .simple-asset-item-wrap.swiped, .liab-item-wrap.reveal, .liab-item-wrap.swiped')) closeAllSwipeReveal();
     }, { passive: true });
 
     function renderUI() {
@@ -2034,7 +2097,7 @@
                 delay: 200,
                 delayOnTouchOnly: true,
                 touchStartThreshold: 5,
-                group: { name: 'liab-items', put: ['liab-items'] },
+                group: { name: 'liab-items', put: ['liab-items'] }, draggable: '.liab-item-wrap',
                 onMove: function(evt){ return !evt.dragged.classList.contains('liab-card'); },
                 onEnd: () => calculateAllLiabilities()
             });
@@ -2058,20 +2121,23 @@
 
     function addLiability(catId, name='', amount=0) {
         const list = document.getElementById(`liab-list-${catId}`); if (!list) return;
-        const div = document.createElement('div'); div.className = 'liab-item';
         const amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
-        div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.liab-item').remove(); calculateAllLiabilities();">×</button>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
-                <div class="edit-container"><input type="text" class="edit-input liab-name" value="${name}" onblur="autoViewModeLiab(this)"></div>
-            </div>
-            <div>
-                <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)" oninput="calculateAllLiabilities()"></div>
+        const wrap = document.createElement('div'); wrap.className = 'liab-item-wrap';
+        wrap.innerHTML = `
+            <div class="liab-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
+            <div class="liab-item">
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
+                    <div class="edit-container"><input type="text" class="edit-input liab-name" value="${name}" onblur="autoViewModeLiab(this)"></div>
+                </div>
+                <div>
+                    <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
+                    <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)" oninput="calculateAllLiabilities()"></div>
+                </div>
             </div>
         `;
-        list.appendChild(div);
+        list.appendChild(wrap);
+        attachSwipeRevealDelete(wrap, '.liab-item', function() { calculateAllLiabilities(); });
     }
 
     function addLiabCategory() {
