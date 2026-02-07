@@ -20,7 +20,9 @@
             --theme-accent-rgb: 255, 140, 66;
             --gray-marble: #F0F0F0;
             --radius: 12px;
+            --border-dark: #1A1A1A;
         }
+        body.night-mode { background-color: #2d2d2d; --border-dark: #5a5a5a; }
         [data-theme="orange"] { --theme-accent: #FF8C42; --theme-bg: #3D2B1F; --theme-accent-rgb: 255, 140, 66; }
         [data-theme="forest"] { --theme-accent: #dac4fc; --theme-bg: #293d0b; --theme-accent-rgb: 218, 196, 252; }
         [data-theme="wine"]   { --theme-accent: #80C5DE; --theme-bg: #6e0000; --theme-accent-rgb: 128, 197, 222; }
@@ -29,18 +31,18 @@
         [data-theme="amber"]  { --theme-accent: #F0A650; --theme-bg: #0045c6; --theme-accent-rgb: 240, 166, 80; }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
+        body { background-color: var(--gray-marble); color: #3D2B1F; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; overflow-x: hidden; width: 100%; transition: background-color 0.2s ease; }
         .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
 
-        h1 { border: 4px solid #1A1A1A; text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
+        h1 { border: 4px solid var(--border-dark); text-align: center; margin: 0; background: var(--theme-accent); padding: 15px 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-radius: var(--radius); color: var(--theme-bg); font-weight: 900; line-height: 1.2; }
         #home-view h1 { margin-bottom: 12px; }
         
         .save-status { text-align: center; font-size: 10px; font-weight: bold; margin: 10px 0 20px 0; color: #888; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .status-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
         .status-dot.active { background: #00C853; box-shadow: 0 0 8px #00C853; }
 
-        .rebalance-panel { background: white; border: 4px solid #1A1A1A; padding: 20px; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); border-radius: var(--radius); }
-        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; padding: 5px 10px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: none; white-space: nowrap; flex-shrink: 0; }
+        .rebalance-panel { background: white; border: 4px solid var(--border-dark); padding: 20px; margin-bottom: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.10); border-radius: var(--radius); }
+        .chart-btn { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid var(--border-dark); padding: 5px 10px; font-size: 0.7rem; font-weight: 900; border-radius: 6px; cursor: pointer; box-shadow: none; white-space: nowrap; flex-shrink: 0; }
 
         .category-card { background: #fff; border: 4px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 8px 22px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
         .category-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
@@ -59,11 +61,10 @@
         .liab-header, .simple-asset-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 6px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
         .liab-card:not(.collapsed) .liab-header, .simple-asset-card:not(.collapsed) .simple-asset-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
 
-        .btn-delete-card { position: absolute; top: -16px; right: -16px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: none; z-index: 20; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        .category-card:hover .btn-delete-card, .liab-card:hover .btn-delete-card, .simple-asset-card:hover .btn-delete-card, .show-delete .btn-delete-card { opacity: 1; pointer-events: auto; }
-        .sheet .in-sheet .btn-delete-card { opacity: 1; pointer-events: auto; }
+        .btn-delete-card { display: none !important; }
 
-        .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
+        .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid var(--border-dark); font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; -moz-appearance: textfield; }
+        .target-input::-webkit-outer-spin-button, .target-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .target-display { font-size: 10px; color: #888; }
         .category-card.collapsed .target-edit { display: none; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
@@ -91,22 +92,22 @@
         .simple-asset-item div:nth-child(3) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        .asset-item { display: grid; grid-template-columns: 12px 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; position: relative; }
-        .asset-item .asset-delete-zone { display: flex; align-items: center; justify-content: flex-start; min-width: 0; position: relative; padding-right: 0; }
-        .asset-item .btn-delete-left { opacity: 0; transition: opacity 0.2s; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 12px; padding: 0; font-size: 14px; line-height: 1; }
-        .asset-item .asset-delete-zone:hover .btn-delete-left { opacity: 1; }
-        .asset-item.asset-reveal-delete .btn-delete-left { opacity: 1; }
+        .asset-item-wrap { position: relative; overflow: hidden; border-bottom: 1px solid #F2F2F2; }
+        .asset-item-delete-reveal { position: absolute; right: 0; top: 0; bottom: 0; width: 56px; background: #e57373; display: flex; align-items: center; justify-content: center; z-index: 0; }
+        .asset-item-delete-reveal .asset-item-delete-btn { background: transparent; border: none; color: #fff; font-size: 0.8rem; font-weight: 800; cursor: pointer; padding: 8px; }
+        .asset-item { display: grid; grid-template-columns: 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 8px 0; align-items: center; cursor: grab; position: relative; z-index: 1; background: #fff; transition: transform 0.2s ease-out; }
+        .asset-item-wrap.reveal .asset-item, .asset-item-wrap.swiped:not(.editing) .asset-item { transform: translateX(-56px); }
         
         .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
         .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
-        .asset-item div:nth-child(2) { min-width: 0; }
-        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } 
-        .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
-        .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
-        .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
+        .asset-item div:nth-child(1) { min-width: 0; }
+        .asset-item div:nth-child(1) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } 
+        .asset-item div:nth-child(2) .static-view, .asset-item div:nth-child(3) .static-view { font-size: 11px; color: #999; } 
+        .asset-item div:nth-child(4) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
+        .asset-item div:nth-child(5) .static-view, .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
 
         .edit-container { position: relative; display: none; width: 100%; }
-        .edit-input { width: 100%; height: 28px; border: 2px solid #1A1A1A; border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
+        .edit-input { width: 100%; height: 28px; border: 2px solid var(--border-dark); border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
         .edit-container.prefix::before { content: '$'; position: absolute; left: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
         .edit-container.suffix::after { content: '%'; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-weight: 900; font-size: 9px; color: #1A1A1A; z-index: 2; }
         .edit-input[type="number"] { text-align: center; padding-right: 0; }
@@ -134,32 +135,41 @@
         .category-card.collapsed, .liab-card.collapsed, .simple-asset-card.collapsed { grid-column: span 1; padding: 7px; min-height: 80px; width: 100%; border-width: 3px; }
         .liab-card.collapsed, .simple-asset-card.collapsed { min-height: 72px; }
         .liab-card .current-p, .simple-asset-card .current-p { display: none; }
-        .category-card.collapsed .category-header, .liab-card.collapsed .liab-header, .simple-asset-card.collapsed .simple-asset-header { padding: 5px 9px; }
+        .category-card.collapsed .category-header, .liab-card.collapsed .liab-header, .simple-asset-card.collapsed .simple-asset-header { padding: 5px 9px; gap: 8px; }
         .category-card.collapsed .card-footer, .liab-card.collapsed .card-footer, .simple-asset-card.collapsed .card-footer { margin-top: 5px; padding-top: 5px; }
         .card-emoji { margin: 0 6px; }
         .card-icon { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
         .card-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
         .sheet #sheetContent { padding: 24px 12px 16px; }
         .sheet-tools { background: transparent; border-top: none; color: inherit; }
-        .icon-grid, .color-grid { background: transparent; border: 3px solid #1A1A1A; border-radius: 12px; min-height: 44px; }
+        .icon-grid, .color-grid { background: transparent; border: 3px solid var(--border-dark); border-radius: 12px; min-height: 44px; }
         .icon-grid .icon-dot, .color-grid .color-dot { min-width: 36px; min-height: 36px; }
         .icon-dot { background: #fff; }
-        .color-dot { width: 28px; height: 28px; border: 1px solid #1A1A1A; border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0 #1A1A1A; }
+        .color-dot { width: 28px; height: 28px; border: 1px solid var(--border-dark); border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0 var(--border-dark); }
         .sheet .in-sheet { border-width: 3px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
         .sheet .in-sheet .category-header, .sheet .in-sheet .liab-header, .sheet .in-sheet .simple-asset-header { padding: 10px 12px; margin-bottom: 8px; }
         .sheet .in-sheet .asset-list, .sheet .in-sheet .liab-list, .sheet .in-sheet .simple-asset-list { max-height: 48vh; overflow: auto; border: 1px solid #EEE; border-radius: 8px; padding: 4px 8px; }
         .sheet .in-sheet .card-icon { cursor: pointer; }
         .sheet .in-sheet .card-icon:hover { filter: brightness(1.08); }
         .picker-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); z-index: 50; }
-        .picker-panel.picker-floating { position: absolute; left: 50%; top: 50px; transform: translateX(-50%); width: min(92vw, 420px); max-height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; z-index: 51; background: #fff; border-radius: 12px; border: 3px solid #1A1A1A; box-shadow: 0 12px 40px rgba(0,0,0,0.22); padding: 16px; box-sizing: border-box; }
-        .picker-panel-inner { min-height: 40px; }
+        .picker-panel.picker-floating { position: absolute; left: 50%; top: 50px; transform: translateX(-50%); width: min(92vw, 420px); max-height: min(78vh, calc(100vh - 100px)); overflow: hidden; -webkit-overflow-scrolling: touch; z-index: 51; background: #fff; border-radius: 12px; border: 3px solid var(--border-dark); box-shadow: 0 12px 40px rgba(0,0,0,0.22); box-sizing: border-box; padding: 0; padding-top: 38px; padding-bottom: 12px; }
+        .picker-tabs { position: absolute; top: 0; left: 0; right: 0; display: flex; padding: 8px 12px 0; gap: 6px; }
+        .picker-tab { position: relative; flex: 1; padding: 10px 14px; font-size: 0.85rem; font-weight: 800; border: 2px solid var(--border-dark); border-bottom: none; border-radius: 10px 10px 0 0; cursor: pointer; background: #e8e8e8; color: #555; transition: background 0.15s, color 0.15s; box-sizing: border-box; }
+        .picker-tab.active { background: #fff; color: #1A1A1A; }
+        .picker-tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: #fff; }
+        .picker-panel-inner { min-height: 40px; height: min(52vh, calc(100vh - 138px)); max-height: min(52vh, calc(100vh - 138px)); padding: 16px; padding-bottom: 12px; overflow-y: auto; box-sizing: border-box; }
+        .picker-tab-content { display: none; }
+        .picker-tab-content.active { display: block; }
         /* picker 內圖示／色塊：依螢幕比例自適應，避免擠在一起 */
         .picker-panel .icon-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(52px, 20vw), 1fr)); gap: clamp(8px, 2.5vw, 14px); padding: 12px 14px; justify-items: center; }
         .picker-panel .icon-grid .icon-dot { width: clamp(40px, 10vw, 52px); height: clamp(40px, 10vw, 52px); min-width: 40px; min-height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
         .picker-panel .icon-grid .icon-dot svg { width: clamp(18px, 4.5vw, 24px); height: clamp(18px, 4.5vw, 24px); }
-        .picker-panel .color-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(36px, 14vw), 1fr)); gap: clamp(6px, 1.5vw, 10px); padding: 12px 14px; justify-items: center; }
+        .picker-panel .color-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(36px, 14vw), 1fr)); gap: clamp(6px, 1.5vw, 10px); padding: 12px 14px; justify-items: center; margin-bottom: 4px; }
         .picker-panel .color-grid .color-dot { width: clamp(28px, 8vw, 38px); height: clamp(28px, 8vw, 38px); min-width: 28px; min-height: 28px; }
-        .picker-panel #iconSectionLabel, .picker-panel #iconSectionLabel2, .picker-panel #colorSectionLabel { margin-bottom: 4px; }
+        .picker-panel #iconSectionLabel, .picker-panel #iconSectionLabel2, .picker-panel #colorSectionLabel { margin-bottom: 4px; font-size: 0.7rem; font-weight: 800; color: #666; }
+        .picker-panel #iconSectionLabel { margin-top: 0; }
+        .picker-panel #iconSectionLabel2 { margin-top: 12px; }
+        .picker-panel #colorSectionLabel { margin-top: 0; }
         .picker-panel #iconGridOther { margin-bottom: 4px; }
         .sheet .in-sheet .card-footer { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #E5E5E5; }
 
@@ -168,8 +178,11 @@
         .footer-row { display: flex; justify-content: space-between; align-items: flex-start; }
         .category-card .footer-row { flex-direction: column; align-items: center; gap: 4px; }
         .liab-card .footer-row, .simple-asset-card .footer-row { flex-direction: column; align-items: center; gap: 4px; }
-        .cat-sum-display { font-size: 1.15rem; font-weight: 900; }
-        .liab-sum-display, .fixed-sum-display, .recv-sum-display { font-size: 1.15rem; font-weight: 900; }
+        .cat-sum-display, .liab-sum-display, .fixed-sum-display, .recv-sum-display { font-size: 1.15rem; font-weight: 900; min-width: 0; }
+        .recv-sum-display { padding-bottom: 6px; }
+        .cat-sum-display.sum-len-m, .liab-sum-display.sum-len-m, .fixed-sum-display.sum-len-m, .recv-sum-display.sum-len-m { font-size: 1rem; }
+        .cat-sum-display.sum-len-l, .liab-sum-display.sum-len-l, .fixed-sum-display.sum-len-l, .recv-sum-display.sum-len-l { font-size: 0.88rem; }
+        .cat-sum-display.sum-len-xl, .liab-sum-display.sum-len-xl, .fixed-sum-display.sum-len-xl, .recv-sum-display.sum-len-xl { font-size: 0.76rem; }
         
         .current-p { font-size: 0.75rem; font-weight: 700; color: #555; margin-top: 2px; }
         .category-card .current-p, .liab-card .current-p, .simple-asset-card .current-p { font-size: 0.7rem; color: #999; opacity: 0.9; margin-top: 0; }
@@ -177,6 +190,13 @@
         .current-p.p-low  { color: #B86B6B; opacity: 0.85; }
         .sum-label { font-size: 0.75rem; font-weight: 800; color: #555; }
         .category-card.collapsed .sum-label, .liab-card.collapsed .sum-label, .simple-asset-card.collapsed .sum-label { display: none; }
+        /* 小卡階層：金額為主、名稱為輔、比例為輔助 */
+        .category-card.collapsed .cat-name-text { font-weight: 700; color: #555; font-size: 0.82rem; }
+        .category-card.collapsed .cat-sum-display { font-weight: 900; color: #1A1A1A; }
+        .category-card.collapsed .current-p { font-size: 0.65rem; font-weight: 600; color: #999; opacity: 1; }
+        .category-card.collapsed .current-p.p-high { color: #5A7EA8; }
+        .category-card.collapsed .current-p.p-low { color: #B86B6B; }
+        .liab-card.collapsed .liab-name-text, .simple-asset-card.collapsed .fixed-name-text, .simple-asset-card.collapsed .recv-name-text { font-weight: 700; color: #555; font-size: 0.82rem; }
         .category-card:not(.collapsed) .footer-row, .liab-card:not(.collapsed) .footer-row, .simple-asset-card:not(.collapsed) .footer-row { flex-direction: row; align-items: center; justify-content: space-between; }
         .category-card:not(.collapsed) .cat-sum-display, .liab-card:not(.collapsed) .liab-sum-display, .simple-asset-card:not(.collapsed) .fixed-sum-display { flex: 1; text-align: center; }
         .category-card:not(.collapsed) .current-p, .liab-card:not(.collapsed) .current-p, .simple-asset-card:not(.collapsed) .current-p { flex: 0 0 auto; text-align: right; }
@@ -187,14 +207,34 @@
         }
 
         .status-tag { margin-top: 12px; padding: 10px; text-align: center; font-size: 0.8rem; border-radius: 8px; font-weight: 900; background: rgba(var(--theme-accent-rgb), 0.15); color: var(--theme-bg); border: 1px solid rgba(var(--theme-accent-rgb), 0.3); }
-        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
-        .btn-subtle { background: #fff; color: #555; border: 2px solid #1A1A1A; font-weight: 700; }
+        .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid var(--border-dark); padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
+        .btn-subtle { background: #fff; color: #555; border: 2px solid var(--border-dark); font-weight: 700; }
         
-        #chartContainer { display:none; margin-top: 20px; width: 100%; min-height: 250px; height: 250px; position: relative; }
+        .chart-wrapper { margin-top: 20px; }
+        #chartContainer { display:none; width: 100%; min-height: 250px; height: 250px; position: relative; overflow: hidden; flex-direction: column; }
+        #chartContainer .chart-slides { flex: 1; min-height: 0; }
+        .chart-slides { display: flex; width: 200%; height: 100%; transition: transform 0.25s ease-out; }
+        .chart-slides.show-history { transform: translateX(-50%); }
+        .chart-slide { width: 50%; flex-shrink: 0; height: 100%; position: relative; }
         #chartContainer .chart-inner-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .chart-history-inner { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 12px; background: #fff; border-radius: var(--radius); }
+        .chart-history-header { margin-bottom: 8px; flex-shrink: 0; }
+        .chart-history-header strong { font-size: 0.85rem; }
+        .chart-history-canvas-wrap { flex: 1; min-height: 0; position: relative; }
+        .chart-history-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+        .chart-history-hint { font-size: 11px; color: #888; margin: 6px 0 0; flex-shrink: 0; }
         .chart-to-history { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); background: rgba(255,255,255,0.95); color: #333; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         #chartContainer:hover .chart-to-history { opacity: 1; pointer-events: auto; }
-        @media (hover: none) { .chart-to-history { opacity: 0.6; pointer-events: auto; } }
+        .chart-to-pie { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); background: rgba(255,255,255,0.95); color: #333; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 2; }
+        .chart-slide-history:hover .chart-to-pie { opacity: 1; pointer-events: auto; }
+        @media (hover: none) {
+            .chart-to-history { display: none; }
+            .chart-to-pie { display: none; }
+            .chart-dots { display: flex !important; }
+        }
+        .chart-dots { display: none; justify-content: center; gap: 8px; padding: 10px 0 0; }
+        .chart-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; transition: background 0.2s; }
+        .chart-dot.active { background: #555; }
         #portfolioChart { width: 100% !important; height: auto !important; }
         #liabChartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #liabChart { width: 100% !important; height: auto !important; }
@@ -212,13 +252,16 @@
         }
 
         .theme-panel { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; background: rgba(var(--theme-accent-rgb), 0.12); border-radius: 12px; padding: 8px 12px; }
-        .theme-toggle-icon, .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 6px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: none; display: inline-flex; align-items: center; }
+        .theme-toggle-icon, .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 6px 12px; border: 2px solid var(--border-dark); border-radius: 20px; box-shadow: none; display: inline-flex; align-items: center; }
         .theme-options { display: none; flex-basis: 100%; width: 100%; gap: 10px; margin-top: 10px; padding: 10px 0 0; border-top: 1px solid rgba(0,0,0,0.08); justify-content: flex-end; flex-wrap: wrap; }
         .theme-panel.active .theme-options { display: flex; }
         
         /* 雙色主題預覽按鍵 */
-        .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1A1A1A; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
+        .theme-options button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border-dark); cursor: pointer; position: relative; overflow: hidden; padding: 0; }
         .theme-options button::after { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--btn-accent); }
+        .theme-options button.night-mode-btn { width: 30px; height: 30px; padding: 0; font-size: 1rem; border-radius: 50%; background: #444; color: #eee; }
+        .theme-options button.night-mode-btn::after { display: none; }
+        .theme-options button.night-mode-btn.active { background: #5a5a5a; color: #fff; }
         
         /* 當卡片收合時，隱藏列表、標頭行、新增按鈕以及建議標籤 */
         .collapsed .asset-list, .collapsed .asset-header-row, 
@@ -234,14 +277,18 @@
         
         /* 底部滑出細節頁樣式 */
         .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1500; display: none; }
-        .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid #1A1A1A; box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: hidden; opacity: 0; pointer-events: none; }
+        .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid var(--border-dark); box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: visible; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
         .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
-        .sheet-grabber { width: 40px; height: 4px; background: #ccc; border-radius: 4px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
+        .sheet-grabber { flex-shrink: 0; width: 40px; height: 4px; background: #ccc; border-radius: 4px; margin: 10px auto 0; }
+        .sheet-scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+        .sheet-footer { flex-shrink: 0; }
         .sheet-close { display: none !important; }
-        .sheet .in-sheet .btn-delete-card { top: -16px; right: -16px; left: auto; }
-        .icon-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--theme-accent); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
+        .sheet-footer { padding: 8px 16px; border-top: 1px solid #eee; background: #fafafa; }
+        .btn-delete-card-bottom { width: 100%; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; color: #888; background: transparent; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+        .btn-delete-card-bottom:hover { color: #c62828; border-color: #c62828; }
+        .icon-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-dark); background: var(--theme-accent); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
         .icon-dot svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
-        .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--dot); box-shadow: none; cursor: pointer; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-dark); background: var(--dot); box-shadow: none; cursor: pointer; }
 
         /* 1. 每一頁的共同設定：預設隱藏，填滿空間 */
         .page-view {
@@ -256,7 +303,7 @@
         
         /* 2. 首頁標題樣式 (直接套用你原本最漂亮的設計) */
         .dashboard-title {
-            border: 4px solid #1A1A1A;
+            border: 4px solid var(--border-dark);
             text-align: center;
             background: var(--theme-accent);
             padding: 15px 12px;
@@ -278,10 +325,10 @@
         /* 4. 單張卡片設計 */
         .dash-card {
             background: white;
-            border: 4px solid #1A1A1A;
+            border: 4px solid var(--border-dark);
             padding: 25px;
             border-radius: var(--radius);
-            box-shadow: 6px 6px 0px #1A1A1A;
+            box-shadow: 6px 6px 0px var(--border-dark);
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -291,7 +338,7 @@
         /* 點擊時的下壓感 */
         .dash-card:active {
             transform: translate(2px, 2px);
-            box-shadow: 3px 3px 0px #1A1A1A;
+            box-shadow: 3px 3px 0px var(--border-dark);
         }
         
         .dash-label {
@@ -325,7 +372,7 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 12px;
-            border-top: 2px solid #1A1A1A;
+            border-top: 2px solid var(--border-dark);
             z-index: 1000;
             border-radius: 16px 16px 0 0;
             background: rgba(255,255,255,0.8);
@@ -362,7 +409,7 @@
             left: 50%;
             transform: translateX(-50%);
             background: white;
-            border: 3px solid #1A1A1A;
+            border: 3px solid var(--border-dark);
             border-radius: 12px;
             display: none;
             z-index: 1000;
@@ -402,26 +449,31 @@
         .toast { padding: 14px 24px; border-radius: 10px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); animation: toastIn 0.3s ease; max-width: 90vw; transition: opacity 0.3s, transform 0.3s; }
         .toast.success { background: #00C853; color: white; border: 2px solid #009624; }
         .toast.error { background: #FF5252; color: white; border: 2px solid #D32F2F; }
-        .toast.info { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid #1A1A1A; }
+        .toast.info { background: var(--theme-accent); color: var(--theme-bg); border: 2px solid var(--border-dark); }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 自訂確認 Modal（取代 confirm，模擬視窗也能顯示） */
         #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
         #modalOverlay.show { display: flex; animation: fadeIn 0.2s ease; }
-        #confirmModal { background: white; border: 4px solid #1A1A1A; border-radius: var(--radius); padding: 24px; max-width: 320px; width: 100%; box-shadow: 8px 8px 0 #1A1A1A; }
+        #confirmModal { background: white; border: 4px solid var(--border-dark); border-radius: var(--radius); padding: 24px; max-width: 320px; width: 100%; box-shadow: 8px 8px 0 var(--border-dark); }
         #confirmModal .modal-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 16px; color: #1A1A1A; }
         #confirmModal .modal-btns { display: flex; gap: 12px; margin-top: 20px; }
-        #confirmModal .modal-btn { flex: 1; padding: 12px; font-weight: 900; border-radius: 8px; cursor: pointer; border: 2px solid #1A1A1A; font-size: 0.95rem; }
+        #confirmModal .modal-btn { flex: 1; padding: 12px; font-weight: 900; border-radius: 8px; cursor: pointer; border: 2px solid var(--border-dark); font-size: 0.95rem; }
         #confirmModal .modal-btn.cancel { background: #f0f0f0; color: #333; }
         #confirmModal .modal-btn.confirm { background: var(--theme-accent); color: var(--theme-bg); }
         #confirmModal .modal-btn.danger { background: #FF4444; color: white; border-color: #B30000; }
 
         /* 總覽頁優化設計 */
-        .dashboard-hero { background: #fff; color: var(--theme-accent); padding: 22px 18px; border-radius: var(--radius); margin-bottom: 18px; border: 3px solid #1A1A1A; box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
+        .dashboard-hero { background: #fff; color: var(--theme-accent); padding: 22px 18px; border-radius: var(--radius); margin-bottom: 18px; border: 3px solid var(--border-dark); box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
         .dashboard-hero .hero-label { font-size: 0.9rem; font-weight: 900; letter-spacing: 1px; opacity: 1; margin-bottom: 6px; color: #1A1A1A; }
         .dashboard-hero .hero-value { font-size: 2.6rem; font-weight: 900; letter-spacing: -1px; color: var(--theme-bg); display: inline-block; }
         .dashboard-hero .hero-value.positive { border-bottom: 3px solid #4CAF50; }
         .dashboard-hero .hero-value.negative { border-bottom: 3px solid #FF8A80; }
+        .net-worth-history-expand { margin: -8px 0 18px 0; padding: 14px; background: #fff; border: 3px solid var(--border-dark); border-radius: var(--radius); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .net-worth-history-inner { display: flex; flex-direction: column; }
+        .net-worth-history-title { font-size: 0.85rem; margin-bottom: 8px; display: block; }
+        .net-worth-history-canvas-wrap { height: 200px; position: relative; }
+        .net-worth-history-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
         .dashboard-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .dashboard-cards .dash-card { padding: 22px 16px; margin: 0; border-width: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
         .dashboard-cards .dash-card .dash-value { font-size: 1.4rem; margin-top: 6px; color: #666; }
@@ -448,6 +500,7 @@
             <button style="background: #6245b7; --btn-accent: #B4D355" onclick="setTheme('purple')"></button>
             <button style="background: #1b2941; --btn-accent: #e4d9c4" onclick="setTheme('navy')"></button>
             <button style="background: #0045c6; --btn-accent: #F0A650" onclick="setTheme('amber')"></button>
+            <button type="button" class="night-mode-btn" id="nightModeBtn" onclick="toggleNightMode()" title="夜間模式">🌙</button>
         </div>
     </div>
     
@@ -457,9 +510,16 @@
                 <span class="title-en">Dashboard</span><br>
                 <span class="title-zh">財務總覽</span>
             </h1>
-            <div class="dashboard-hero" onclick="openHistoryChart('netWorth')" style="cursor:pointer;" title="點擊看歷史變化">
+            <div class="dashboard-hero" onclick="toggleNetWorthChart()" style="cursor:pointer;" title="點擊看歷史變化">
                 <div class="hero-label">淨資產 Net Worth</div>
                 <div id="dash-net-worth" class="hero-value">$0</div>
+            </div>
+            <div id="netWorthHistoryExpand" class="net-worth-history-expand" style="display:none;">
+                <div class="net-worth-history-inner">
+                    <strong class="net-worth-history-title">淨資產 歷史變化</strong>
+                    <div class="net-worth-history-canvas-wrap"><canvas id="netWorthHistoryCanvas"></canvas></div>
+                    <p id="netWorthHistoryHint" class="chart-history-hint">每日一筆，儲存最近 60 天</p>
+                </div>
             </div>
             <div class="dashboard-cards">
                 <div class="dash-card" onclick="showPage('assets-view')">
@@ -500,12 +560,34 @@
             </div>
             <div class="summary-with-trend"><span id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="rebalanceSummaryTrend" class="summary-trend"></span></div>
             <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px; background:#FFE5E5; color:#B30000; border:2px solid #FF4444; text-align:center; font-weight:bold;"></div>
+            <div class="chart-wrapper">
             <div id="chartContainer">
-                <div class="chart-inner-wrap">
-                    <canvas id="portfolioChart"></canvas>
-                    <button type="button" class="chart-to-history" onclick="openHistoryChart('assets')" title="看歷史變化">→</button>
+                <div class="chart-slides" id="chartSlides">
+                    <div class="chart-slide chart-slide-pie">
+                        <div class="chart-inner-wrap">
+                            <canvas id="portfolioChart"></canvas>
+                            <button type="button" class="chart-to-history" onclick="openHistoryChart('assets')" title="看歷史變化">→</button>
+                        </div>
+                    </div>
+                    <div class="chart-slide chart-slide-history">
+                        <button type="button" class="chart-to-pie" onclick="closeHistoryChart()" title="回圓餅圖">←</button>
+                        <div class="chart-history-inner">
+                            <div class="chart-history-header">
+                                <strong id="historyChartTitle">流動資產總額 歷史變化</strong>
+                            </div>
+                            <div class="chart-history-canvas-wrap">
+                                <canvas id="historyChartCanvas"></canvas>
+                            </div>
+                            <p id="historyChartHint" class="chart-history-hint">每日一筆，儲存最近 60 天</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-dots" id="chartDots" aria-hidden="true">
+                    <span class="chart-dot active" data-slide="0"></span>
+                    <span class="chart-dot" data-slide="1"></span>
                 </div>
             </div>
+        </div>
         </div>
     
         <div id="mainGrid"></div>
@@ -593,16 +675,29 @@
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeSheet()"></div>
     <div id="detailSheet" class="sheet">
     <div class="sheet-grabber"></div>
-    <div id="sheetContent"></div>
+    <div class="sheet-scroll-wrap">
+        <div id="sheetContent"></div>
+    </div>
+    <div id="sheetFooter" class="sheet-footer" style="display:none;">
+        <button type="button" class="btn-delete-card-bottom" id="sheetDeleteCardBtn">刪除此卡片</button>
+    </div>
     <div id="pickerBackdrop" class="picker-backdrop" style="display:none;" onclick="closePickerPanel()"></div>
     <div id="pickerPanel" class="picker-panel picker-floating" style="display:none;">
+        <div class="picker-tabs">
+            <button type="button" class="picker-tab active" data-tab="icons" onclick="switchPickerTab('icons')">圖示</button>
+            <button type="button" class="picker-tab" data-tab="colors" onclick="switchPickerTab('colors')">顏色</button>
+        </div>
         <div class="picker-panel-inner">
-        <div id="iconSectionLabel" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:4px;">金錢／記帳圖示</div>
-        <div id="iconGrid" class="icon-grid"></div>
-        <div id="iconSectionLabel2" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:12px;">其他圖示</div>
-        <div id="iconGridOther" class="icon-grid"></div>
-        <div id="colorSectionLabel" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:12px;">同色系背景（選一個）</div>
-        <div id="colorGrid" class="color-grid"></div>
+            <div class="picker-tab-content active" id="pickerTabIcons">
+                <div id="iconSectionLabel">金錢／記帳圖示</div>
+                <div id="iconGrid" class="icon-grid"></div>
+                <div id="iconSectionLabel2">其他圖示</div>
+                <div id="iconGridOther" class="icon-grid"></div>
+            </div>
+            <div class="picker-tab-content" id="pickerTabColors">
+                <div id="colorSectionLabel">同色系背景（選一個）</div>
+                <div id="colorGrid" class="color-grid"></div>
+            </div>
         </div>
     </div>
     <div style="height:20px"></div>
@@ -614,18 +709,6 @@
             <button class="modal-btn cancel" id="modalCancel">取消</button>
             <button class="modal-btn confirm" id="modalConfirm">確定</button>
         </div>
-    </div>
-</div>
-<div id="historyChartOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="if(event.target===this) closeHistoryChart();">
-    <div style="background:#fff; border:3px solid #1A1A1A; border-radius:12px; padding:16px; max-width:400px; width:100%; box-shadow:0 12px 40px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <strong id="historyChartTitle">歷史變化</strong>
-            <button type="button" onclick="closeHistoryChart()" style="border:2px solid #1A1A1A; background:#fff; border-radius:8px; padding:4px 10px; font-weight:bold; cursor:pointer;">關閉</button>
-        </div>
-        <div style="height:220px; position:relative;">
-            <canvas id="historyChartCanvas"></canvas>
-        </div>
-        <p id="historyChartHint" style="font-size:11px; color:#888; margin-top:8px;">每日一筆，儲存最近 60 天</p>
     </div>
 </div>
 <nav class="bottom-nav">
@@ -729,6 +812,14 @@
 
     function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return hideAmounts ? "***" : ("$" + Math.round(num || 0).toLocaleString('en-US')); }
+    function applySumDisplaySize(el) {
+        if (!el) return;
+        var len = (el.textContent || '').length;
+        el.classList.remove('sum-len-m', 'sum-len-l', 'sum-len-xl');
+        if (len > 11) el.classList.add('sum-len-xl');
+        else if (len > 8) el.classList.add('sum-len-l');
+        else if (len > 6) el.classList.add('sum-len-m');
+    }
 
     function sanitizeIconName(name) {
         var fallback = 'wallet';
@@ -827,6 +918,20 @@
     
     function toggleThemePanel() { document.getElementById('themePanel').classList.toggle('active'); }
 
+    function toggleNightMode() {
+        var on = document.body.classList.toggle('night-mode');
+        localStorage.setItem('userNightMode', on ? '1' : '0');
+        var btn = document.getElementById('nightModeBtn');
+        if (btn) { btn.classList.toggle('active', on); btn.textContent = on ? '☀️' : '🌙'; }
+        document.getElementById('themePanel').classList.remove('active');
+    }
+    function initNightMode() {
+        var on = localStorage.getItem('userNightMode') === '1';
+        if (on) document.body.classList.add('night-mode');
+        var btn = document.getElementById('nightModeBtn');
+        if (btn) { btn.classList.toggle('active', on); btn.textContent = on ? '☀️' : '🌙'; }
+    }
+
     function editMode(el) {
         const con = el.nextElementSibling; el.style.display = 'none'; con.style.display = 'block';
         const i = con.querySelector('input'); if (i) { i.focus(); i.select(); }
@@ -911,13 +1016,16 @@
         document.querySelectorAll('.category-card').forEach(card => {
             const target = parseFloat(card.querySelector('.target-input').value) || 0, curP = total > 0 ? (catSums[card.id] / total * 100) : 0;
             card.querySelector('.target-amount-label').innerText = formatCurrency(total * (target / 100));
-            card.querySelector('.cat-sum-display').innerText = formatCurrency(catSums[card.id]);
+            var catSumEl = card.querySelector('.cat-sum-display'); catSumEl.innerText = formatCurrency(catSums[card.id]); applySumDisplaySize(catSumEl);
             const curEl = card.querySelector('.current-p');
             curEl.innerText = curP.toFixed(1) + "%";
             curEl.classList.remove('p-high','p-low');
             if (target > 0 && total > 0) {
-                if (curP < target) curEl.classList.add('p-low');
-                else if (curP > target) curEl.classList.add('p-high');
+                var withinTolerance = Math.abs(curP - target) <= 3;
+                if (!withinTolerance) {
+                    if (curP < target) curEl.classList.add('p-low');
+                    else curEl.classList.add('p-high');
+                }
             }
             const td = card.querySelector('.target-display'); if (td) td.innerText = `目標 ${target}%`;
             const tag = card.querySelector('.status-alert'), diff = catSums[card.id] - (total * (target / 100));
@@ -954,7 +1062,7 @@
             let sum = 0;
             card.querySelectorAll('.liab-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.liab-sum-display');
-            if (sumDisplay) sumDisplay.innerText = formatCurrency(sum);
+            if (sumDisplay) { sumDisplay.innerText = formatCurrency(sum); applySumDisplaySize(sumDisplay); }
             total += sum;
         });
 
@@ -976,6 +1084,11 @@
         if (!grid) return;
         grid.innerHTML = '';
         fixedCategories.forEach(cat => {
+            if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id.startsWith('fixed_') && cat.id === sheetCardEl.id) {
+                var ph = document.createElement('div'); ph.id = 'sheet-placeholder-' + cat.id; ph.style.display = 'none'; ph.setAttribute('data-sheet-placeholder', '1');
+                grid.appendChild(ph);
+                return;
+            }
             const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
@@ -1001,7 +1114,6 @@
                 </div>
             `;
             grid.appendChild(card);
-            attachLongPressDelete(card);
             if (cat.color) card.setAttribute('data-color', cat.color);
             if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.items && data.items.length > 0) data.items.forEach(i => addFixedAsset(cat.id, i.name, i.amount));
@@ -1017,7 +1129,7 @@
             animation: 150, handle: '.simple-asset-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
             group: { name: 'fixed-cards', pull: true, put: ['fixed-cards'] }, draggable: '.simple-asset-card',
             onMove: function(evt){ var g = document.getElementById('fixedGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('simple-asset-card'); },
-            onEnd: () => calculateAllFixedAssets()
+            onEnd: function(){ var g = document.getElementById('fixedGrid'); document.querySelectorAll('.simple-asset-card').forEach(function(card){ if (card.classList.contains('in-sheet') || !card.id.startsWith('fixed_')) return; if (card.parentElement && card.parentElement !== g){ var idx = fixedCategories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAllFixedAssets(); }
         });
         calculateAllFixedAssets();
         refreshIcons(grid);
@@ -1117,7 +1229,7 @@
             let sum = 0;
             card.querySelectorAll('.fixed-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.fixed-sum-display');
-            if (sumDisplay) sumDisplay.innerText = formatCurrency(sum);
+            if (sumDisplay) { sumDisplay.innerText = formatCurrency(sum); applySumDisplaySize(sumDisplay); }
             total += sum;
         });
         fixedTotal = total;
@@ -1136,6 +1248,11 @@
         if (!grid) return;
         grid.innerHTML = '';
         recvCategories.forEach(cat => {
+            if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && !sheetCardEl.id.startsWith('fixed_') && cat.id === sheetCardEl.id) {
+                var ph = document.createElement('div'); ph.id = 'sheet-placeholder-' + cat.id; ph.style.display = 'none'; ph.setAttribute('data-sheet-placeholder', '1');
+                grid.appendChild(ph);
+                return;
+            }
             const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
@@ -1161,7 +1278,6 @@
                 </div>
             `;
             grid.appendChild(card);
-            attachLongPressDelete(card);
             if (cat.color) card.setAttribute('data-color', cat.color);
             if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.items && data.items.length > 0) data.items.forEach(i => addRecvAsset(cat.id, i.name, i.amount));
@@ -1177,7 +1293,7 @@
             animation: 150, handle: '.simple-asset-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
             group: { name: 'recv-cards', pull: true, put: ['recv-cards'] }, draggable: '.simple-asset-card',
             onMove: function(evt){ var g = document.getElementById('recvGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('simple-asset-card'); },
-            onEnd: () => calculateAllReceivables()
+            onEnd: function(){ var g = document.getElementById('recvGrid'); document.querySelectorAll('.simple-asset-card').forEach(function(card){ if (card.classList.contains('in-sheet') || card.id.startsWith('fixed_')) return; if (card.parentElement && card.parentElement !== g){ var idx = recvCategories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAllReceivables(); }
         });
         calculateAllReceivables();
         refreshIcons(grid);
@@ -1277,7 +1393,7 @@
             let sum = 0;
             card.querySelectorAll('.recv-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.recv-sum-display');
-            if (sumDisplay) sumDisplay.innerText = formatCurrency(sum);
+            if (sumDisplay) { sumDisplay.innerText = formatCurrency(sum); applySumDisplaySize(sumDisplay); }
             total += sum;
         });
         receivableTotal = total;
@@ -1309,16 +1425,20 @@
         } catch (e) {}
     }
     function openHistoryChart(type) {
-        var overlay = document.getElementById('historyChartOverlay');
+        if (type === 'netWorth') return;
+        var container = document.getElementById('chartContainer');
+        var slides = document.getElementById('chartSlides');
         var titleEl = document.getElementById('historyChartTitle');
         var canvas = document.getElementById('historyChartCanvas');
-        if (!overlay || !canvas) return;
-        titleEl.textContent = type === 'netWorth' ? '淨資產 歷史變化' : '流動資產總額 歷史變化';
-        var arr = JSON.parse(localStorage.getItem('history_' + type) || '[]');
+        if (!container || !slides || !canvas) return;
+        container.style.display = 'flex';
+        titleEl.textContent = '流動資產總額 歷史變化';
+        var arr = JSON.parse(localStorage.getItem('history_assets') || '[]');
         var hintEl = document.getElementById('historyChartHint');
         if (arr.length === 0) {
             if (hintEl) hintEl.textContent = '尚無歷史紀錄，請先輸入資料並在總覽頁更新後再試。';
-            overlay.style.display = 'flex';
+            slides.classList.add('show-history');
+            updateChartDots(1);
             return;
         }
         if (hintEl) hintEl.textContent = '每日一筆，儲存最近 60 天';
@@ -1333,7 +1453,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: type === 'netWorth' ? '淨資產' : '流動資產',
+                    label: '流動資產',
                     data: values,
                     borderColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim(),
                     backgroundColor: 'rgba(0,0,0,0.05)',
@@ -1350,11 +1470,63 @@
                 }
             }
         });
-        overlay.style.display = 'flex';
+        slides.classList.add('show-history');
+        updateChartDots(1);
+    }
+    var myNetWorthHistoryChart = null;
+    function toggleNetWorthChart() {
+        var el = document.getElementById('netWorthHistoryExpand');
+        var canvas = document.getElementById('netWorthHistoryCanvas');
+        var hintEl = document.getElementById('netWorthHistoryHint');
+        if (!el || !canvas) return;
+        if (el.style.display === 'none' || !el.style.display) {
+            el.style.display = 'block';
+            var arr = JSON.parse(localStorage.getItem('history_netWorth') || '[]');
+            if (hintEl) hintEl.textContent = arr.length === 0 ? '尚無歷史紀錄，請先輸入資料並在總覽頁更新後再試。' : '每日一筆，儲存最近 60 天';
+            if (arr.length > 0) {
+                var labels = arr.map(function (d) {
+                    var dt = new Date(d.t);
+                    return (dt.getMonth() + 1) + '/' + dt.getDate();
+                });
+                var values = arr.map(function (d) { return d.v; });
+                if (myNetWorthHistoryChart) myNetWorthHistoryChart.destroy();
+                myNetWorthHistoryChart = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '淨資產',
+                            data: values,
+                            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim(),
+                            backgroundColor: 'rgba(0,0,0,0.05)',
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false } }
+                    }
+                });
+            }
+        } else {
+            el.style.display = 'none';
+            if (myNetWorthHistoryChart) { myNetWorthHistoryChart.destroy(); myNetWorthHistoryChart = null; }
+        }
     }
     function closeHistoryChart() {
-        var overlay = document.getElementById('historyChartOverlay');
-        if (overlay) overlay.style.display = 'none';
+        var slides = document.getElementById('chartSlides');
+        if (slides) slides.classList.remove('show-history');
+        updateChartDots(0);
+    }
+    function updateChartDots(activeIndex) {
+        var dots = document.getElementById('chartDots');
+        if (!dots) return;
+        dots.querySelectorAll('.chart-dot').forEach(function(dot, i) {
+            dot.classList.toggle('active', i === activeIndex);
+        });
     }
 
     function updateDashboard() {
@@ -1473,6 +1645,21 @@
         document.getElementById('sheetContent').appendChild(card);
         document.getElementById('sheetBackdrop').style.display = 'block';
         document.getElementById('detailSheet').classList.add('open');
+        var footer = document.getElementById('sheetFooter');
+        var deleteBtn = document.getElementById('sheetDeleteCardBtn');
+        if (footer) footer.style.display = 'block';
+        if (deleteBtn) {
+            deleteBtn.onclick = function() {
+                var id = sheetCardEl.id;
+                var isCat = sheetCardEl.classList.contains('category-card');
+                var isLiab = sheetCardEl.classList.contains('liab-card');
+                var isSimple = sheetCardEl.classList.contains('simple-asset-card');
+                closeSheet();
+                if (isCat) deleteCategory(id);
+                else if (isLiab) deleteLiabCategory(id);
+                else if (isSimple) { if (String(id).startsWith('fixed_')) deleteFixedCategory(id); else deleteRecvCategory(id); }
+            };
+        }
         refreshIcons(document.getElementById('detailSheet'));
         closePickerPanel();
         var iconEl = sheetCardEl.querySelector('.card-icon');
@@ -1493,19 +1680,31 @@
             if (sheetCardEl.classList.contains('category-card')) container = document.getElementById('mainGrid');
             else if (sheetCardEl.classList.contains('liab-card')) container = document.getElementById('liabGrid');
             else if (sheetCardEl.classList.contains('simple-asset-card')) {
-                // 判斷屬於固定資產或應收帳款
                 const isFixed = sheetCardEl.querySelector('.simple-asset-header-row')?.textContent?.includes('名稱') && sheetCardEl.id.startsWith('fixed_');
                 container = isFixed ? document.getElementById('fixedGrid') : document.getElementById('recvGrid');
             }
             if (!container) container = sheetOriginalParent;
-            if (sheetPlaceholder && sheetPlaceholder.parentElement) {
-                const parentForReplace = sheetPlaceholder.parentElement;
-                parentForReplace.replaceChild(sheetCardEl, sheetPlaceholder);
-            } else {
-                container.appendChild(sheetCardEl);
+            var placeById = document.getElementById('sheet-placeholder-' + sheetCardEl.id);
+            if (placeById && placeById.parentNode) {
+                placeById.parentNode.replaceChild(sheetCardEl, placeById);
+            } else if (sheetPlaceholder && sheetPlaceholder.parentElement) {
+                sheetPlaceholder.parentElement.replaceChild(sheetCardEl, sheetPlaceholder);
+            } else if (container) {
+                var idx = -1;
+                if (sheetCardEl.classList.contains('category-card')) idx = categories.findIndex(function(c){ return c.id === sheetCardEl.id; });
+                else if (sheetCardEl.classList.contains('liab-card')) idx = liabCategories.findIndex(function(c){ return c.id === sheetCardEl.id; });
+                else if (sheetCardEl.classList.contains('simple-asset-card')) {
+                    var arr = sheetCardEl.id.startsWith('fixed_') ? fixedCategories : recvCategories;
+                    idx = arr.findIndex(function(c){ return c.id === sheetCardEl.id; });
+                }
+                var next = idx >= 0 && idx < container.children.length ? container.children[idx] : null;
+                if (next) container.insertBefore(sheetCardEl, next);
+                else container.appendChild(sheetCardEl);
             }
             sheetCardEl = null; sheetOriginalParent = null; sheetPlaceholder = null;
         }
+        var footer = document.getElementById('sheetFooter');
+        if (footer) footer.style.display = 'none';
     }
     function applyIconToCard(card, iconName) {
         const icon = sanitizeIconName(iconName);
@@ -1555,6 +1754,17 @@
         if (panel) panel.style.display = 'none';
         if (backdrop) backdrop.style.display = 'none';
     }
+    function switchPickerTab(tabId) {
+        var panel = document.getElementById('pickerPanel');
+        if (!panel) return;
+        panel.querySelectorAll('.picker-tab').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+        });
+        var iconsContent = document.getElementById('pickerTabIcons');
+        var colorsContent = document.getElementById('pickerTabColors');
+        if (iconsContent) iconsContent.classList.toggle('active', tabId === 'icons');
+        if (colorsContent) colorsContent.classList.toggle('active', tabId === 'colors');
+    }
     function openPickerPanel() {
         var panel = document.getElementById('pickerPanel');
         var backdrop = document.getElementById('pickerBackdrop');
@@ -1563,7 +1773,8 @@
         buildColorGrid();
         if (backdrop) backdrop.style.display = 'block';
         panel.style.display = 'block';
-        panel.scrollTop = 0;
+        switchPickerTab('icons');
+        panel.querySelector('.picker-panel-inner').scrollTop = 0;
         setTimeout(function() { refreshIcons(panel); }, 80);
     }
     function closeIconGrid() {
@@ -1632,19 +1843,49 @@
         card.addEventListener('mouseup', clear);
         card.addEventListener('mouseleave', clear);
     }
-    function attachAssetItemSwipe(rowEl) {
-        if (!rowEl || !rowEl.classList.contains('asset-item')) return;
+    function attachAssetItemSwipe(wrapEl) {
+        if (!wrapEl || !wrapEl.classList.contains('asset-item-wrap')) return;
         var startX = 0;
-        rowEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
-        rowEl.addEventListener('touchend', function(e) {
+        var row = wrapEl.querySelector('.asset-item');
+        if (!row) return;
+        var hoverTimer = null;
+        wrapEl.addEventListener('mouseenter', function() {
+            hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
+        });
+        wrapEl.addEventListener('mouseleave', function() {
+            if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+            wrapEl.classList.remove('reveal');
+        });
+        wrapEl.addEventListener('focusin', function(e) {
+            if (e.target.matches('input, [contenteditable="true"]')) { wrapEl.classList.add('editing'); wrapEl.classList.remove('swiped'); wrapEl.classList.remove('reveal'); row.style.transform = ''; if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; } }
+        });
+        wrapEl.addEventListener('focusout', function(e) {
+            if (!wrapEl.contains(e.relatedTarget)) wrapEl.classList.remove('editing');
+        });
+        wrapEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+        wrapEl.addEventListener('touchmove', function(e) {
+            var x = e.touches[0].clientX;
+            var delta = startX - x;
+            if (delta > 0) row.style.transform = 'translateX(-' + Math.min(delta, 56) + 'px)';
+            else row.style.transform = 'translateX(0)';
+        }, { passive: true });
+        wrapEl.addEventListener('touchend', function(e) {
             var endX = e.changedTouches[0].clientX;
-            if (startX - endX > 50) rowEl.classList.add('asset-reveal-delete');
+            var delta = startX - endX;
+            row.style.transform = '';
+            if (delta > 50) wrapEl.classList.add('swiped');
+            else if (delta < -30) wrapEl.classList.remove('swiped');
         }, { passive: true });
     }
 
     function renderUI() {
         const saved = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {}, grid = document.getElementById('mainGrid'); grid.innerHTML = '';
         categories.forEach(cat => {
+            if (sheetCardEl && sheetCardEl.classList.contains('category-card') && cat.id === sheetCardEl.id) {
+                var ph = document.createElement('div'); ph.id = 'sheet-placeholder-' + cat.id; ph.style.display = 'none'; ph.setAttribute('data-sheet-placeholder', '1');
+                grid.appendChild(ph);
+                return;
+            }
             const data = saved[cat.id] || { target: 20, assets: [], collapsed: true };
             const card = document.createElement('div'); card.id = cat.id; card.className = `category-card collapsed`;
             const iconHTML = getIconHTML(cat.icon || 'wallet', cat.color || '');
@@ -1663,35 +1904,36 @@
             `;
             grid.appendChild(card);
             card.addEventListener('click', function(e) {
-                if (card.classList.contains('collapsed') && !e.target.closest('.btn-delete-card')) toggleCategory(card.id);
+                if (card.classList.contains('collapsed')) toggleCategory(card.id);
             });
-            attachLongPressDelete(card);
             if (cat.color) card.setAttribute('data-color', cat.color);
             if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-items', put: ['asset-items'] }, onMove: function(evt){ return !evt.dragged.classList.contains('category-card'); }, onEnd: () => calculateAll() });
+            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-items', put: ['asset-items'] }, draggable: '.asset-item-wrap', onMove: function(evt){ return !evt.dragged.classList.contains('category-card'); }, onEnd: () => calculateAll() });
         });
-        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-cards', pull: true, put: ['asset-cards'] }, draggable: '.category-card', onMove: function(evt){ var g = document.getElementById('mainGrid'); return evt.to === g && evt.related && evt.related.parentNode === g && evt.related.classList.contains('category-card'); }, onEnd: function(){ var g = document.getElementById('mainGrid'); document.querySelectorAll('.category-card').forEach(function(card){ if (card.parentElement && card.parentElement !== g && !card.classList.contains('in-sheet')) g.appendChild(card); }); calculateAll(); } });
+        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-cards', pull: true, put: ['asset-cards'] }, draggable: '.category-card', onMove: function(evt){ var g = document.getElementById('mainGrid'); return evt.to === g && evt.related && evt.related.parentNode === g && evt.related.classList.contains('category-card'); }, onEnd: function(){ var g = document.getElementById('mainGrid'); document.querySelectorAll('.category-card').forEach(function(card){ if (card.classList.contains('in-sheet')) return; if (card.parentElement && card.parentElement !== g){ var idx = categories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAll(); } });
         calculateAll();
         refreshIcons(grid);
     }
 
     function addAsset(catId, name='', value=0, targetP=0, qty='', price='') {
         const list = document.getElementById(`list-${catId}`); if(!list) return;
-        const div = document.createElement('div'); div.className = 'asset-item';
+        const wrap = document.createElement('div'); wrap.className = 'asset-item-wrap';
         const qD = (qty === '' || qty == 0) ? '-' : formatNum(qty), pD = (price === '' || price == 0) ? '-' : formatNum(price);
-        div.innerHTML = `
-            <div class="asset-delete-zone"><button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button></div>
-            <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" inputmode="numeric" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" step="any" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
-            <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" inputmode="numeric" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
-            <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
+        wrap.innerHTML = `
+            <div class="asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn" onclick="var w=this.closest('.asset-item-wrap'); w.remove(); calculateAll();">刪除</button></div>
+            <div class="asset-item">
+                <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
+                <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" inputmode="numeric" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
+                <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" step="any" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
+                <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
+                <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" inputmode="numeric" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
+                <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
+            </div>
         `;
-        list.appendChild(div);
-        attachAssetItemSwipe(div);
+        list.appendChild(wrap);
+        attachAssetItemSwipe(wrap);
     }
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
@@ -1705,11 +1947,16 @@
         grid.innerHTML = '';
 
         liabCategories.forEach(cat => {
+            if (sheetCardEl && sheetCardEl.classList.contains('liab-card') && cat.id === sheetCardEl.id) {
+                var ph = document.createElement('div'); ph.id = 'sheet-placeholder-' + cat.id; ph.style.display = 'none'; ph.setAttribute('data-sheet-placeholder', '1');
+                grid.appendChild(ph);
+                return;
+            }
             const data = saved[cat.id] || { items: [], collapsed: true };
             const card = document.createElement('div');
             card.id = cat.id;
             card.className = `liab-card collapsed`;
-            const iconHTML = getIconHTML(cat.icon || 'card', cat.color || '');
+            const iconHTML = getIconHTML(cat.icon || 'credit-card', cat.color || '');
             card.innerHTML = `
                 <button class="btn-delete-card" onclick="deleteLiabCategory('${cat.id}')">×</button>
                 <div class="liab-header" onclick="toggleLiabCategory('${cat.id}')">
@@ -1730,9 +1977,8 @@
                 </div>
             `;
             grid.appendChild(card);
-            attachLongPressDelete(card);
-            if (cat.color) card.setAttribute('data-color', cat.color);
-            if (cat.icon) card.setAttribute('data-icon', cat.icon);
+            card.setAttribute('data-color', cat.color || '');
+            card.setAttribute('data-icon', cat.icon || 'credit-card');
 
             if (data.items && data.items.length > 0) {
                 data.items.forEach(i => addLiability(cat.id, i.name, i.amount));
@@ -1760,7 +2006,7 @@
             group: { name: 'liab-cards', pull: true, put: ['liab-cards'] },
             draggable: '.liab-card',
             onMove: function(evt){ var g = document.getElementById('liabGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('liab-card'); },
-            onEnd: () => calculateAllLiabilities()
+            onEnd: function(){ var g = document.getElementById('liabGrid'); document.querySelectorAll('.liab-card').forEach(function(card){ if (card.classList.contains('in-sheet')) return; if (card.parentElement && card.parentElement !== g){ var idx = liabCategories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAllLiabilities(); }
         });
 
         calculateAllLiabilities();
@@ -1786,7 +2032,7 @@
     }
 
     function addLiabCategory() {
-        liabCategories.push({ id: 'debt_'+Date.now(), name: '新負債' });
+        liabCategories.push({ id: 'debt_'+Date.now(), name: '新負債', color: '', icon: 'credit-card' });
         renderLiabilitiesUI();
     }
 
@@ -1858,7 +2104,7 @@
         if (await showConfirm('是否清除所有負債資料並重置？', { danger: true })) {
             localStorage.removeItem('myLiabilities_v1');
             localStorage.removeItem('liabConfig_v1');
-            liabCategories = LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+            liabCategories = LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'credit-card' }));
             renderLiabilitiesUI();
             calculateAllLiabilities();
         }
@@ -1869,7 +2115,7 @@
         if (target.tagName === 'INPUT' || target.isContentEditable) return;
         openSheetWithCard(id);
     }
-    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; calculateAll(); }
+    function toggleChart() { const c = document.getElementById('chartContainer'); c.style.display = c.style.display === 'none' ? 'flex' : 'none'; calculateAll(); }
     async function clearAll() { if (await showConfirm('是否清除所有資料並重置？此操作無法復原。', { danger: true })) { localStorage.clear(); location.reload(); } }
 
     function toggleHideAmounts() {
@@ -1889,9 +2135,9 @@
         if (btn) btn.textContent = hideAmounts ? '👁️ 顯示金額' : '🙈 隱藏金額';
     }
     function handleNavAssetsClick() {
-        var assetsView = document.getElementById('assets-view');
-        if (!assetsView) return;
-        if (assetsView.style.display !== 'block') {
+        var currentPage = null;
+        document.querySelectorAll('.page-view').forEach(function(p) { if (p.style.display === 'block') currentPage = p.id; });
+        if (currentPage === 'home-view' || currentPage === 'liabilities-view') {
             showPage('assets-view');
             hideAssetsMenu();
         } else {
@@ -1921,7 +2167,7 @@
         const s = localStorage.getItem('catConfig_v5');
         categories = s ? JSON.parse(s) : DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'wallet' }));
         const liabS = localStorage.getItem('liabConfig_v1');
-        liabCategories = liabS ? JSON.parse(liabS) : LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'card' }));
+        liabCategories = liabS ? JSON.parse(liabS) : LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'credit-card' }));
         const fixedS = localStorage.getItem('fixedConfig_v1');
         fixedCategories = fixedS ? JSON.parse(fixedS) : FIXED_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'home' }));
         const recvS = localStorage.getItem('recvConfig_v1');
@@ -1932,6 +2178,7 @@
         renderReceivablesUI();
         setTheme(localStorage.getItem('userTheme') || 'orange');
         initHideAmounts();
+        initNightMode();
         showPage('home-view');
         var chartContainer = document.getElementById('chartContainer');
         if (chartContainer) {
@@ -1939,7 +2186,12 @@
             chartContainer.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
             chartContainer.addEventListener('touchend', function(e) {
                 var endX = e.changedTouches[0].clientX;
-                if (startX - endX > 80) openHistoryChart('assets');
+                var slides = document.getElementById('chartSlides');
+                if (slides && slides.classList.contains('show-history')) {
+                    if (endX - startX > 80) closeHistoryChart();
+                } else {
+                    if (startX - endX > 80) openHistoryChart('assets');
+                }
             }, { passive: true });
         }
     };
