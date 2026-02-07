@@ -161,10 +161,10 @@
         .picker-tab-content { display: none; }
         .picker-tab-content.active { display: block; }
         /* picker 內圖示／色塊：依螢幕比例自適應，避免擠在一起 */
-        .picker-panel .icon-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(52px, 20vw), 1fr)); gap: clamp(8px, 2.5vw, 14px); padding: 12px 14px; justify-items: center; }
+        .picker-panel .icon-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(52px, 20vw), 1fr)); gap: clamp(8px, 2.5vw, 14px); padding: 12px 14px; justify-items: center; border: none; border-radius: 0; min-height: 0; }
         .picker-panel .icon-grid .icon-dot { width: clamp(40px, 10vw, 52px); height: clamp(40px, 10vw, 52px); min-width: 40px; min-height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
         .picker-panel .icon-grid .icon-dot svg { width: clamp(18px, 4.5vw, 24px); height: clamp(18px, 4.5vw, 24px); }
-        .picker-panel .color-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(8, auto); gap: 6px; padding: 12px 14px; justify-items: center; align-items: center; margin-bottom: 4px; }
+        .picker-panel .color-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(8, auto); gap: 6px; padding: 12px 14px; justify-items: center; align-items: center; margin-bottom: 4px; border: none; border-radius: 0; background: transparent; min-height: 0; }
         .picker-panel .color-grid .color-dot { width: clamp(30px, 7.5vw, 44px); height: clamp(30px, 7.5vw, 44px); min-width: 30px; min-height: 30px; border: 2px solid var(--border-dark); box-shadow: none; }
         .picker-panel #iconSectionLabel, .picker-panel #iconSectionLabel2, .picker-panel #colorSectionLabel { margin-bottom: 4px; font-size: 0.7rem; font-weight: 800; color: #666; }
         .picker-panel #iconSectionLabel { margin-top: 0; }
@@ -1868,7 +1868,7 @@
     }
     function attachAssetItemSwipe(wrapEl) {
         if (!wrapEl || !wrapEl.classList.contains('asset-item-wrap')) return;
-        var startX = 0, didSwipePast80 = false;
+        var startX = 0, didSwipePastThreshold = false;
         var row = wrapEl.querySelector('.asset-item');
         if (!row) return;
         var hoverTimer = null;
@@ -1890,19 +1890,19 @@
         });
         wrapEl.addEventListener('touchstart', function(e) {
             startX = e.touches[0].clientX;
-            didSwipePast80 = false;
+            didSwipePastThreshold = false;
         }, { passive: true });
         wrapEl.addEventListener('touchmove', function(e) {
             var x = e.touches[0].clientX;
             var delta = startX - x;
-            if (delta > 80) didSwipePast80 = true;
-            if (delta > 40) row.style.transform = 'translateX(-' + Math.min(delta, 56) + 'px)';
+            if (delta > 56) didSwipePastThreshold = true;
+            if (delta > 28) row.style.transform = 'translateX(-' + Math.min(delta, 56) + 'px)';
             else row.style.transform = '';
         }, { passive: true });
         wrapEl.addEventListener('touchend', function(e) {
             var justOpened = sheetOpenedAt && (Date.now() - sheetOpenedAt < 420);
             row.style.transform = '';
-            if (didSwipePast80 && !justOpened) wrapEl.classList.add('swiped');
+            if (didSwipePastThreshold && !justOpened) wrapEl.classList.add('swiped');
         }, { passive: true });
     }
     function closeAllAssetItemReveal() {
