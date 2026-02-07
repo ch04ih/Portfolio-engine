@@ -1893,8 +1893,7 @@
             var delta = startX - endX;
             var justOpened = sheetOpenedAt && (Date.now() - sheetOpenedAt < 420);
             row.style.transform = '';
-            if (delta > 50 && !justOpened) wrapEl.classList.add('swiped');
-            else if (delta < -30) wrapEl.classList.remove('swiped');
+            if (delta > 80 && !justOpened) wrapEl.classList.add('swiped');
         }, { passive: true });
     }
     function closeAllAssetItemReveal() {
