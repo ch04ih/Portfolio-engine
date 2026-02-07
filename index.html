@@ -61,14 +61,16 @@
 
         .btn-delete-card { position: absolute; top: -16px; right: -16px; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; font-weight: bold; cursor: pointer; box-shadow: none; z-index: 20; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .category-card:hover .btn-delete-card, .liab-card:hover .btn-delete-card, .simple-asset-card:hover .btn-delete-card, .show-delete .btn-delete-card { opacity: 1; pointer-events: auto; }
+        .sheet .in-sheet .btn-delete-card { opacity: 1; pointer-events: auto; }
 
         .target-input { width: 42px; background: var(--theme-accent); color: var(--theme-bg); border: 1px solid #1A1A1A; font-weight: bold; text-align: center; border-radius: 6px; padding: 2px; }
         .target-display { font-size: 10px; color: #888; }
         .category-card.collapsed .target-edit { display: none; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        .asset-header-row { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
+        .asset-header-row { display: grid; grid-template-columns: 12px 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
+        .asset-header-row span:first-child { text-align: center; }
 
         /* 簡化列表欄位配置（名稱 + 金額，靠左對齊） */
         .liab-header-row, .simple-asset-header-row { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
@@ -89,12 +91,16 @@
         .simple-asset-item div:nth-child(3) .edit-input { justify-content: flex-start; text-align: left; padding-left: 4px; }
 
         .asset-list { margin-bottom: 15px; min-height: 5px; }
-        .asset-item { display: grid; grid-template-columns: 20px 1.2fr 0.6fr 0.6fr 1.1fr 0.8fr 45px; gap: 8px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; }
+        .asset-item { display: grid; grid-template-columns: 12px 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 8px 0; align-items: center; border-bottom: 1px solid #F2F2F2; cursor: grab; position: relative; }
+        .asset-item .asset-delete-zone { display: flex; align-items: center; justify-content: flex-start; min-width: 0; position: relative; padding-right: 0; }
+        .asset-item .btn-delete-left { opacity: 0; transition: opacity 0.2s; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 12px; padding: 0; font-size: 14px; line-height: 1; }
+        .asset-item .asset-delete-zone:hover .btn-delete-left { opacity: 1; }
+        .asset-item.asset-reveal-delete .btn-delete-left { opacity: 1; }
         
         .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
         .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
-
-        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; } 
+        .asset-item div:nth-child(2) { min-width: 0; }
+        .asset-item div:nth-child(2) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } 
         .asset-item div:nth-child(3) .static-view, .asset-item div:nth-child(4) .static-view { font-size: 11px; color: #999; } 
         .asset-item div:nth-child(5) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
         .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
@@ -126,22 +132,38 @@
         #liabGrid + .btn { margin-top: 18px; }
         .category-card, .liab-card, .simple-asset-card { grid-column: 1 / -1; }
         .category-card.collapsed, .liab-card.collapsed, .simple-asset-card.collapsed { grid-column: span 1; padding: 7px; min-height: 80px; width: 100%; border-width: 3px; }
+        .liab-card.collapsed, .simple-asset-card.collapsed { min-height: 72px; }
+        .liab-card .current-p, .simple-asset-card .current-p { display: none; }
         .category-card.collapsed .category-header, .liab-card.collapsed .liab-header, .simple-asset-card.collapsed .simple-asset-header { padding: 5px 9px; }
         .category-card.collapsed .card-footer, .liab-card.collapsed .card-footer, .simple-asset-card.collapsed .card-footer { margin-top: 5px; padding-top: 5px; }
         .card-emoji { margin: 0 6px; }
         .card-icon { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
         .card-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
-        .sheet #sheetContent { padding: 8px 12px 16px; }
+        .sheet #sheetContent { padding: 24px 12px 16px; }
         .sheet-tools { background: transparent; border-top: none; color: inherit; }
-        .icon-grid, .color-grid { background: transparent; border: 3px solid #1A1A1A; border-radius: 12px; }
+        .icon-grid, .color-grid { background: transparent; border: 3px solid #1A1A1A; border-radius: 12px; min-height: 44px; }
+        .icon-grid .icon-dot, .color-grid .color-dot { min-width: 36px; min-height: 36px; }
         .icon-dot { background: #fff; }
         .color-dot { width: 28px; height: 28px; border: 1px solid #1A1A1A; border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0 #1A1A1A; }
         .sheet .in-sheet { border-width: 3px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
         .sheet .in-sheet .category-header, .sheet .in-sheet .liab-header, .sheet .in-sheet .simple-asset-header { padding: 10px 12px; margin-bottom: 8px; }
         .sheet .in-sheet .asset-list, .sheet .in-sheet .liab-list, .sheet .in-sheet .simple-asset-list { max-height: 48vh; overflow: auto; border: 1px solid #EEE; border-radius: 8px; padding: 4px 8px; }
+        .sheet .in-sheet .card-icon { cursor: pointer; }
+        .sheet .in-sheet .card-icon:hover { filter: brightness(1.08); }
+        .picker-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); z-index: 50; }
+        .picker-panel.picker-floating { position: absolute; left: 50%; top: 50px; transform: translateX(-50%); width: min(92vw, 420px); max-height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; z-index: 51; background: #fff; border-radius: 12px; border: 3px solid #1A1A1A; box-shadow: 0 12px 40px rgba(0,0,0,0.22); padding: 16px; box-sizing: border-box; }
+        .picker-panel-inner { min-height: 40px; }
+        /* picker 內圖示／色塊：依螢幕比例自適應，避免擠在一起 */
+        .picker-panel .icon-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(52px, 20vw), 1fr)); gap: clamp(8px, 2.5vw, 14px); padding: 12px 14px; justify-items: center; }
+        .picker-panel .icon-grid .icon-dot { width: clamp(40px, 10vw, 52px); height: clamp(40px, 10vw, 52px); min-width: 40px; min-height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+        .picker-panel .icon-grid .icon-dot svg { width: clamp(18px, 4.5vw, 24px); height: clamp(18px, 4.5vw, 24px); }
+        .picker-panel .color-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(auto-fill, minmax(min(36px, 14vw), 1fr)); gap: clamp(6px, 1.5vw, 10px); padding: 12px 14px; justify-items: center; }
+        .picker-panel .color-grid .color-dot { width: clamp(28px, 8vw, 38px); height: clamp(28px, 8vw, 38px); min-width: 28px; min-height: 28px; }
+        .picker-panel #iconSectionLabel, .picker-panel #iconSectionLabel2, .picker-panel #colorSectionLabel { margin-bottom: 4px; }
+        .picker-panel #iconGridOther { margin-bottom: 4px; }
         .sheet .in-sheet .card-footer { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #E5E5E5; }
 
-        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 16px; cursor: pointer; padding: 0; text-align: left; }
+        .btn-delete-left { background: transparent; border: none; color: #FF4444; font-size: 18px; cursor: pointer; padding: 0; text-align: center; line-height: 1; }
         .card-footer { margin-top: 14px; padding-top: 14px; border-top: 2px dashed #DDD; }
         .footer-row { display: flex; justify-content: space-between; align-items: flex-start; }
         .category-card .footer-row { flex-direction: column; align-items: center; gap: 4px; }
@@ -168,19 +190,30 @@
         .btn { background: var(--theme-accent); color: var(--theme-bg); border: 3px solid #1A1A1A; padding: 12px; font-weight: bold; width: 100%; border-radius: var(--radius); box-shadow: none; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
         .btn-subtle { background: #fff; color: #555; border: 2px solid #1A1A1A; font-weight: 700; }
         
-        #chartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
+        #chartContainer { display:none; margin-top: 20px; width: 100%; min-height: 250px; height: 250px; position: relative; }
+        #chartContainer .chart-inner-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .chart-to-history { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); background: rgba(255,255,255,0.95); color: #333; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        #chartContainer:hover .chart-to-history { opacity: 1; pointer-events: auto; }
+        @media (hover: none) { .chart-to-history { opacity: 0.6; pointer-events: auto; } }
         #portfolioChart { width: 100% !important; height: auto !important; }
         #liabChartContainer { display:none; margin-top: 20px; width: 100%; height: auto; min-height: 250px; }
         #liabChart { width: 100% !important; height: auto !important; }
         #rebalanceSummary, #fixedRebalanceSummary, #recvRebalanceSummary, #liabRebalanceSummary { font-size: clamp(1.6rem, 7.5vw, 2.2rem) !important; }
+        .summary-with-trend { position: relative; display: inline-block; min-height: 1.8em; padding-right: 1.4em; }
+        .summary-trend { position: absolute; right: 0; bottom: 2px; font-size: 0.9rem; line-height: 1; font-weight: 900; }
+        .summary-trend.up { color: #2E7D32; opacity: 0.65; }
+        .summary-trend.down { color: #C62828; opacity: 0.65; }
+        .category-card.collapsed { cursor: pointer; }
+        @keyframes card-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+        .category-card.show-delete, .liab-card.show-delete, .simple-asset-card.show-delete { animation: card-shake 0.35s ease-in-out; }
         @media (max-width: 380px) {
             .cat-sum-display, .liab-sum-display, .fixed-sum-display, .recv-sum-display { font-size: 1rem; }
             .asset-item div:nth-child(5) .static-view { font-size: 11px; }
         }
 
-        .theme-panel { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; background: rgba(var(--theme-accent-rgb), 0.12); border-radius: 12px; padding: 8px 12px; }
+        .theme-panel { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; background: rgba(var(--theme-accent-rgb), 0.12); border-radius: 12px; padding: 8px 12px; }
         .theme-toggle-icon, .hide-toggle-icon { font-size: 0.75rem; font-weight: bold; cursor: pointer; background: white; padding: 6px 12px; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: none; display: inline-flex; align-items: center; }
-        .theme-options { display: none; gap: 10px; margin-top: 10px; background: white; padding: 10px; border: 2px solid #1A1A1A; border-radius: 12px; box-shadow: none; z-index: 100; }
+        .theme-options { display: none; flex-basis: 100%; width: 100%; gap: 10px; margin-top: 10px; padding: 10px 0 0; border-top: 1px solid rgba(0,0,0,0.08); justify-content: flex-end; flex-wrap: wrap; }
         .theme-panel.active .theme-options { display: flex; }
         
         /* 雙色主題預覽按鍵 */
@@ -204,7 +237,8 @@
         .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid #1A1A1A; box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: hidden; opacity: 0; pointer-events: none; }
         .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
         .sheet-grabber { width: 40px; height: 4px; background: #ccc; border-radius: 4px; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
-        .sheet-close { position: absolute; right: 12px; top: 8px; border: 2px solid #1A1A1A; background: #fff; border-radius: 8px; padding: 4px 8px; font-weight: 900; cursor: pointer; }
+        .sheet-close { display: none !important; }
+        .sheet .in-sheet .btn-delete-card { top: -16px; right: -16px; left: auto; }
         .icon-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--theme-accent); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
         .icon-dot svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
         .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1A1A1A; background: var(--dot); box-shadow: none; cursor: pointer; }
@@ -296,7 +330,6 @@
             border-radius: 16px 16px 0 0;
             background: rgba(255,255,255,0.8);
             backdrop-filter: saturate(150%) blur(10px);
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.12);
             gap: 10px;
         }
         .bottom-nav .item {
@@ -320,9 +353,8 @@
             box-shadow: none;
         }
         .bottom-nav .item.active {
-            background: var(--theme-accent);
+            background: rgba(var(--theme-accent-rgb), 0.5);
             color: var(--theme-bg);
-            box-shadow: 3px 3px 0 #1A1A1A;
         }
         .nav-dropdown {
             position: fixed;
@@ -332,7 +364,6 @@
             background: white;
             border: 3px solid #1A1A1A;
             border-radius: 12px;
-            box-shadow: 6px 6px 0 #1A1A1A;
             display: none;
             z-index: 1000;
             padding: 8px;
@@ -426,7 +457,7 @@
                 <span class="title-en">Dashboard</span><br>
                 <span class="title-zh">財務總覽</span>
             </h1>
-            <div class="dashboard-hero">
+            <div class="dashboard-hero" onclick="openHistoryChart('netWorth')" style="cursor:pointer;" title="點擊看歷史變化">
                 <div class="hero-label">淨資產 Net Worth</div>
                 <div id="dash-net-worth" class="hero-value">$0</div>
             </div>
@@ -467,10 +498,13 @@
                     <button class="chart-btn" onclick="toggleChart()">圖表</button>
                 </div>
             </div>
-            <div id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div class="summary-with-trend"><span id="rebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="rebalanceSummaryTrend" class="summary-trend"></span></div>
             <div id="target-sum-alert" style="display:none; font-size:12px; margin-top:10px; padding:5px; border-radius:5px; background:#FFE5E5; color:#B30000; border:2px solid #FF4444; text-align:center; font-weight:bold;"></div>
             <div id="chartContainer">
-                <canvas id="portfolioChart"></canvas>
+                <div class="chart-inner-wrap">
+                    <canvas id="portfolioChart"></canvas>
+                    <button type="button" class="chart-to-history" onclick="openHistoryChart('assets')" title="看歷史變化">→</button>
+                </div>
             </div>
         </div>
     
@@ -494,7 +528,7 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
                 <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Fixed Assets｜固定資產總額 (TWD)</div>
             </div>
-            <div id="fixedRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div class="summary-with-trend"><span id="fixedRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="fixedRebalanceSummaryTrend" class="summary-trend"></span></div>
         </div>
 
         <div id="fixedGrid"></div>
@@ -517,7 +551,7 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
                 <div style="font-size: 0.75rem; font-weight: 900; color: #888; flex-grow: 1;">Total Receivables｜應收帳款總額 (TWD)</div>
             </div>
-            <div id="recvRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div class="summary-with-trend"><span id="recvRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="recvRebalanceSummaryTrend" class="summary-trend"></span></div>
         </div>
 
         <div id="recvGrid"></div>
@@ -543,7 +577,7 @@
                     <button class="chart-btn" onclick="toggleLiabChart()">圖表</button>
                 </div>
             </div>
-            <div id="liabRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</div>
+            <div class="summary-with-trend"><span id="liabRebalanceSummary" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">$0</span><span id="liabRebalanceSummaryTrend" class="summary-trend"></span></div>
             <div id="liabChartContainer">
                 <canvas id="liabChart"></canvas>
             </div>
@@ -559,15 +593,18 @@
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeSheet()"></div>
     <div id="detailSheet" class="sheet">
     <div class="sheet-grabber"></div>
-    <button class="sheet-close" onclick="closeSheet()">×</button>
-    <div class="sheet-tools" style="display:flex; gap:8px; align-items:center; padding: 8px 12px 8px 12px; flex-wrap: wrap;">
-        <div id="pickerPreview" style="display:flex; align-items:center; gap:4px; min-height:40px; width:100%;">
-            <button class="icon-dot" onclick="toggleColorGrid()" title="Icon 底色"><i data-lucide="palette"></i></button>
-        </div>
-        <div id="iconGrid" class="icon-grid" style="display:none; width:100%; grid-template-columns: repeat(6, 1fr); gap:8px; padding:8px 8px;"></div>
-        <div id="colorGrid" class="color-grid" style="display:none; width:100%; grid-template-columns: repeat(8, 1fr); gap:8px; padding:8px 8px;"></div>
-    </div>
     <div id="sheetContent"></div>
+    <div id="pickerBackdrop" class="picker-backdrop" style="display:none;" onclick="closePickerPanel()"></div>
+    <div id="pickerPanel" class="picker-panel picker-floating" style="display:none;">
+        <div class="picker-panel-inner">
+        <div id="iconSectionLabel" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:4px;">金錢／記帳圖示</div>
+        <div id="iconGrid" class="icon-grid"></div>
+        <div id="iconSectionLabel2" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:12px;">其他圖示</div>
+        <div id="iconGridOther" class="icon-grid"></div>
+        <div id="colorSectionLabel" style="font-size:0.7rem; font-weight:800; color:#666; margin-top:12px;">同色系背景（選一個）</div>
+        <div id="colorGrid" class="color-grid"></div>
+        </div>
+    </div>
     <div style="height:20px"></div>
 </div>
 <div id="modalOverlay">
@@ -579,9 +616,21 @@
         </div>
     </div>
 </div>
+<div id="historyChartOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="if(event.target===this) closeHistoryChart();">
+    <div style="background:#fff; border:3px solid #1A1A1A; border-radius:12px; padding:16px; max-width:400px; width:100%; box-shadow:0 12px 40px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <strong id="historyChartTitle">歷史變化</strong>
+            <button type="button" onclick="closeHistoryChart()" style="border:2px solid #1A1A1A; background:#fff; border-radius:8px; padding:4px 10px; font-weight:bold; cursor:pointer;">關閉</button>
+        </div>
+        <div style="height:220px; position:relative;">
+            <canvas id="historyChartCanvas"></canvas>
+        </div>
+        <p id="historyChartHint" style="font-size:11px; color:#888; margin-top:8px;">每日一筆，儲存最近 60 天</p>
+    </div>
+</div>
 <nav class="bottom-nav">
         <div id="nav-home" class="item" onclick="showPage('home-view')">🏠 總覽</div>
-        <div id="nav-assets" class="item" onclick="toggleAssetsMenu()">💰 資產 ▾</div>
+        <div id="nav-assets" class="item" onclick="handleNavAssetsClick()">💰 資產 ▾</div>
         <div id="nav-liab" class="item" onclick="showPage('liabilities-view')">📉 負債</div>
     </nav>
 <div id="assetsMenu" class="nav-dropdown">
@@ -648,23 +697,44 @@
     let categories = [], stockData = [], usdRate = 32.5;
     let liabCategories = [], fixedCategories = [], recvCategories = [];
     let assetTotal = 0, liabilityTotal = 0, fixedTotal = 0, receivableTotal = 0;
+    let prevAssetTotal = null, prevFixedTotal = null, prevRecvTotal = null, prevLiabTotal = null;
+    function setSummaryTrend(summaryId, trendId, total, prev) {
+        var trendEl = document.getElementById(trendId);
+        if (!trendEl) return;
+        if (prev === null) { trendEl.textContent = ''; trendEl.className = 'summary-trend'; return; }
+        if (total > prev) { trendEl.textContent = '▲'; trendEl.className = 'summary-trend up'; }
+        else if (total < prev) { trendEl.textContent = '▼'; trendEl.className = 'summary-trend down'; }
+        else { trendEl.textContent = ''; trendEl.className = 'summary-trend'; }
+    }
+    const moneyIconList = [
+        'wallet','credit-card','banknote','coins','landmark','receipt','circle-dollar-sign','dollar-sign','piggy-bank',
+        'trending-up','trending-down','percent','calculator','pie-chart','bar-chart','activity','briefcase','hand-coins','receipt-text'
+    ];
     const iconList = [
         'wallet','credit-card','banknote','coins','landmark','briefcase','trending-up','trending-down','pie-chart','bar-chart','activity',
         'shopping-bag','shopping-cart','home','car','plane','gift','coffee','utensils','heart','star','user','users','settings','lock','unlock',
         'key','shield','bell','calendar','clock','mail','phone','camera','image','music','video','globe','map-pin','navigation','cloud','sun',
         'moon','zap','anchor','award','bookmark','box','cpu','database','gem','hard-hat','layers'
     ];
-    const recommendedColors = ['#F2C94C','#2D9CDB','#9B51E0','#F2994A','#27AE60','#EB5757','#828282','#6FCF97'];
+    /* 紅橙黃綠藍靛紫：每色一排，左半粉嫩、右半莫蘭迪 */
+    const colorFamilies = [
+        { label: '紅', colors: ['#FFB3BA','#FFC9CE','#FFDFE3','#FF8A80','#A85A5A','#8B4545','#6B3535','#4A2525'] },
+        { label: '橙', colors: ['#FFDFBA','#FFE4C9','#FFEBD9','#FFAB91','#B87A5A','#9A6647','#7A5035','#553520'] },
+        { label: '黃', colors: ['#FFFBBA','#FFF9C9','#FFFDE7','#FFF176','#B8A84A','#9A8E3D','#7A702E','#554D20'] },
+        { label: '綠', colors: ['#BAFFC9','#C8FFD4','#E0FFE5','#81C784','#5A8B5A','#457045','#355535','#253D25'] },
+        { label: '藍', colors: ['#BAE1FF','#C9E8FF','#E0F2FF','#64B5F6','#4A7BA8','#3D6589','#304D6B','#22354A'] },
+        { label: '靛', colors: ['#C9C9FF','#D4D4FF','#E5E5FF','#7986CB','#5A5A9E','#45457A','#35355A','#25253D'] },
+        { label: '紫', colors: ['#E1BEE7','#E8C9ED','#F0DDF5','#B39DDB','#7E6B9E','#63557A','#4A405A','#332A3D'] }
+    ];
 
     function formatNum(num) { return (num === '' || isNaN(num) || num == 0) ? "-" : parseFloat(num).toLocaleString('en-US'); }
     function formatCurrency(num) { return hideAmounts ? "***" : ("$" + Math.round(num || 0).toLocaleString('en-US')); }
 
     function sanitizeIconName(name) {
-        const fallback = 'wallet';
-        const map = { '💳':'credit-card','💰':'coins','💵':'banknote','💸':'banknote','🪙':'coins','🏦':'landmark' };
-        const n = map[name] || name || fallback;
-        if (window.lucide && window.lucide.icons && window.lucide.icons[n]) return n;
-        return fallback;
+        var fallback = 'wallet';
+        var map = { '💳':'credit-card','💰':'coins','💵':'banknote','💸':'banknote','🪙':'coins','🏦':'landmark' };
+        var n = (map[name] || name || fallback).replace(/\s/g,'');
+        return n || fallback;
     }
     function getIconHTML(name, color) {
         const n = sanitizeIconName(name);
@@ -672,12 +742,13 @@
         return `<span class="card-icon" style="background:${c}"><i data-lucide="${n}"></i></span>`;
     }
     function refreshIcons(scopeEl) {
-        if (window.lucide && typeof window.lucide.createIcons === 'function') {
-            try {
-                window.lucide.createIcons(scopeEl || document.body);
-            } catch (e) {
-                setTimeout(() => { window.lucide.createIcons(scopeEl || document.body); }, 0);
-            }
+        var lucide = window.lucide || window.Lucide;
+        if (!lucide || typeof lucide.createIcons !== 'function') return;
+        try {
+            if (scopeEl) lucide.createIcons({ root: scopeEl });
+            else lucide.createIcons();
+        } catch (e) {
+            try { lucide.createIcons(scopeEl || document.body); } catch (e2) {}
         }
     }
     const DEFAULT_CONFIG = [
@@ -866,6 +937,8 @@
             });
         });
         document.getElementById('rebalanceSummary').innerText = formatCurrency(total);
+        setSummaryTrend('rebalanceSummary', 'rebalanceSummaryTrend', total, prevAssetTotal);
+        prevAssetTotal = total;
 
         // 將資產總額存成全域變數，給 Dashboard 使用
         assetTotal = total;
@@ -888,6 +961,8 @@
         liabilityTotal = total;
         const totalEl = document.getElementById('liabRebalanceSummary');
         if (totalEl) totalEl.innerText = formatCurrency(total);
+        setSummaryTrend('liabRebalanceSummary', 'liabRebalanceSummaryTrend', total, prevLiabTotal);
+        prevLiabTotal = total;
 
         updateLiabChart();
         updateDashboard();
@@ -933,11 +1008,15 @@
             else addFixedAsset(cat.id);
             new Sortable(document.getElementById(`fixed-list-${cat.id}`), {
                 animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
+                group: { name: 'fixed-items', put: ['fixed-items'] },
+                onMove: function(evt){ return !evt.dragged.classList.contains('simple-asset-card'); },
                 onEnd: () => calculateAllFixedAssets()
             });
         });
         new Sortable(grid, {
             animation: 150, handle: '.simple-asset-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
+            group: { name: 'fixed-cards', pull: true, put: ['fixed-cards'] }, draggable: '.simple-asset-card',
+            onMove: function(evt){ var g = document.getElementById('fixedGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('simple-asset-card'); },
             onEnd: () => calculateAllFixedAssets()
         });
         calculateAllFixedAssets();
@@ -955,7 +1034,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input fixed-amount" value="${amount}" onblur="autoViewModeFixed(this)" oninput="calculateAllFixedAssets()"></div>
             </div>
         `;
         list.appendChild(div);
@@ -987,6 +1066,7 @@
     }
     async function deleteFixedCategory(id) {
         if (await showConfirm('是否確定要刪除此固定資產類別？', { danger: true })) {
+            if (sheetCardEl && sheetCardEl.id === id) closeSheet();
             fixedCategories = fixedCategories.filter(c => c.id !== id);
             renderFixedAssetsUI();
             forceSaveFixed();
@@ -1031,7 +1111,9 @@
         let total = 0;
         const grid = document.getElementById('fixedGrid');
         if (!grid) return;
-        grid.querySelectorAll('.simple-asset-card').forEach(card => {
+        let cards = Array.from(grid.querySelectorAll('.simple-asset-card'));
+        if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id && String(sheetCardEl.id).startsWith('fixed_')) cards.push(sheetCardEl);
+        cards.forEach(card => {
             let sum = 0;
             card.querySelectorAll('.fixed-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.fixed-sum-display');
@@ -1041,6 +1123,8 @@
         fixedTotal = total;
         const totalEl = document.getElementById('fixedRebalanceSummary');
         if (totalEl) totalEl.innerText = formatCurrency(total);
+        setSummaryTrend('fixedRebalanceSummary', 'fixedRebalanceSummaryTrend', total, prevFixedTotal);
+        prevFixedTotal = total;
         updateDashboard();
         forceSaveFixed();
     }
@@ -1084,11 +1168,15 @@
             else addRecvAsset(cat.id);
             new Sortable(document.getElementById(`recv-list-${cat.id}`), {
                 animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
+                group: { name: 'recv-items', put: ['recv-items'] },
+                onMove: function(evt){ return !evt.dragged.classList.contains('simple-asset-card'); },
                 onEnd: () => calculateAllReceivables()
             });
         });
         new Sortable(grid, {
             animation: 150, handle: '.simple-asset-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5,
+            group: { name: 'recv-cards', pull: true, put: ['recv-cards'] }, draggable: '.simple-asset-card',
+            onMove: function(evt){ var g = document.getElementById('recvGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('simple-asset-card'); },
             onEnd: () => calculateAllReceivables()
         });
         calculateAllReceivables();
@@ -1106,7 +1194,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input recv-amount" value="${amount}" onblur="autoViewModeRecv(this)" oninput="calculateAllReceivables()"></div>
             </div>
         `;
         list.appendChild(div);
@@ -1138,6 +1226,7 @@
     }
     async function deleteRecvCategory(id) {
         if (await showConfirm('是否確定要刪除此應收帳款類別？', { danger: true })) {
+            if (sheetCardEl && sheetCardEl.id === id) closeSheet();
             recvCategories = recvCategories.filter(c => c.id !== id);
             renderReceivablesUI();
             forceSaveRecv();
@@ -1182,7 +1271,9 @@
         let total = 0;
         const grid = document.getElementById('recvGrid');
         if (!grid) return;
-        grid.querySelectorAll('.simple-asset-card').forEach(card => {
+        let cards = Array.from(grid.querySelectorAll('.simple-asset-card'));
+        if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id && String(sheetCardEl.id).startsWith('recv_')) cards.push(sheetCardEl);
+        cards.forEach(card => {
             let sum = 0;
             card.querySelectorAll('.recv-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.recv-sum-display');
@@ -1192,8 +1283,78 @@
         receivableTotal = total;
         const totalEl = document.getElementById('recvRebalanceSummary');
         if (totalEl) totalEl.innerText = formatCurrency(total);
+        setSummaryTrend('recvRebalanceSummary', 'recvRebalanceSummaryTrend', total, prevRecvTotal);
+        prevRecvTotal = total;
         updateDashboard();
         forceSaveRecv();
+    }
+
+    var myHistoryChart = null;
+    var HISTORY_MAX = 60;
+    function pushHistory(key, value) {
+        try {
+            var arr = JSON.parse(localStorage.getItem('history_' + key) || '[]');
+            var now = Date.now();
+            var today = new Date(now).toDateString();
+            var last = arr[arr.length - 1];
+            var lastDay = last ? new Date(last.t).toDateString() : '';
+            if (lastDay !== today) {
+                arr.push({ t: now, v: value });
+                if (arr.length > HISTORY_MAX) arr = arr.slice(-HISTORY_MAX);
+                localStorage.setItem('history_' + key, JSON.stringify(arr));
+            } else {
+                arr[arr.length - 1] = { t: now, v: value };
+                localStorage.setItem('history_' + key, JSON.stringify(arr));
+            }
+        } catch (e) {}
+    }
+    function openHistoryChart(type) {
+        var overlay = document.getElementById('historyChartOverlay');
+        var titleEl = document.getElementById('historyChartTitle');
+        var canvas = document.getElementById('historyChartCanvas');
+        if (!overlay || !canvas) return;
+        titleEl.textContent = type === 'netWorth' ? '淨資產 歷史變化' : '流動資產總額 歷史變化';
+        var arr = JSON.parse(localStorage.getItem('history_' + type) || '[]');
+        var hintEl = document.getElementById('historyChartHint');
+        if (arr.length === 0) {
+            if (hintEl) hintEl.textContent = '尚無歷史紀錄，請先輸入資料並在總覽頁更新後再試。';
+            overlay.style.display = 'flex';
+            return;
+        }
+        if (hintEl) hintEl.textContent = '每日一筆，儲存最近 60 天';
+        var labels = arr.map(function (d) {
+            var dt = new Date(d.t);
+            return (dt.getMonth() + 1) + '/' + dt.getDate();
+        });
+        var values = arr.map(function (d) { return d.v; });
+        if (myHistoryChart) myHistoryChart.destroy();
+        myHistoryChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: type === 'netWorth' ? '淨資產' : '流動資產',
+                    data: values,
+                    borderColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim(),
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+        overlay.style.display = 'flex';
+    }
+    function closeHistoryChart() {
+        var overlay = document.getElementById('historyChartOverlay');
+        if (overlay) overlay.style.display = 'none';
     }
 
     function updateDashboard() {
@@ -1202,6 +1363,8 @@
         const dashLiabilities = document.getElementById('dash-total-liabilities');
         const totalAssets = (assetTotal || 0) + (fixedTotal || 0) + (receivableTotal || 0);
         const netWorth = totalAssets - liabilityTotal;
+        pushHistory('netWorth', netWorth);
+        pushHistory('assets', assetTotal != null ? assetTotal : 0);
         if (dashAssets) dashAssets.innerText = formatCurrency(totalAssets);
         if (dashLiabilities) dashLiabilities.innerText = formatCurrency(liabilityTotal);
         if (dashNet) {
@@ -1297,12 +1460,12 @@
     // === 底部滑出細節頁 ===
     let sheetCardEl = null, sheetOriginalParent = null, sheetPlaceholder = null;
     function openSheetWithCard(cardId) {
-        const card = document.getElementById(cardId);
+        var card = document.getElementById(cardId);
         if (!card) return;
         sheetCardEl = card;
         sheetOriginalParent = card.parentElement;
         sheetPlaceholder = document.createElement('div');
-        sheetPlaceholder.id = `sheet-placeholder-${cardId}`;
+        sheetPlaceholder.id = 'sheet-placeholder-' + cardId;
         sheetPlaceholder.style.display = 'none';
         sheetOriginalParent.insertBefore(sheetPlaceholder, card);
         card.classList.remove('collapsed');
@@ -1311,22 +1474,18 @@
         document.getElementById('sheetBackdrop').style.display = 'block';
         document.getElementById('detailSheet').classList.add('open');
         refreshIcons(document.getElementById('detailSheet'));
-        const ig = document.getElementById('iconGrid');
-        const cg = document.getElementById('colorGrid');
-        if (ig) ig.innerHTML = '';
-        if (cg) cg.innerHTML = '';
-        buildIconGrid();
-        buildColorGrid();
-        const ic = sheetCardEl.getAttribute('data-icon') || 'wallet';
-        const col = sheetCardEl.getAttribute('data-color') || getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim();
-        const pv = document.getElementById('pickerIconPreview');
-        if (pv) { pv.innerHTML = `<i data-lucide="${ic}"></i>`; refreshIcons(pv); pv.style.background = col; }
+        closePickerPanel();
+        var iconEl = sheetCardEl.querySelector('.card-icon');
+        if (iconEl) {
+            iconEl.onclick = function(e) { e.stopPropagation(); openPickerPanel(); };
+        }
     }
     function closeSheet() {
-        const sheet = document.getElementById('detailSheet');
-        const backdrop = document.getElementById('sheetBackdrop');
-        sheet.classList.remove('open');
-        backdrop.style.display = 'none';
+        closePickerPanel();
+        var sheet = document.getElementById('detailSheet');
+        var backdrop = document.getElementById('sheetBackdrop');
+        if (sheet) sheet.classList.remove('open');
+        if (backdrop) backdrop.style.display = 'none';
         if (sheetCardEl && sheetOriginalParent) {
             sheetCardEl.classList.remove('in-sheet');
             sheetCardEl.classList.add('collapsed');
@@ -1374,73 +1533,87 @@
     function setSheetCardIcon(iconName) {
         if (!sheetCardEl) return;
         applyIconToCard(sheetCardEl, iconName);
-        const pv = document.getElementById('pickerIconPreview');
-        if (pv) { pv.innerHTML = `<i data-lucide="${iconName}"></i>`; refreshIcons(pv); }
         persistCardStyle(sheetCardEl);
+        reattachPickerTrigger();
+        closePickerPanel();
     }
     function setSheetCardColor(color) {
         if (!sheetCardEl) return;
         applyColorToCard(sheetCardEl, color);
-        const pv = document.getElementById('pickerIconPreview');
-        if (pv) { pv.style.background = color; }
         persistCardStyle(sheetCardEl);
-        const g = document.getElementById('colorGrid');
-        if (g) g.style.display = 'none';
+        reattachPickerTrigger();
+        closePickerPanel();
     }
-    function toggleIconGrid() {
-        const g = document.getElementById('iconGrid');
-        if (!g) return;
-        const willShow = g.style.display === 'none';
-        if (willShow) {
-            buildIconGrid();
-            g.style.display = 'grid';
-            refreshIcons(g);
-        } else {
-            g.style.display = 'none';
-        }
+    function reattachPickerTrigger() {
+        if (!sheetCardEl) return;
+        var iconEl = sheetCardEl.querySelector('.card-icon');
+        if (iconEl) iconEl.onclick = function(e) { e.stopPropagation(); openPickerPanel(); };
     }
-    function toggleColorGrid() {
-        const g = document.getElementById('colorGrid');
-        if (!g) return;
-        const willShow = g.style.display === 'none';
-        if (willShow) {
-            if (g.childElementCount === 0) buildColorGrid();
-            g.style.display = 'grid';
-        } else {
-            g.style.display = 'none';
-        }
+    function closePickerPanel() {
+        var panel = document.getElementById('pickerPanel');
+        var backdrop = document.getElementById('pickerBackdrop');
+        if (panel) panel.style.display = 'none';
+        if (backdrop) backdrop.style.display = 'none';
+    }
+    function openPickerPanel() {
+        var panel = document.getElementById('pickerPanel');
+        var backdrop = document.getElementById('pickerBackdrop');
+        if (!panel) return;
+        buildIconGrid();
+        buildColorGrid();
+        if (backdrop) backdrop.style.display = 'block';
+        panel.style.display = 'block';
+        panel.scrollTop = 0;
+        setTimeout(function() { refreshIcons(panel); }, 80);
+    }
+    function closeIconGrid() {
+        closePickerPanel();
+    }
+    function closeColorGrid() {
+        closePickerPanel();
     }
     function buildIconGrid() {
-        const g = document.getElementById('iconGrid'); if (!g) return;
+        const g = document.getElementById('iconGrid');
+        const g2 = document.getElementById('iconGridOther');
+        if (!g) return;
+        var allNames = [...new Set([...moneyIconList, ...iconList])];
+        var moneyIcons = moneyIconList.filter(function(n){ return allNames.indexOf(n) !== -1; });
+        var otherIcons = iconList.filter(function(n){ return moneyIconList.indexOf(n) === -1; });
         g.innerHTML = '';
-        const names = (window.lucide && window.lucide.icons) ? iconList.filter(n => window.lucide.icons[n]) : iconList;
-        names.forEach(n => {
-            const b = document.createElement('button');
+        moneyIcons.forEach(function(n) {
+            var b = document.createElement('button');
             b.className = 'icon-dot';
-            b.innerHTML = `<i data-lucide="${n}"></i>`;
-            b.onclick = () => setSheetCardIcon(n);
+            b.innerHTML = '<i data-lucide="' + n + '"></i>';
+            b.onclick = function(){ setSheetCardIcon(n); };
+            b.title = n;
             g.appendChild(b);
         });
-        refreshIcons(g);
+        if (g2) {
+            g2.innerHTML = '';
+            otherIcons.forEach(function(n) {
+                var b = document.createElement('button');
+                b.className = 'icon-dot';
+                b.innerHTML = '<i data-lucide="' + n + '"></i>';
+                b.onclick = function(){ setSheetCardIcon(n); };
+                b.title = n;
+                g2.appendChild(b);
+            });
+        }
+        setTimeout(function(){ refreshIcons(g); if (g2) refreshIcons(g2); }, 50);
     }
     function buildColorGrid() {
-        const g = document.getElementById('colorGrid'); if (!g) return;
+        var g = document.getElementById('colorGrid');
+        if (!g) return;
         g.innerHTML = '';
-        const colors = ['#111','#222','#333','#555','#777','#999','#B4D355','#FF8C42','#304FFE','#00C853','#FF6D00','#6A1B9A','#F0F0F0','#e4d9c4','#80C5DE','#dac4fc','#b45a5a','#1976d2'];
-        recommendedColors.forEach(c => {
-            const b = document.createElement('button');
-            b.className = 'color-dot';
-            b.style.background = c;
-            b.title = '推薦主題色';
-            b.onclick = () => setSheetCardColor(c);
-            g.appendChild(b);
-        });
-        colors.forEach(c => {
-            const b = document.createElement('button');
-            b.className = 'color-dot';
-            b.style.background = c;
-            b.onclick = () => setSheetCardColor(c);
-            g.appendChild(b);
+        colorFamilies.forEach(function(fam) {
+            fam.colors.forEach(function(c) {
+                var b = document.createElement('button');
+                b.className = 'color-dot';
+                b.style.background = c;
+                b.title = fam.label + ' ' + c;
+                b.onclick = function(){ setSheetCardColor(c); };
+                g.appendChild(b);
+            });
         });
     }
     document.addEventListener('DOMContentLoaded', () => {
@@ -1449,15 +1622,24 @@
         }
     });
     function attachLongPressDelete(card) {
-        let timer = null;
-        const start = () => { timer = setTimeout(() => { card.classList.add('show-delete'); }, 600); };
-        const clear = () => { if (timer) { clearTimeout(timer); timer = null; } };
+        var timer = null;
+        var start = function() { timer = setTimeout(function() { card.classList.add('show-delete'); }, 1000); };
+        var clear = function() { if (timer) { clearTimeout(timer); timer = null; } };
         card.addEventListener('touchstart', start, { passive: true });
         card.addEventListener('touchend', clear);
         card.addEventListener('touchcancel', clear);
         card.addEventListener('mousedown', start);
         card.addEventListener('mouseup', clear);
         card.addEventListener('mouseleave', clear);
+    }
+    function attachAssetItemSwipe(rowEl) {
+        if (!rowEl || !rowEl.classList.contains('asset-item')) return;
+        var startX = 0;
+        rowEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+        rowEl.addEventListener('touchend', function(e) {
+            var endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) rowEl.classList.add('asset-reveal-delete');
+        }, { passive: true });
     }
 
     function renderUI() {
@@ -1474,20 +1656,23 @@
                     <div class="card-subtitle"><span class="target-display">目標 ${data.target}%</span></div>
                     <div class="target-edit" onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
                 </div>
-                <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span></span></div>
+                <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span>實際%</span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
                 <div class="card-footer"><div class="footer-row"><span class="sum-label">合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
             `;
             grid.appendChild(card);
+            card.addEventListener('click', function(e) {
+                if (card.classList.contains('collapsed') && !e.target.closest('.btn-delete-card')) toggleCategory(card.id);
+            });
             attachLongPressDelete(card);
             if (cat.color) card.setAttribute('data-color', cat.color);
             if (cat.icon) card.setAttribute('data-icon', cat.icon);
             if (data.assets && data.assets.length > 0) data.assets.forEach(a => addAsset(cat.id, a.name, a.value, a.targetP, a.qty, a.price));
             else addAsset(cat.id);
-            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
+            new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-items', put: ['asset-items'] }, onMove: function(evt){ return !evt.dragged.classList.contains('category-card'); }, onEnd: () => calculateAll() });
         });
-        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: () => calculateAll() });
+        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-cards', pull: true, put: ['asset-cards'] }, draggable: '.category-card', onMove: function(evt){ var g = document.getElementById('mainGrid'); return evt.to === g && evt.related && evt.related.parentNode === g && evt.related.classList.contains('category-card'); }, onEnd: function(){ var g = document.getElementById('mainGrid'); document.querySelectorAll('.category-card').forEach(function(card){ if (card.parentElement && card.parentElement !== g && !card.classList.contains('in-sheet')) g.appendChild(card); }); calculateAll(); } });
         calculateAll();
         refreshIcons(grid);
     }
@@ -1497,7 +1682,7 @@
         const div = document.createElement('div'); div.className = 'asset-item';
         const qD = (qty === '' || qty == 0) ? '-' : formatNum(qty), pD = (price === '' || price == 0) ? '-' : formatNum(price);
         div.innerHTML = `
-            <button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button>
+            <div class="asset-delete-zone"><button class="btn-delete-left" onclick="this.closest('.asset-item').remove(); calculateAll();">×</button></div>
             <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" inputmode="numeric" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
             <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" step="any" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
@@ -1506,10 +1691,11 @@
             <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
         `;
         list.appendChild(div);
+        attachAssetItemSwipe(div);
     }
 
     function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
-    async function deleteCategory(id) { if (await showConfirm('是否確定要刪除此投資區域？', { danger: true })) { categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+    async function deleteCategory(id) { if (await showConfirm('是否確定要刪除此投資區域？', { danger: true })) { if (sheetCardEl && sheetCardEl.id === id) closeSheet(); categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
 
     // ===== 負債頁面：UI 與資料處理 =====
     function renderLiabilitiesUI() {
@@ -1559,6 +1745,8 @@
                 delay: 200,
                 delayOnTouchOnly: true,
                 touchStartThreshold: 5,
+                group: { name: 'liab-items', put: ['liab-items'] },
+                onMove: function(evt){ return !evt.dragged.classList.contains('liab-card'); },
                 onEnd: () => calculateAllLiabilities()
             });
         });
@@ -1569,6 +1757,9 @@
             delay: 200,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            group: { name: 'liab-cards', pull: true, put: ['liab-cards'] },
+            draggable: '.liab-card',
+            onMove: function(evt){ var g = document.getElementById('liabGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('liab-card'); },
             onEnd: () => calculateAllLiabilities()
         });
 
@@ -1588,7 +1779,7 @@
             </div>
             <div>
                 <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)"></div>
+                <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)" oninput="calculateAllLiabilities()"></div>
             </div>
         `;
         list.appendChild(div);
@@ -1601,6 +1792,7 @@
 
     async function deleteLiabCategory(id) {
         if (await showConfirm('是否確定要刪除此負債類別？', { danger: true })) {
+            if (sheetCardEl && sheetCardEl.id === id) closeSheet();
             liabCategories = liabCategories.filter(c => c.id !== id);
             renderLiabilitiesUI();
             forceSaveLiab();
@@ -1696,8 +1888,18 @@
         const btn = document.getElementById('hideToggleBtn');
         if (btn) btn.textContent = hideAmounts ? '👁️ 顯示金額' : '🙈 隱藏金額';
     }
+    function handleNavAssetsClick() {
+        var assetsView = document.getElementById('assets-view');
+        if (!assetsView) return;
+        if (assetsView.style.display !== 'block') {
+            showPage('assets-view');
+            hideAssetsMenu();
+        } else {
+            toggleAssetsMenu();
+        }
+    }
     function toggleAssetsMenu() {
-        const m = document.getElementById('assetsMenu');
+        var m = document.getElementById('assetsMenu');
         if (!m) return;
         m.style.display = (m.style.display === 'block') ? 'none' : 'block';
     }
@@ -1731,6 +1933,15 @@
         setTheme(localStorage.getItem('userTheme') || 'orange');
         initHideAmounts();
         showPage('home-view');
+        var chartContainer = document.getElementById('chartContainer');
+        if (chartContainer) {
+            var startX = 0;
+            chartContainer.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+            chartContainer.addEventListener('touchend', function(e) {
+                var endX = e.changedTouches[0].clientX;
+                if (startX - endX > 80) openHistoryChart('assets');
+            }, { passive: true });
+        }
     };
 </script>
 </body>
