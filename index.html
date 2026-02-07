@@ -1665,6 +1665,7 @@
         }
         refreshIcons(document.getElementById('detailSheet'));
         closePickerPanel();
+        closeAllAssetItemReveal();
         var iconEl = sheetCardEl.querySelector('.card-icon');
         if (iconEl) {
             iconEl.onclick = function(e) { e.stopPropagation(); openPickerPanel(); };
@@ -1862,7 +1863,7 @@
     }
     function attachAssetItemSwipe(wrapEl) {
         if (!wrapEl || !wrapEl.classList.contains('asset-item-wrap')) return;
-        var startX = 0;
+        var startX = 0, touchStartTime = 0;
         var row = wrapEl.querySelector('.asset-item');
         if (!row) return;
         var hoverTimer = null;
@@ -1879,7 +1880,7 @@
         wrapEl.addEventListener('focusout', function(e) {
             if (!wrapEl.contains(e.relatedTarget)) wrapEl.classList.remove('editing');
         });
-        wrapEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+        wrapEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; touchStartTime = Date.now(); }, { passive: true });
         wrapEl.addEventListener('touchmove', function(e) {
             var x = e.touches[0].clientX;
             var delta = startX - x;
@@ -1889,8 +1890,9 @@
         wrapEl.addEventListener('touchend', function(e) {
             var endX = e.changedTouches[0].clientX;
             var delta = startX - endX;
+            var duration = Date.now() - touchStartTime;
             row.style.transform = '';
-            if (delta > 50) wrapEl.classList.add('swiped');
+            if (delta > 50 && duration > 180) wrapEl.classList.add('swiped');
             else if (delta < -30) wrapEl.classList.remove('swiped');
         }, { passive: true });
     }
