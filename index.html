@@ -279,7 +279,7 @@
         .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1500; display: none; }
         .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid var(--border-dark); box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: visible; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
         .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
-        .sheet-close-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; border-radius: 50%; background: #f0f0f0; color: #333; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+        .sheet-close-btn { position: absolute; top: 0; right: 0; width: 36px; height: 36px; margin: 0; border: none; border-radius: 0 16px 0 12px; background: #f0f0f0; color: #333; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
         .sheet-close-btn:hover { background: #e0e0e0; }
         .sheet-close-btn:active { transform: scale(0.95); }
         .sheet-grabber { flex-shrink: 0; width: 40px; height: 4px; background: #ccc; border-radius: 4px; margin: 10px auto 0; }
@@ -1872,13 +1872,16 @@
         var row = wrapEl.querySelector('.asset-item');
         if (!row) return;
         var hoverTimer = null;
-        wrapEl.addEventListener('mouseenter', function() {
-            hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
-        });
-        wrapEl.addEventListener('mouseleave', function() {
-            if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
-            wrapEl.classList.remove('reveal');
-        });
+        var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        if (!isTouchDevice) {
+            wrapEl.addEventListener('mouseenter', function() {
+                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
+            });
+            wrapEl.addEventListener('mouseleave', function() {
+                if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+                wrapEl.classList.remove('reveal');
+            });
+        }
         wrapEl.addEventListener('focusin', function(e) {
             if (e.target.matches('input, [contenteditable="true"]')) { wrapEl.classList.add('editing'); wrapEl.classList.remove('swiped'); wrapEl.classList.remove('reveal'); row.style.transform = ''; if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; } }
         });
