@@ -1633,7 +1633,7 @@
     }
 
     // === 底部滑出細節頁 ===
-    let sheetCardEl = null, sheetOriginalParent = null, sheetPlaceholder = null;
+    let sheetCardEl = null, sheetOriginalParent = null, sheetPlaceholder = null, sheetOpenedAt = 0;
     function openSheetWithCard(cardId) {
         var card = document.getElementById(cardId);
         if (!card) return;
@@ -1648,6 +1648,7 @@
         document.getElementById('sheetContent').appendChild(card);
         document.getElementById('sheetBackdrop').style.display = 'block';
         document.getElementById('detailSheet').classList.add('open');
+        sheetOpenedAt = Date.now();
         var footer = document.getElementById('sheetFooter');
         var deleteBtn = document.getElementById('sheetDeleteCardBtn');
         if (footer) footer.style.display = 'block';
@@ -1717,7 +1718,7 @@
                 if (next) container.insertBefore(sheetCardEl, next);
                 else container.appendChild(sheetCardEl);
             }
-            sheetCardEl = null; sheetOriginalParent = null; sheetPlaceholder = null;
+            sheetCardEl = null; sheetOriginalParent = null; sheetPlaceholder = null; sheetOpenedAt = 0;
         }
         var footer = document.getElementById('sheetFooter');
         if (footer) footer.style.display = 'none';
@@ -1891,8 +1892,9 @@
             var endX = e.changedTouches[0].clientX;
             var delta = startX - endX;
             var duration = Date.now() - touchStartTime;
+            var justOpened = sheetOpenedAt && (Date.now() - sheetOpenedAt < 550);
             row.style.transform = '';
-            if (delta > 50 && duration > 180) wrapEl.classList.add('swiped');
+            if (delta > 50 && duration > 180 && !justOpened) wrapEl.classList.add('swiped');
             else if (delta < -30) wrapEl.classList.remove('swiped');
         }, { passive: true });
     }
