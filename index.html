@@ -279,6 +279,9 @@
         .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1500; display: none; }
         .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid var(--border-dark); box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: visible; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
         .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+        .sheet-close-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; border-radius: 50%; background: #f0f0f0; color: #333; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+        .sheet-close-btn:hover { background: #e0e0e0; }
+        .sheet-close-btn:active { transform: scale(0.95); }
         .sheet-grabber { flex-shrink: 0; width: 40px; height: 4px; background: #ccc; border-radius: 4px; margin: 10px auto 0; }
         .sheet-scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
         .sheet-footer { flex-shrink: 0; }
@@ -674,6 +677,7 @@
 <!-- 底部滑出細節頁 -->
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeSheet()"></div>
     <div id="detailSheet" class="sheet">
+    <button type="button" class="sheet-close-btn" onclick="closeSheet()" aria-label="關閉">×</button>
     <div class="sheet-grabber"></div>
     <div class="sheet-scroll-wrap">
         <div id="sheetContent"></div>
@@ -1864,7 +1868,7 @@
     }
     function attachAssetItemSwipe(wrapEl) {
         if (!wrapEl || !wrapEl.classList.contains('asset-item-wrap')) return;
-        var startX = 0;
+        var startX = 0, didSwipePast80 = false;
         var row = wrapEl.querySelector('.asset-item');
         if (!row) return;
         var hoverTimer = null;
@@ -1881,19 +1885,21 @@
         wrapEl.addEventListener('focusout', function(e) {
             if (!wrapEl.contains(e.relatedTarget)) wrapEl.classList.remove('editing');
         });
-        wrapEl.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+        wrapEl.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            didSwipePast80 = false;
+        }, { passive: true });
         wrapEl.addEventListener('touchmove', function(e) {
             var x = e.touches[0].clientX;
             var delta = startX - x;
+            if (delta > 80) didSwipePast80 = true;
             if (delta > 40) row.style.transform = 'translateX(-' + Math.min(delta, 56) + 'px)';
             else row.style.transform = '';
         }, { passive: true });
         wrapEl.addEventListener('touchend', function(e) {
-            var endX = e.changedTouches[0].clientX;
-            var delta = startX - endX;
             var justOpened = sheetOpenedAt && (Date.now() - sheetOpenedAt < 420);
             row.style.transform = '';
-            if (delta > 80 && !justOpened) wrapEl.classList.add('swiped');
+            if (didSwipePast80 && !justOpened) wrapEl.classList.add('swiped');
         }, { passive: true });
     }
     function closeAllAssetItemReveal() {
