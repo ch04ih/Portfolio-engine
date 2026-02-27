@@ -50,9 +50,9 @@
 
         .category-card { background: #fff; border: 2px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 8px 22px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
         .category-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
-        .category-card:not(.collapsed) .category-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
+        .category-card:not(.collapsed) .category-header { flex-direction: row; text-align: left; justify-content: flex-start; align-items: center; gap: 8px; }
         .category-card:not(.collapsed) .category-header > div:nth-child(1) { flex: 0 0 auto; }
-        .category-card:not(.collapsed) .category-header > div:nth-child(2) { flex: 1 1 auto; text-align: center; font-weight: 900; }
+        .category-card:not(.collapsed) .category-header > div:nth-child(2) { flex: 1 1 auto; text-align: left; font-weight: 900; }
         .category-header .cat-name-text, .category-header .liquid-name-text { font-size: 0.9rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 7em; max-width: 7em; display: inline-block; }
         .simple-asset-header .fixed-name-text, .simple-asset-header .recv-name-text, .liab-header .liab-name-text { font-size: 0.9rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 7em; max-width: 7em; display: inline-block; }
         .category-card:not(.collapsed) .category-header > div:nth-child(3) { flex: 0 0 auto; text-align: right; }
@@ -63,7 +63,8 @@
         /* 卡片樣式（負債與簡易資產共享） */
         .liab-card, .simple-asset-card { background: #fff; border: 2px solid var(--theme-accent); padding: 15px; margin: 0; box-shadow: 0 6px 18px rgba(0,0,0,0.10); border-radius: var(--radius); position: relative; max-width: 100%; overflow: visible; }
         .liab-header, .simple-asset-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 6px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
-        .liab-card:not(.collapsed) .liab-header, .simple-asset-card:not(.collapsed) .simple-asset-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
+        .liab-card:not(.collapsed) .liab-header, .simple-asset-card:not(.collapsed) .simple-asset-header { flex-direction: row; text-align: left; justify-content: flex-start; align-items: center; gap: 8px; }
+        .liab-card:not(.collapsed) .liab-header > div:nth-child(2), .simple-asset-card:not(.collapsed) .simple-asset-header > div:nth-child(2) { flex: 1 1 auto; text-align: left; }
 
         .btn-delete-card { display: none !important; }
 
@@ -73,9 +74,8 @@
         .category-card.collapsed .target-edit, .liquid-simple-card.collapsed .target-edit { display: none; }
         .target-amount-label { font-size: 9px; font-weight: 900; opacity: 0.8; text-align: right; margin-top: 2px; letter-spacing: 0.5px; }
 
-        .asset-header-row { display: grid; grid-template-columns: 12px 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
+        .asset-header-row { display: grid; grid-template-columns: 1.1fr 0.65fr 0.65fr 1.2fr 0.55fr 0.75fr; gap: 6px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
         .asset-header-row span { font-size: 9px; font-weight: 900; color: #888; text-align: center; }
-        .asset-header-row span:first-child { text-align: center; }
 
         /* 簡化列表欄位配置（名稱 + 金額，靠左對齊） */
         .liab-header-row, .simple-asset-header-row { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 8px; padding: 0 0 8px 0; margin-bottom: 5px; border-bottom: 1px solid #DDD; }
@@ -105,16 +105,23 @@
         .asset-item-wrap { position: relative; overflow: hidden; border-bottom: 1px solid #F2F2F2; }
         .asset-item-delete-reveal { position: absolute; right: 0; top: 0; bottom: 0; width: 56px; background: #e57373; display: flex; align-items: center; justify-content: center; z-index: 0; }
         .asset-item-delete-reveal .asset-item-delete-btn { background: transparent; border: none; color: #fff; font-size: 0.8rem; font-weight: 800; cursor: pointer; padding: 8px; }
-        .asset-item { display: grid; grid-template-columns: 1.4fr 0.5fr 0.5fr 1.2fr 0.65fr 0.65fr; gap: 6px; padding: 8px 0; align-items: center; cursor: grab; position: relative; z-index: 1; background: #fff; transition: transform 0.2s ease-out; }
+        .asset-item { display: grid; grid-template-columns: 1.1fr 0.65fr 0.65fr 1.2fr 0.55fr 0.75fr; gap: 6px; padding: 8px 0; align-items: center; cursor: grab; position: relative; z-index: 1; background: #fff; transition: transform 0.2s ease-out; }
         .asset-item-wrap.reveal .asset-item, .asset-item-wrap.swiped:not(.editing) .asset-item { transform: translateX(-56px); }
         
         .static-view { background: transparent; border: none; color: #333; font-size: 12px; min-height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; border-radius: 4px; }
         .static-view.empty-placeholder { color: #BBB !important; font-style: italic; }
-        .asset-item div:nth-child(1) { min-width: 0; }
+        .asset-item > div { min-width: 0; }
         .asset-item div:nth-child(1) .static-view { font-weight: 900; color: #1A1A1A; background-color: #F0F4F8 !important; padding: 0 4px; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } 
-        .asset-item div:nth-child(2) .static-view, .asset-item div:nth-child(3) .static-view { font-size: 11px; color: #999; } 
-        .asset-item div:nth-child(4) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; } 
+        .asset-item div:nth-child(2) .static-view, .asset-item div:nth-child(3) .static-view { font-size: 11px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: clip; } 
+        .asset-item div:nth-child(2) .static-view.num-len-m, .asset-item div:nth-child(3) .static-view.num-len-m { font-size: 9px !important; letter-spacing: -0.1px; }
+        .asset-item div:nth-child(2) .static-view.num-len-l, .asset-item div:nth-child(3) .static-view.num-len-l { font-size: 8px !important; letter-spacing: -0.15px; }
+        .asset-item div:nth-child(2) .static-view.num-len-xl, .asset-item div:nth-child(3) .static-view.num-len-xl { font-size: 7px !important; letter-spacing: -0.2px; }
+        .asset-item div:nth-child(4) .static-view { font-weight: 900; color: #1A1A1A; justify-content: flex-end; background-color: #FFF9E6 !important; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: clip; } 
+        .asset-item .asset-value-display.val-len-m { font-size: 11px; }
+        .asset-item .asset-value-display.val-len-l { font-size: 10px; }
+        .asset-item .asset-value-display.val-len-xl { font-size: 9px; }
         .asset-item div:nth-child(5) .static-view, .asset-item div:nth-child(6) .static-view { font-size: 11px; color: var(--theme-bg); justify-content: flex-end; opacity: 0.8; } 
+        .asset-item .asset-target-display { transform: translateX(2px); }
 
         .edit-container { position: relative; display: none; width: 100%; }
         .edit-input { width: 100%; height: 28px; border: 2px solid var(--border-dark); border-radius: 6px; text-align: center; font-weight: bold; background: white; font-size: 12px; outline: none; }
@@ -150,7 +157,7 @@
         .card-emoji { margin: 0 6px; }
         .card-icon { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
         .card-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
-        .sheet #sheetContent { padding: 24px 12px 16px; }
+        .sheet #sheetContent { padding: 30px 14px 18px; }
         /* 詳情頁開啟時，原位置保留的佔位格（可見，避免背後小卡「消失」） */
         .sheet-placeholder[data-sheet-placeholder] {
             grid-column: span 1;
@@ -167,9 +174,22 @@
         .icon-grid .icon-dot, .color-grid .color-dot { min-width: 36px; min-height: 36px; }
         .icon-dot { background: #fff; }
         .color-dot { width: 28px; height: 28px; border: 1px solid var(--border-dark); border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 0 var(--border-dark); }
-        .sheet .in-sheet { border-width: 3px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-        .sheet .in-sheet .category-header, .sheet .in-sheet .liab-header, .sheet .in-sheet .simple-asset-header { padding: 10px 12px; margin-bottom: 8px; }
-        .sheet .in-sheet .asset-list, .sheet .in-sheet .liab-list, .sheet .in-sheet .simple-asset-list { max-height: 48vh; overflow: auto; border: 1px solid #EEE; border-radius: 8px; padding: 4px 8px; }
+        .sheet .in-sheet { border-width: 3px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-radius: 14px; }
+        .sheet .in-sheet .category-header, .sheet .in-sheet .liab-header, .sheet .in-sheet .simple-asset-header { padding: 12px 14px; margin-bottom: 10px; border-radius: 10px; }
+        .sheet .in-sheet .target-edit { font-size: 10px; font-weight: 900; }
+        .sheet .in-sheet .target-input {
+            width: 42px;
+            min-width: 42px;
+            max-width: 42px;
+            height: 22px;
+            padding: 0 4px;
+            background: rgba(var(--theme-accent-rgb), 0.24);
+            border: none;
+            box-shadow: none;
+            border-radius: 6px;
+        }
+        .sheet .in-sheet .asset-list, .sheet .in-sheet .liab-list, .sheet .in-sheet .simple-asset-list { max-height: min(52dvh, 58vh); overflow: auto; border: 1px solid #EEE; border-radius: 10px; padding: 6px 10px; background: #fff; }
+        .sheet .in-sheet .btn { border-width: 2px; }
         .sheet .in-sheet .card-icon { cursor: pointer; }
         .sheet .in-sheet .card-icon:hover { filter: brightness(1.08); }
         .picker-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); z-index: 50; }
@@ -215,8 +235,8 @@
         .category-card.collapsed .cat-name-text, .liquid-simple-card.collapsed .liquid-name-text { font-weight: 700; color: #555; font-size: 0.82rem; }
         .category-card.collapsed .cat-sum-display, .liquid-simple-card.collapsed .liquid-sum-display { font-weight: 900; color: #1A1A1A; }
         .category-card.collapsed .current-p, .liquid-simple-card.collapsed .current-p { font-size: 0.65rem; font-weight: 600; color: #999; opacity: 1; }
-        .category-card.collapsed .current-p.p-high { color: #5A7EA8; }
-        .category-card.collapsed .current-p.p-low { color: #B86B6B; }
+        .category-card.collapsed .current-p.p-high, .liquid-simple-card.collapsed .current-p.p-high { color: #5A7EA8; }
+        .category-card.collapsed .current-p.p-low, .liquid-simple-card.collapsed .current-p.p-low { color: #B86B6B; }
         .liab-card.collapsed .liab-name-text, .simple-asset-card.collapsed .fixed-name-text, .simple-asset-card.collapsed .recv-name-text { font-weight: 700; color: #555; font-size: 0.82rem; }
         .category-card:not(.collapsed) .footer-row, .liab-card:not(.collapsed) .footer-row, .simple-asset-card:not(.collapsed) .footer-row, .liquid-simple-card:not(.collapsed) .footer-row { flex-direction: row; align-items: center; justify-content: space-between; }
         .category-card:not(.collapsed) .cat-sum-display, .liab-card:not(.collapsed) .liab-sum-display, .simple-asset-card:not(.collapsed) .fixed-sum-display, .liquid-simple-card:not(.collapsed) .liquid-sum-display { flex: 1; text-align: center; }
@@ -309,20 +329,22 @@
         .chevron { display: inline-block; transition: 0.3s; font-size: 0.8rem; transform: rotate(0deg);}
         .collapsed .chevron { transform: rotate(-90deg); }
         
-        /* 底部滑出細節頁樣式 */
-        .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1500; display: none; }
-        .sheet { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98); width: 95vw; max-width: 520px; max-height: 85vh; background: #fff; border: 3px solid var(--border-dark); box-shadow: 0 16px 48px rgba(0,0,0,0.18); border-radius: 16px; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: visible; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
-        .sheet.open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
-        .sheet-close-btn { position: absolute; top: 0; right: 0; width: 36px; height: 36px; margin: 0; border: none; border-radius: 0 16px 0 12px; background: #f0f0f0; color: #333; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
-        .sheet-close-btn:hover { background: #e0e0e0; }
-        .sheet-close-btn:active { transform: scale(0.95); }
-        .sheet-grabber { flex-shrink: 0; width: 40px; height: 4px; background: #ccc; border-radius: 4px; margin: 10px auto 0; }
-        .sheet-scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+        /* 全頁詳情頁樣式 */
+        .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.28); backdrop-filter: blur(2px); z-index: 1500; display: none; }
+        .sheet { position: fixed; inset: 0; transform: translateY(12px); width: 100vw; height: 100dvh; background: linear-gradient(180deg, #fff 0%, #fafafa 100%); border: none; box-shadow: none; border-radius: 0; z-index: 2000; transition: transform 0.2s ease, opacity 0.2s ease; overflow: hidden; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
+        .sheet.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .sheet-close-btn { position: absolute; top: 23px; left: 14px; width: 34px; height: 34px; border: 1px solid #ddd; border-radius: 50%; background: rgba(0,0,0,0.02); color: #aaa; font-size: 1rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; z-index: 12; }
+        .sheet-close-btn:hover { background: rgba(0,0,0,0.05); color: #888; }
+        .sheet-grabber { flex-shrink: 0; width: 48px; height: 5px; background: #d3d3d3; border-radius: 5px; margin: calc(max(14px, env(safe-area-inset-top)) + 2px) auto 6px; }
+        .sheet-scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 8px 12px; }
         .sheet-footer { flex-shrink: 0; }
         .sheet-close { display: none !important; }
-        .sheet-footer { padding: 8px 16px; border-top: 1px solid #eee; background: #fafafa; }
-        .btn-delete-card-bottom { width: 100%; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; color: #888; background: transparent; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+        .sheet-footer { padding: 10px 16px calc(max(12px, env(safe-area-inset-bottom))); border-top: 1px solid #eee; background: rgba(255,255,255,0.96); display: flex; flex-direction: column; gap: 15px; }
+        .btn-delete-card-bottom { width: 100%; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; color: #888; background: transparent; border: 1.5px solid #ddd; border-radius: 8px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
         .btn-delete-card-bottom:hover { color: #c62828; border-color: #c62828; }
+        .btn-save-card-bottom { width: 100%; padding: 8px 12px; font-size: 0.8rem; font-weight: 800; color: var(--theme-bg); background: rgba(var(--theme-accent-rgb), 0.9); border: 1.5px solid rgba(var(--theme-accent-rgb), 0.7); border-radius: 8px; cursor: pointer; box-shadow: none; transition: background-color 0.15s, opacity 0.15s; }
+        .btn-save-card-bottom:hover { background: rgba(var(--theme-accent-rgb), 0.84); }
+        .btn-save-card-bottom:active { background: rgba(var(--theme-accent-rgb), 0.78); }
         .icon-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-dark); background: var(--theme-accent); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; }
         .icon-dot svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
         .color-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-dark); background: var(--dot); box-shadow: none; cursor: pointer; }
@@ -500,6 +522,25 @@
         #confirmModal .modal-btn.cancel { background: #eee; color: #555; }
         #confirmModal .modal-btn.confirm { background: var(--theme-accent); color: var(--theme-bg); }
         #confirmModal .modal-btn.danger { background: #e57373; color: white; }
+        #assetEditOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.28); backdrop-filter: blur(2px); z-index: 12000; display: none; }
+        #assetEditOverlay.show { display: block; }
+        #assetEditModal { width: 100vw; height: 100dvh; background: linear-gradient(180deg, #fff 0%, #fafafa 100%); padding: calc(max(14px, env(safe-area-inset-top)) + 8px) 14px calc(max(14px, env(safe-area-inset-bottom)) + 10px); display: flex; flex-direction: column; box-sizing: border-box; }
+        #assetEditModal .asset-edit-topbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 22px; }
+        #assetEditModal .asset-edit-back-btn { width: 34px; height: 34px; border: 1px solid #ddd; border-radius: 50%; background: rgba(0,0,0,0.02); color: #aaa; font-size: 1rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        #assetEditModal .asset-edit-back-btn:hover { background: rgba(0,0,0,0.05); color: #888; }
+        #assetEditModal .asset-edit-title { flex: 1; font-size: 1.05rem; font-weight: 900; color: #333; text-align: center; margin: 0; }
+        #assetEditModal .asset-edit-topbar-spacer { width: 36px; height: 36px; }
+        #assetEditModal .asset-edit-form { flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px; box-sizing: border-box; }
+        #assetEditModal .asset-edit-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        #assetEditModal .asset-edit-row label { width: 92px; flex: 0 0 92px; font-size: 0.82rem; font-weight: 800; color: #666; text-align: left; padding-left: 8px; }
+        #assetEditModal .asset-edit-row input { height: 38px; border: none; border-radius: 10px; padding: 0 9px; font-size: 0.88rem; font-weight: 600; font-family: inherit; background: rgba(var(--theme-accent-rgb), 0.16); margin-left: auto; text-align: right !important; }
+        #assetEditModal .asset-edit-row input[type="number"] { width: 10ch; min-width: 84px; max-width: min(64vw, 300px); }
+        #assetEditModal .asset-edit-row input[type="number"]::-webkit-outer-spin-button,
+        #assetEditModal .asset-edit-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #assetEditModal .asset-edit-row input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+        #assetEditModal #assetEditName { width: 10ch; min-width: 84px; max-width: min(66vw, 320px); text-align: right !important; margin-left: auto; }
+        #assetEditModal .asset-edit-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; padding: 0 12px; box-sizing: border-box; }
+        #assetEditModal .asset-edit-actions button { width: 100%; border: 1.5px solid rgba(var(--theme-accent-rgb), 0.7); border-radius: 10px; padding: 10px; font-weight: 800; cursor: pointer; background: rgba(var(--theme-accent-rgb), 0.9); color: var(--theme-bg); }
 
         /* 總覽頁優化設計 */
         .dashboard-hero { background: #fff; color: var(--theme-accent); padding: 22px; border-radius: var(--radius); margin-bottom: 18px; border: 3px solid var(--border-dark); box-shadow: 0 6px 18px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; position: relative; }
@@ -577,7 +618,8 @@
         .liquid-simple-card .liquid-item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 0; align-items: center; cursor: grab; }
         .liquid-simple-card .liquid-sum-display { font-size: 1.15rem; font-weight: 900; min-width: 0; }
         .liquid-simple-card .category-header { background: #fff; color: #1A1A1A; padding: 12px 15px; margin: 0 0 10px 0; display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; border-radius: 8px; cursor: pointer; text-align: center; }
-        .liquid-simple-card:not(.collapsed) .category-header { flex-direction: row; text-align: left; justify-content: space-between; align-items: center; }
+        .liquid-simple-card:not(.collapsed) .category-header { flex-direction: row; text-align: left; justify-content: flex-start; align-items: center; gap: 8px; }
+        .liquid-simple-card:not(.collapsed) .category-header > div:nth-child(2) { flex: 1 1 auto; text-align: left; }
         .liquid-simple-card:not(.collapsed) .category-header > div:nth-child(3) { flex: 0 0 auto; text-align: right; }
         /* 流動資產卡：表頭列與列表僅在詳情頁顯示，主畫面只顯示標題＋合計 */
         .liquid-simple-card:not(.in-sheet) .liquid-header-row,
@@ -741,6 +783,7 @@
         <div id="sheetContent"></div>
     </div>
     <div id="sheetFooter" class="sheet-footer" style="display:none;">
+        <button type="button" class="btn-save-card-bottom" id="sheetSaveBtn" onclick="closeSheet()">儲存</button>
         <button type="button" class="btn-delete-card-bottom" id="sheetDeleteCardBtn">刪除此卡片</button>
     </div>
     <div id="pickerBackdrop" class="picker-backdrop" style="display:none;" onclick="closePickerPanel()"></div>
@@ -772,6 +815,40 @@
         <div class="modal-btns">
             <button class="modal-btn cancel" id="modalCancel">取消</button>
             <button class="modal-btn confirm" id="modalConfirm">確定</button>
+        </div>
+    </div>
+</div>
+<div id="assetEditOverlay" onclick="if(event.target===this) closeAssetItemEditor()">
+    <div id="assetEditModal">
+        <div class="asset-edit-topbar">
+            <button type="button" class="asset-edit-back-btn" onclick="closeAssetItemEditor()" aria-label="關閉">×</button>
+            <div class="asset-edit-title">編輯標的</div>
+            <span class="asset-edit-topbar-spacer" aria-hidden="true"></span>
+        </div>
+        <div class="asset-edit-form">
+            <div class="asset-edit-row" id="assetEditRowName">
+                <label for="assetEditName">名稱</label>
+                <input id="assetEditName" type="text" list="stockList">
+            </div>
+            <div class="asset-edit-row" id="assetEditRowQty">
+                <label for="assetEditQty" id="assetEditQtyLabel">股數</label>
+                <input id="assetEditQty" type="text" inputmode="decimal">
+            </div>
+            <div class="asset-edit-row" id="assetEditRowPrice">
+                <label for="assetEditPrice" id="assetEditPriceLabel">單價</label>
+                <input id="assetEditPrice" type="text" inputmode="decimal">
+            </div>
+            <div class="asset-edit-row" id="assetEditRowValue">
+                <label for="assetEditValue" id="assetEditValueLabel">現值</label>
+                <input id="assetEditValue" type="text" inputmode="decimal">
+            </div>
+            <div class="asset-edit-row" id="assetEditRowTarget">
+                <label for="assetEditTarget">目標%</label>
+                <input id="assetEditTarget" type="text" inputmode="decimal">
+            </div>
+        </div>
+        <div class="asset-edit-actions">
+            <button type="button" onclick="saveAssetItemEditor()">保存</button>
         </div>
     </div>
 </div>
@@ -807,6 +884,295 @@
             overlay.onclick = (e) => { if (e.target === overlay) close(false); };
         });
     }
+    let editingAssetItem = null;
+    let editingItemContext = null;
+    function setAssetEditorMode(mode, titleText) {
+        const titleEl = document.querySelector('#assetEditModal .asset-edit-title');
+        if (titleEl) titleEl.textContent = titleText || '編輯項目';
+        const showAssetRows = mode === 'asset';
+        const qtyRow = document.getElementById('assetEditRowQty');
+        const priceRow = document.getElementById('assetEditRowPrice');
+        const targetRow = document.getElementById('assetEditRowTarget');
+        const valueLabel = document.getElementById('assetEditValueLabel');
+        if (qtyRow) qtyRow.style.display = showAssetRows ? 'flex' : 'none';
+        if (priceRow) priceRow.style.display = showAssetRows ? 'flex' : 'none';
+        if (targetRow) targetRow.style.display = showAssetRows ? 'flex' : 'none';
+        if (valueLabel) valueLabel.textContent = showAssetRows ? '現值' : '金額';
+    }
+    function refreshAssetItemDisplay(item) {
+        if (!item) return;
+        const name = (item.querySelector('.asset-name') || {}).value || '';
+        const qty = parseFloat((item.querySelector('.asset-qty') || {}).value);
+        const price = parseFloat((item.querySelector('.asset-price') || {}).value);
+        const value = parseFloat((item.querySelector('.asset-value') || {}).value);
+        const target = parseFloat((item.querySelector('.target-p-input') || {}).value);
+        const nameEl = item.querySelector('.asset-name-display');
+        const qtyEl = item.querySelector('.asset-qty-display');
+        const priceEl = item.querySelector('.asset-price-display');
+        const valueEl = item.querySelector('.asset-value-display');
+        const targetEl = item.querySelector('.asset-target-display');
+        if (nameEl) {
+            nameEl.innerText = name || '點擊輸入';
+            nameEl.classList.toggle('empty-placeholder', !name);
+        }
+        if (qtyEl) {
+            qtyEl.innerText = !isNaN(qty) && qty !== 0 ? formatNum(qty) : '-';
+            qtyEl.classList.toggle('empty-placeholder', isNaN(qty) || qty === 0);
+            applyAssetSmallNumberSize(qtyEl);
+        }
+        if (priceEl) {
+            priceEl.innerText = !isNaN(price) && price !== 0 ? formatNum(price) : '-';
+            priceEl.classList.toggle('empty-placeholder', isNaN(price) || price === 0);
+            applyAssetSmallNumberSize(priceEl);
+        }
+        if (valueEl) {
+            valueEl.innerText = !isNaN(value) ? formatCurrency(value) : '$0';
+            applyAssetValueDisplaySize(valueEl);
+        }
+        if (targetEl) targetEl.innerText = !isNaN(target) ? (target + '%') : '0%';
+    }
+    function autoResizeAssetEditorInput(inputEl) {
+        if (!inputEl) return;
+        const val = String(inputEl.value || '').trim();
+        const baseLen = val.length > 0 ? val.length : 4;
+        const id = inputEl.id || '';
+        const maxCh = id === 'assetEditName' ? 22 : 18;
+        const minCh = 9;
+        const ch = Math.min(maxCh, Math.max(minCh, baseLen + 2));
+        inputEl.style.width = 'calc(' + ch + 'ch + 8px)';
+    }
+    function refreshAssetEditorInputWidths() {
+        ['assetEditName','assetEditQty','assetEditPrice','assetEditValue','assetEditTarget'].forEach(function(id){
+            autoResizeAssetEditorInput(document.getElementById(id));
+        });
+    }
+    function sanitizeEditorNumberString(raw) {
+        return String(raw || '').replace(/[$,%\s]/g, '').replace(/,/g, '').trim();
+    }
+    function parseEditorNumber(raw) {
+        const n = parseFloat(sanitizeEditorNumberString(raw));
+        return isNaN(n) ? NaN : n;
+    }
+    function formatEditorNumeric(raw) {
+        const n = parseEditorNumber(raw);
+        if (isNaN(n)) return '';
+        const neg = n < 0 ? '-' : '';
+        const absStr = String(Math.abs(n));
+        const parts = absStr.split('.');
+        const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const decPart = parts.length > 1 ? '.' + parts[1] : '';
+        return neg + intPart + decPart;
+    }
+    function formatEditorQtyField() {
+        const el = document.getElementById('assetEditQty');
+        if (!el) return;
+        const n = parseEditorNumber(el.value);
+        el.value = isNaN(n) ? '' : parseFloat(n).toLocaleString('en-US');
+        autoResizeAssetEditorInput(el);
+    }
+    function formatEditorPriceField() {
+        const el = document.getElementById('assetEditPrice');
+        if (!el) return;
+        const n = parseEditorNumber(el.value);
+        el.value = isNaN(n) ? '' : parseFloat(n).toLocaleString('en-US');
+        autoResizeAssetEditorInput(el);
+    }
+    function formatEditorValueField() {
+        const el = document.getElementById('assetEditValue');
+        if (!el) return;
+        const n = parseEditorNumber(el.value);
+        el.value = isNaN(n) ? '' : formatCurrency(n);
+        autoResizeAssetEditorInput(el);
+    }
+    function formatEditorTargetField() {
+        const el = document.getElementById('assetEditTarget');
+        if (!el) return;
+        const n = parseEditorNumber(el.value);
+        el.value = isNaN(n) ? '' : (parseFloat(n).toLocaleString('en-US') + '%');
+        autoResizeAssetEditorInput(el);
+    }
+    function recalcAssetEditorValueFromInputs(triggerByQty) {
+        if (!editingItemContext || editingItemContext.mode !== 'asset') return;
+        const name = (document.getElementById('assetEditName') || {}).value || '';
+        const qtyEl = document.getElementById('assetEditQty');
+        const priceEl = document.getElementById('assetEditPrice');
+        const valueEl = document.getElementById('assetEditValue');
+        if (!qtyEl || !priceEl || !valueEl) return;
+        const qty = parseEditorNumber(qtyEl.value);
+        let price = parseEditorNumber(priceEl.value);
+        const stock = stockData.find(st => st.s == String(name).trim());
+        if (stock && stock.p && (triggerByQty || isNaN(price) || price === 0)) {
+            price = parseFloat(stock.p);
+            if (!isNaN(price)) {
+                priceEl.value = price;
+                autoResizeAssetEditorInput(priceEl);
+            }
+        }
+        if (!isNaN(qty) && qty > 0 && !isNaN(price) && price > 0) {
+            var value = /^[A-Za-z]+$/.test(String(name).trim()) ? Math.round(qty * price * usdRate) : Math.round(qty * price);
+            valueEl.value = value;
+            formatEditorValueField();
+        }
+    }
+    function openAssetItemEditor(rowEl) {
+        const item = rowEl && rowEl.closest ? rowEl.closest('.asset-item') : null;
+        const wrap = item ? item.closest('.asset-item-wrap') : null;
+        if (!item || !wrap || wrap.classList.contains('reveal') || wrap.classList.contains('swiped')) return;
+        editingAssetItem = item;
+        editingItemContext = { mode: 'asset', item: item, wrap: wrap };
+        setAssetEditorMode('asset', '編輯標的');
+        document.getElementById('assetEditName').value = (item.querySelector('.asset-name') || {}).value || '';
+        document.getElementById('assetEditQty').value = (item.querySelector('.asset-qty') || {}).value || '';
+        document.getElementById('assetEditPrice').value = (item.querySelector('.asset-price') || {}).value || '';
+        document.getElementById('assetEditValue').value = (item.querySelector('.asset-value') || {}).value || '';
+        document.getElementById('assetEditTarget').value = (item.querySelector('.target-p-input') || {}).value || '';
+        formatEditorQtyField();
+        formatEditorValueField();
+        formatEditorTargetField();
+        refreshAssetEditorInputWidths();
+        document.getElementById('assetEditOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('assetEditName').focus(), 0);
+    }
+    function openAmountItemEditor(rowEl, kind) {
+        const row = rowEl && rowEl.closest ? rowEl.closest('.liquid-item, .simple-asset-item, .liab-item') : null;
+        const wrap = row ? row.closest('.liquid-item-wrap, .simple-asset-item-wrap, .liab-item-wrap') : null;
+        if (!row || !wrap || wrap.classList.contains('reveal') || wrap.classList.contains('swiped')) return;
+        const nameInput = row.querySelector('.liquid-name, .fixed-name, .recv-name, .liab-name');
+        const amountInput = row.querySelector('.liquid-amount, .fixed-amount, .recv-amount, .liab-amount');
+        if (!nameInput || !amountInput) return;
+        editingAssetItem = null;
+        editingItemContext = { mode: 'amount', kind: kind || 'amount', row: row, wrap: wrap, nameInput: nameInput, amountInput: amountInput };
+        const titleMap = { liquid: '編輯流動資產', fixed: '編輯其他資產', recv: '編輯其他資產', liab: '編輯負債' };
+        setAssetEditorMode('amount', titleMap[kind] || '編輯項目');
+        document.getElementById('assetEditName').value = nameInput.value || '';
+        document.getElementById('assetEditQty').value = '';
+        document.getElementById('assetEditPrice').value = '';
+        document.getElementById('assetEditValue').value = amountInput.value || '';
+        document.getElementById('assetEditTarget').value = '';
+        formatEditorValueField();
+        refreshAssetEditorInputWidths();
+        document.getElementById('assetEditOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('assetEditName').focus(), 0);
+    }
+    function closeAssetItemEditor() {
+        editingAssetItem = null;
+        editingItemContext = null;
+        document.getElementById('assetEditOverlay').classList.remove('show');
+    }
+    function deleteAssetItemFromEditor() {
+        const ctx = editingItemContext;
+        if (!ctx) return;
+        const wrap = ctx.wrap || (editingAssetItem ? editingAssetItem.closest('.asset-item-wrap') : null);
+        if (wrap) wrap.remove();
+        closeAssetItemEditor();
+        if (ctx.mode === 'asset') calculateAll();
+        else if (ctx.kind === 'liquid') { calculateAll(); forceSaveLiquidSimple(); }
+        else if (ctx.kind === 'liab') { calculateAllLiabilities(); forceSaveLiab(); }
+        else calculateAllFixedAssets();
+    }
+    function saveAssetItemEditor() {
+        const ctx = editingItemContext;
+        if (!ctx) return;
+        if (ctx.mode === 'amount') {
+            const name = document.getElementById('assetEditName').value.trim();
+            const amount = parseFloat(document.getElementById('assetEditValue').value);
+            ctx.nameInput.value = name || '';
+            ctx.amountInput.value = !isNaN(amount) ? amount : '';
+            const nameView = ctx.row.querySelector('div:nth-child(1) .static-view');
+            const amountView = ctx.row.querySelector('div:nth-child(2) .static-view');
+            if (nameView) {
+                nameView.innerText = name || '點擊輸入';
+                nameView.classList.toggle('empty-placeholder', !name);
+            }
+            if (amountView) {
+                amountView.innerText = !isNaN(amount) && amount !== 0 ? formatCurrency(amount) : '-';
+                amountView.classList.toggle('empty-placeholder', isNaN(amount) || amount === 0);
+            }
+            closeAssetItemEditor();
+            if (ctx.kind === 'liquid') { calculateAll(); forceSaveLiquidSimple(); }
+            else if (ctx.kind === 'liab') { calculateAllLiabilities(); forceSaveLiab(); }
+            else calculateAllFixedAssets();
+            return;
+        }
+        if (!editingAssetItem) return;
+        const nameRaw = document.getElementById('assetEditName').value.trim();
+        const qtyRaw = document.getElementById('assetEditQty').value;
+        const priceRaw = document.getElementById('assetEditPrice').value;
+        const valueRaw = document.getElementById('assetEditValue').value;
+        const targetRaw = document.getElementById('assetEditTarget').value;
+        const name = nameRaw.includes(' ') ? nameRaw.split(' ')[0] : nameRaw;
+        const qty = parseEditorNumber(qtyRaw);
+        let price = parseEditorNumber(priceRaw);
+        let value = parseEditorNumber(valueRaw);
+        const target = parseEditorNumber(targetRaw);
+        const stock = stockData.find(st => st.s == name);
+        const prevQty = parseFloat((editingAssetItem.querySelector('.asset-qty') || {}).value);
+        const qtyChanged = (!isNaN(qty) || !isNaN(prevQty)) && qty !== prevQty;
+        let usedLivePrice = false;
+        // 改股數時若有股票即時價，單價同步刷新
+        if (stock && stock.p && (qtyChanged || isNaN(price) || price === 0)) {
+            price = parseFloat(stock.p);
+            usedLivePrice = true;
+        }
+        if ((isNaN(value) || value === 0 || qtyChanged || usedLivePrice) && !isNaN(qty) && qty > 0 && !isNaN(price) && price > 0) {
+            value = /^[A-Za-z]+$/.test(name) ? Math.round(qty * price * usdRate) : Math.round(qty * price);
+        }
+        const nameInput = editingAssetItem.querySelector('.asset-name');
+        const qtyInput = editingAssetItem.querySelector('.asset-qty');
+        const priceInput = editingAssetItem.querySelector('.asset-price');
+        const valueInput = editingAssetItem.querySelector('.asset-value');
+        const targetInput = editingAssetItem.querySelector('.target-p-input');
+        if (nameInput) nameInput.value = name || '';
+        if (qtyInput) qtyInput.value = !isNaN(qty) ? qty : '';
+        if (priceInput) priceInput.value = !isNaN(price) ? price : '';
+        if (valueInput) valueInput.value = !isNaN(value) ? value : 0;
+        if (targetInput) targetInput.value = !isNaN(target) ? target : 0;
+        refreshAssetItemDisplay(editingAssetItem);
+        closeAssetItemEditor();
+        calculateAll();
+    }
+    ['assetEditName','assetEditQty','assetEditPrice','assetEditValue','assetEditTarget'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', function(){ autoResizeAssetEditorInput(el); });
+    });
+    ['assetEditQty','assetEditPrice','assetEditValue','assetEditTarget'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('focus', function() {
+            el.value = sanitizeEditorNumberString(el.value);
+            autoResizeAssetEditorInput(el);
+            if (id === 'assetEditTarget') setTimeout(function(){ el.select(); }, 0);
+        });
+    });
+    var qtyEl = document.getElementById('assetEditQty');
+    if (qtyEl) qtyEl.addEventListener('blur', function() {
+        formatEditorQtyField();
+        recalcAssetEditorValueFromInputs(true);
+    });
+    var priceEl = document.getElementById('assetEditPrice');
+    if (priceEl) priceEl.addEventListener('blur', function() {
+        formatEditorPriceField();
+        recalcAssetEditorValueFromInputs(false);
+    });
+    var valueEl = document.getElementById('assetEditValue');
+    if (valueEl) valueEl.addEventListener('blur', formatEditorValueField);
+    var targetEl = document.getElementById('assetEditTarget');
+    if (targetEl) targetEl.addEventListener('blur', formatEditorTargetField);
+    function isDesktopLikeInput() {
+        if (!window.matchMedia) return true;
+        return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter' || e.isComposing || !isDesktopLikeInput()) return;
+        var t = e.target;
+        if (!t) return;
+        if (t.tagName === 'TEXTAREA') return;
+        if (t.matches('input, [contenteditable="true"]')) {
+            e.preventDefault();
+            if (typeof t.blur === 'function') t.blur();
+        }
+    });
     function showPage(pageId) {
     document.querySelectorAll('.page-view').forEach(p => { p.style.display = 'none'; });
     var el = document.getElementById(pageId);
@@ -835,6 +1201,10 @@
     let hideAmounts = false;
     let categories = [], stockData = [], usdRate = 32.5;
     let liabCategories = [], fixedCategories = [], recvCategories = [], liquidSimpleCategories = [];
+    let mainCardOrder = [], otherCardOrder = [];
+    let isRenderingCards = false;
+    let pendingLiquidSave = false;
+    let pendingLiabSave = false;
     let assetTotal = 0, liabilityTotal = 0, fixedTotal = 0, receivableTotal = 0;
     let prevAssetTotal = null, prevFixedTotal = null, prevRecvTotal = null, prevLiabTotal = null;
     function toggleAddDropdown(e) {
@@ -888,6 +1258,22 @@
         if (len > 11) el.classList.add('sum-len-xl');
         else if (len > 8) el.classList.add('sum-len-l');
         else if (len > 6) el.classList.add('sum-len-m');
+    }
+    function applyAssetValueDisplaySize(el) {
+        if (!el) return;
+        var len = (el.textContent || '').length;
+        el.classList.remove('val-len-m', 'val-len-l', 'val-len-xl');
+        if (len > 12) el.classList.add('val-len-xl');
+        else if (len > 10) el.classList.add('val-len-l');
+        else if (len > 8) el.classList.add('val-len-m');
+    }
+    function applyAssetSmallNumberSize(el) {
+        if (!el) return;
+        var len = (el.textContent || '').length;
+        el.classList.remove('num-len-m', 'num-len-l', 'num-len-xl');
+        if (len > 9) el.classList.add('num-len-xl');
+        else if (len > 7) el.classList.add('num-len-l');
+        else if (len > 5) el.classList.add('num-len-m');
     }
 
     function sanitizeIconName(name) {
@@ -943,10 +1329,26 @@
         } catch (e) { document.getElementById('saveText').innerText = "數據載入失敗"; }
     }
 
+    function syncMainCardOrder() {
+        const validIds = categories.map(c => c.id).concat(liquidSimpleCategories.map(c => c.id));
+        mainCardOrder = (Array.isArray(mainCardOrder) ? mainCardOrder : []).filter(id => validIds.includes(id));
+        validIds.forEach(id => { if (!mainCardOrder.includes(id)) mainCardOrder.push(id); });
+        localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder));
+    }
+    function syncOtherCardOrder() {
+        const validIds = fixedCategories.map(c => c.id);
+        otherCardOrder = (Array.isArray(otherCardOrder) ? otherCardOrder : []).filter(id => validIds.includes(id));
+        validIds.forEach(id => { if (!otherCardOrder.includes(id)) otherCardOrder.push(id); });
+        localStorage.setItem('otherCardOrder_v1', JSON.stringify(otherCardOrder));
+    }
+
     function forceSave() {
+        if (isRenderingCards) return;
         try {
             const data = {}, newCats = [];
-            document.querySelectorAll('.category-card').forEach(card => {
+            categories.forEach(cfg => {
+                const card = document.getElementById(cfg.id);
+                if (!card) return;
                 const assets = [];
                 card.querySelectorAll('.asset-item').forEach(item => {
                     assets.push({
@@ -957,12 +1359,13 @@
                         targetP: parseFloat(item.querySelector('.target-p-input').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.cat-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
-                data[card.id] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
+                newCats.push({ id: cfg.id, name: card.querySelector('.cat-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
+                data[cfg.id] = { target: parseFloat(card.querySelector('.target-input').value) || 0, collapsed: card.classList.contains('collapsed'), assets: assets };
             });
             categories = newCats;
             localStorage.setItem('myPortfolio_v5', JSON.stringify(data));
             localStorage.setItem('catConfig_v5', JSON.stringify(categories));
+            syncMainCardOrder();
             const dot = document.getElementById('saveDot'); dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800);
         } catch(e) {}
     }
@@ -1002,8 +1405,22 @@
     }
 
     function editMode(el) {
-        const con = el.nextElementSibling; el.style.display = 'none'; con.style.display = 'block';
-        const i = con.querySelector('input'); if (i) { i.focus(); i.select(); }
+        const liquidRow = el.closest('.liquid-item');
+        if (liquidRow) { openAmountItemEditor(liquidRow, 'liquid'); return; }
+        const liabRow = el.closest('.liab-item');
+        if (liabRow) { openAmountItemEditor(liabRow, 'liab'); return; }
+        const simpleRow = el.closest('.simple-asset-item');
+        if (simpleRow) {
+            const kind = simpleRow.querySelector('.fixed-name') ? 'fixed' : 'recv';
+            openAmountItemEditor(simpleRow, kind);
+            return;
+        }
+        const con = el.nextElementSibling;
+        if (!con) return;
+        el.style.display = 'none';
+        con.style.display = 'block';
+        const i = con.querySelector('input');
+        if (i) { i.focus(); i.select(); }
     }
 
     function autoViewMode(iEl) {
@@ -1056,15 +1473,13 @@
             const nI = i.querySelector('.asset-name'), s = nI.value.trim().toUpperCase(), p = cloud[s];
             if (p && p > 0) { 
                 const pI = i.querySelector('.asset-price'), qI = i.querySelector('.asset-qty'), vI = i.querySelector('.asset-value');
-                pI.value = p; 
-                autoViewMode(pI); 
+                pI.value = p;
                 
                 // 自動更新現值功能
                 const q = parseFloat(qI.value) || 0;
                 let nV = /^[A-Za-z]+$/.test(nI.value.trim()) ? Math.round(q * p * usdRate) : Math.round(q * p);
                 vI.value = nV;
-                const vV = vI.parentElement.previousElementSibling;
-                if (vV) { vV.innerText = formatCurrency(nV); vV.classList.remove('empty-placeholder'); }
+                refreshAssetItemDisplay(i);
             }
         });
         showToast(`股價更新完成！匯率 USD/TWD：${usdRate.toFixed(2)}`, "success");
@@ -1157,11 +1572,12 @@
 
         updateChart(catSums, total); 
         forceSave();
+        forceSaveLiquidSimple();
     }
 
     function calculateAllLiabilities() {
         let total = 0;
-        document.querySelectorAll('.liab-card').forEach(card => {
+        document.querySelectorAll('#liabGrid .liab-card').forEach(card => {
             let sum = 0;
             card.querySelectorAll('.liab-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
             const sumDisplay = card.querySelector('.liab-sum-display');
@@ -1182,8 +1598,9 @@
 
     // ===== 其他資產（固定＋應收合併）：單一 grid、單一 ＋ =====
     function renderFixedAssetsUI() {
+        isRenderingCards = true;
         const grid = document.getElementById('otherAssetsGrid');
-        if (!grid) return;
+        if (!grid) { isRenderingCards = false; return; }
         grid.innerHTML = '';
         const savedFixed = JSON.parse(localStorage.getItem('myFixed_v1')) || {};
         fixedCategories.forEach(cat => {
@@ -1279,14 +1696,20 @@
             onMove: function(evt){ var g = document.getElementById('otherAssetsGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('simple-asset-card'); },
             onEnd: function(){
                 var g = document.getElementById('otherAssetsGrid');
-                var fixedIds = Array.from(g.children).filter(function(el){ return el.id && el.id.startsWith('fixed_'); }).map(function(el){ return el.id; });
-                var recvIds = Array.from(g.children).filter(function(el){ return el.id && el.id.startsWith('recv_'); }).map(function(el){ return el.id; });
-                fixedCategories = fixedIds.map(function(id){ return fixedCategories.find(function(c){ return c.id === id; }); }).filter(Boolean);
-                recvCategories = recvIds.map(function(id){ return recvCategories.find(function(c){ return c.id === id; }); }).filter(Boolean);
+                var ids = Array.from(g.children).filter(function(el){ return el.id && el.classList && el.classList.contains('simple-asset-card'); }).map(function(el){ return el.id; });
+                fixedCategories = ids.map(function(id){ return fixedCategories.find(function(c){ return c.id === id; }); }).filter(Boolean);
+                otherCardOrder = ids.slice();
+                localStorage.setItem('otherCardOrder_v1', JSON.stringify(otherCardOrder));
                 calculateAllFixedAssets();
                 calculateAllReceivables();
             }
         });
+        syncOtherCardOrder();
+        otherCardOrder.forEach(function(id){
+            var el = document.getElementById(id);
+            if (el && el.parentElement === grid) grid.appendChild(el);
+        });
+        isRenderingCards = false;
         calculateAllFixedAssets();
         calculateAllReceivables();
         refreshIcons(grid);
@@ -1297,7 +1720,7 @@
         const wrap = document.createElement('div'); wrap.className = 'simple-asset-item-wrap';
         wrap.innerHTML = `
             <div class="simple-asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
-            <div class="simple-asset-item">
+            <div class="simple-asset-item" onclick="openAmountItemEditor(this, 'fixed')">
                 <div>
                     <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
                     <div class="edit-container"><input type="text" class="edit-input fixed-name" value="${name}" onblur="autoViewModeFixed(this)"></div>
@@ -1334,13 +1757,18 @@
         }, 150);
     }
     function addFixedCategory() {
-        fixedCategories.push({ id: 'fixed_'+Date.now(), name: '新其他資產' });
+        var id = 'fixed_'+Date.now();
+        fixedCategories.push({ id: id, name: '新其他資產' });
+        otherCardOrder.push(id);
+        localStorage.setItem('otherCardOrder_v1', JSON.stringify(otherCardOrder));
         renderFixedAssetsUI();
     }
     async function deleteFixedCategory(id) {
         if (await showConfirm('是否確定要刪除此固定資產類別？', { danger: true })) {
             if (sheetCardEl && sheetCardEl.id === id) closeSheet();
             fixedCategories = fixedCategories.filter(c => c.id !== id);
+            otherCardOrder = otherCardOrder.filter(function(x){ return x !== id; });
+            localStorage.setItem('otherCardOrder_v1', JSON.stringify(otherCardOrder));
             renderFixedAssetsUI();
             forceSaveFixed();
         }
@@ -1351,12 +1779,12 @@
         openSheetWithCard(id);
     }
     function forceSaveFixed() {
+        if (isRenderingCards) return;
         try {
             const data = {}, newCats = [];
-            const og = document.getElementById('otherAssetsGrid');
-            let cards = Array.from(og?.querySelectorAll('.simple-asset-card') || []).filter(function(c){ return c.id && c.id.startsWith('fixed_'); });
-            if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id && String(sheetCardEl.id).startsWith('fixed_')) cards.push(sheetCardEl);
-            cards.forEach(card => {
+            fixedCategories.forEach(cfg => {
+                const card = document.getElementById(cfg.id);
+                if (!card) return;
                 const items = [];
                 card.querySelectorAll('.simple-asset-item').forEach(item => {
                     items.push({
@@ -1364,12 +1792,13 @@
                         amount: parseFloat(item.querySelector('.fixed-amount').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.fixed-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
-                data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
+                newCats.push({ id: cfg.id, name: card.querySelector('.fixed-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
+                data[cfg.id] = { collapsed: card.classList.contains('collapsed'), items: items };
             });
             fixedCategories = newCats;
             localStorage.setItem('myFixed_v1', JSON.stringify(data));
             localStorage.setItem('fixedConfig_v1', JSON.stringify(fixedCategories));
+            syncOtherCardOrder();
             const dot = document.getElementById('saveDotFixed');
             if (dot) { dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800); }
         } catch(e) {}
@@ -1408,16 +1837,14 @@
     }
 
     // ===== 應收帳款：與固定資產共用 otherAssetsGrid，由 renderFixedAssetsUI 一併渲染 =====
-    function renderReceivablesUI() {
-        renderFixedAssetsUI();
-    }
+    function renderReceivablesUI() { /* 其他資產改為單一類型，應收分類停用 */ }
     function addRecvAsset(catId, name='', amount=0) {
         const list = document.getElementById(`recv-list-${catId}`); if (!list) return;
         const amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
         const wrap = document.createElement('div'); wrap.className = 'simple-asset-item-wrap';
         wrap.innerHTML = `
             <div class="simple-asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
-            <div class="simple-asset-item">
+            <div class="simple-asset-item" onclick="openAmountItemEditor(this, 'recv')">
                 <div>
                     <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
                     <div class="edit-container"><input type="text" class="edit-input recv-name" value="${name}" onblur="autoViewModeRecv(this)"></div>
@@ -1453,78 +1880,37 @@
             calculateAllReceivables();
         }, 150);
     }
-    function addRecvCategory() {
-        recvCategories.push({ id: 'recv_'+Date.now(), name: '新應收帳款' });
-        renderReceivablesUI();
-    }
-    async function deleteRecvCategory(id) {
-        if (await showConfirm('是否確定要刪除此應收帳款類別？', { danger: true })) {
-            if (sheetCardEl && sheetCardEl.id === id) closeSheet();
-            recvCategories = recvCategories.filter(c => c.id !== id);
-            renderReceivablesUI();
-            forceSaveRecv();
-        }
-    }
+    function addRecvCategory() { addFixedCategory(); }
+    async function deleteRecvCategory(id) { await deleteFixedCategory(id); }
     function toggleRecvCategory(id) {
         const target = event.target;
         if (target.tagName === 'INPUT' || target.isContentEditable) return;
         openSheetWithCard(id);
     }
     function forceSaveRecv() {
-        try {
-            const data = {}, newCats = [];
-            const og = document.getElementById('otherAssetsGrid');
-            let cards = Array.from(og?.querySelectorAll('.simple-asset-card') || []).filter(function(c){ return c.id && c.id.startsWith('recv_'); });
-            if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id && !String(sheetCardEl.id).startsWith('fixed_')) cards.push(sheetCardEl);
-            cards.forEach(card => {
-                const items = [];
-                card.querySelectorAll('.simple-asset-item').forEach(item => {
-                    items.push({
-                        name: item.querySelector('.recv-name').value || '',
-                        amount: parseFloat(item.querySelector('.recv-amount').value) || 0
-                    });
-                });
-                newCats.push({ id: card.id, name: card.querySelector('.recv-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
-                data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
-            });
-            recvCategories = newCats;
-            localStorage.setItem('myRecv_v1', JSON.stringify(data));
-            localStorage.setItem('recvConfig_v1', JSON.stringify(recvCategories));
-            const dot = document.getElementById('saveDotRecv');
-            if (dot) { dot.classList.add('active'); setTimeout(() => dot.classList.remove('active'), 800); }
-        } catch(e) {}
+        if (isRenderingCards) return;
+        recvCategories = [];
+        localStorage.setItem('myRecv_v1', '{}');
+        localStorage.setItem('recvConfig_v1', '[]');
     }
     async function clearAllRecv() {
         if (await showConfirm('是否清除所有應收帳款資料並重置？', { danger: true })) {
             localStorage.removeItem('myRecv_v1');
             localStorage.removeItem('recvConfig_v1');
-            recvCategories = RECV_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name }));
+            recvCategories = [];
             renderReceivablesUI();
             calculateAllReceivables();
         }
     }
     function calculateAllReceivables() {
-        let total = 0;
-        const grid = document.getElementById('otherAssetsGrid');
-        if (!grid) return;
-        let cards = Array.from(grid.querySelectorAll('.simple-asset-card')).filter(function(c){ return c.id && c.id.startsWith('recv_'); });
-        if (sheetCardEl && sheetCardEl.classList.contains('simple-asset-card') && sheetCardEl.id && String(sheetCardEl.id).startsWith('recv_')) cards.push(sheetCardEl);
-        cards.forEach(card => {
-            let sum = 0;
-            card.querySelectorAll('.recv-amount').forEach(i => { sum += parseFloat(i.value) || 0; });
-            const sumDisplay = card.querySelector('.recv-sum-display');
-            if (sumDisplay) { sumDisplay.innerText = formatCurrency(sum); applySumDisplaySize(sumDisplay); }
-            total += sum;
-        });
-        receivableTotal = total;
+        receivableTotal = 0;
         const totalEl = document.getElementById('recvRebalanceSummary');
-        if (totalEl) totalEl.innerText = formatCurrency(total);
-        setSummaryTrend('recvRebalanceSummary', 'recvRebalanceSummaryTrend', total, prevRecvTotal);
-        prevRecvTotal = total;
+        if (totalEl) totalEl.innerText = formatCurrency(0);
+        setSummaryTrend('recvRebalanceSummary', 'recvRebalanceSummaryTrend', 0, prevRecvTotal);
+        prevRecvTotal = 0;
         const otherEl = document.getElementById('otherAssetsSummary');
         if (otherEl) otherEl.innerText = formatCurrency((fixedTotal || 0) + (receivableTotal || 0));
         updateDashboard();
-        forceSaveRecv();
     }
 
     var myHistoryChart = null;
@@ -1826,7 +2212,7 @@
         sheetOpenedAt = Date.now();
         var footer = document.getElementById('sheetFooter');
         var deleteBtn = document.getElementById('sheetDeleteCardBtn');
-        if (footer) footer.style.display = 'block';
+        if (footer) footer.style.display = 'flex';
         if (deleteBtn) {
             deleteBtn.onclick = function() {
                 var id = sheetCardEl.id;
@@ -1885,16 +2271,10 @@
                 sheetPlaceholder.parentElement.replaceChild(sheetCardEl, sheetPlaceholder);
             } else if (container) {
                 var idx = -1;
-                if (sheetCardEl.classList.contains('category-card')) idx = categories.findIndex(function(c){ return c.id === sheetCardEl.id; });
-                else if (sheetCardEl.classList.contains('liquid-simple-card')) idx = liquidSimpleCategories.findIndex(function(c){ return c.id === sheetCardEl.id; });
+                if (sheetCardEl.classList.contains('category-card') || sheetCardEl.classList.contains('liquid-simple-card')) idx = mainCardOrder.indexOf(sheetCardEl.id);
                 else if (sheetCardEl.classList.contains('liab-card')) idx = liabCategories.findIndex(function(c){ return c.id === sheetCardEl.id; });
-                else if (sheetCardEl.classList.contains('simple-asset-card')) {
-                    var arr = sheetCardEl.id.startsWith('fixed_') ? fixedCategories : recvCategories;
-                    idx = arr.findIndex(function(c){ return c.id === sheetCardEl.id; });
-                }
+                else if (sheetCardEl.classList.contains('simple-asset-card')) idx = otherCardOrder.indexOf(sheetCardEl.id);
                 var domIdx = idx;
-                if (sheetCardEl.classList.contains('liquid-simple-card')) domIdx = categories.length + idx;
-                else if (sheetCardEl.classList.contains('simple-asset-card') && idx >= 0 && !sheetCardEl.id.startsWith('fixed_')) domIdx = fixedCategories.length + idx;
                 var next = domIdx >= 0 && domIdx < container.children.length ? container.children[domIdx] : null;
                 if (next) container.insertBefore(sheetCardEl, next);
                 else container.appendChild(sheetCardEl);
@@ -2052,7 +2432,7 @@
         var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
         if (!isTouchDevice) {
             wrapEl.addEventListener('mouseenter', function() {
-                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
+                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 750);
             });
             wrapEl.addEventListener('mouseleave', function() {
                 if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
@@ -2097,7 +2477,7 @@
         var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
         if (!isTouchDevice) {
             wrapEl.addEventListener('mouseenter', function() {
-                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 450);
+                hoverTimer = setTimeout(function() { wrapEl.classList.add('reveal'); }, 750);
             });
             wrapEl.addEventListener('mouseleave', function() {
                 if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
@@ -2139,7 +2519,9 @@
     }, { passive: true });
 
     function renderUI() {
+        isRenderingCards = true;
         const saved = JSON.parse(localStorage.getItem('myPortfolio_v5')) || {}, grid = document.getElementById('mainGrid'); grid.innerHTML = '';
+        syncMainCardOrder();
         categories.forEach(cat => {
             if (sheetCardEl && sheetCardEl.classList.contains('category-card') && cat.id === sheetCardEl.id) {
                 var ph = document.createElement('div'); ph.id = 'sheet-placeholder-' + cat.id; ph.className = 'sheet-placeholder'; ph.setAttribute('data-sheet-placeholder', '1');
@@ -2157,7 +2539,7 @@
                     <div class="card-subtitle"><span class="target-display">目標 ${data.target}%</span></div>
                     <div class="target-edit" onclick="event.stopPropagation()">目標 <input type="number" class="target-input" value="${data.target}" oninput="calculateAll()"> %<div class="target-amount-label">$0</div></div>
                 </div>
-                <div class="asset-header-row"><span></span><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span>實際%</span></div>
+                <div class="asset-header-row"><span>名稱</span><span>股數</span><span>單價</span><span>現值</span><span>目標%</span><span>實際%</span></div>
                 <div class="asset-list" id="list-${cat.id}"></div>
                 <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="addAsset('${cat.id}')">+ 新增標的</button>
                 <div class="card-footer"><div class="footer-row"><span class="sum-label">合計</span><span class="cat-sum-display">$0</span><span class="current-p">0%</span></div><div class="status-tag status-alert">✅ 比例理想</div></div>
@@ -2172,7 +2554,28 @@
             else addAsset(cat.id);
             new Sortable(document.getElementById(`list-${cat.id}`), { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-items', put: ['asset-items'] }, draggable: '.asset-item-wrap', onMove: function(evt){ return !evt.dragged.classList.contains('category-card'); }, onEnd: () => calculateAll() });
         });
-        new Sortable(grid, { animation: 150, handle: '.category-header', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'asset-cards', pull: true, put: ['asset-cards'] }, draggable: '.category-card', onMove: function(evt){ var g = document.getElementById('mainGrid'); return evt.to === g && evt.related && evt.related.parentNode === g && evt.related.classList.contains('category-card'); }, onEnd: function(){ var g = document.getElementById('mainGrid'); document.querySelectorAll('.category-card').forEach(function(card){ if (card.classList.contains('in-sheet')) return; if (card.parentElement && card.parentElement !== g){ var idx = categories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAll(); } });
+        new Sortable(grid, {
+            animation: 150,
+            handle: '.category-header',
+            delay: 200,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
+            group: { name: 'asset-cards', pull: true, put: ['asset-cards'] },
+            draggable: '.category-card, .liquid-simple-card',
+            onMove: function(evt){
+                var g = document.getElementById('mainGrid');
+                if (evt.to !== g) return false;
+                return evt.related && evt.related.parentNode === g && (evt.related.classList.contains('category-card') || evt.related.classList.contains('liquid-simple-card'));
+            },
+            onEnd: function(){
+                var g = document.getElementById('mainGrid');
+                mainCardOrder = Array.from(g.children)
+                    .filter(function(el){ return el.classList && (el.classList.contains('category-card') || el.classList.contains('liquid-simple-card')); })
+                    .map(function(el){ return el.id; });
+                localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder));
+                calculateAll();
+            }
+        });
         var savedLiquid = JSON.parse(localStorage.getItem('myLiquidSimple_v1')) || {};
         liquidSimpleCategories.forEach(function(cat) {
             if (sheetCardEl && sheetCardEl.classList.contains('liquid-simple-card') && cat.id === sheetCardEl.id) {
@@ -2196,6 +2599,12 @@
             else addLiquidAsset(cat.id);
             new Sortable(list, { animation: 150, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, group: { name: 'liquid-items', put: ['liquid-items'] }, draggable: '.liquid-item-wrap', onEnd: function() { forceSaveLiquidSimple(); calculateAll(); } });
         });
+        // 投資區域與流動資產使用同一個排序序列
+        mainCardOrder.forEach(function(id){
+            var el = document.getElementById(id);
+            if (el && el.parentElement === grid) grid.appendChild(el);
+        });
+        isRenderingCards = false;
         calculateAll();
         refreshIcons(grid);
     }
@@ -2206,23 +2615,38 @@
         const qD = (qty === '' || qty == 0) ? '-' : formatNum(qty), pD = (price === '' || price == 0) ? '-' : formatNum(price);
         wrap.innerHTML = `
             <div class="asset-item-delete-reveal"><button type="button" class="asset-item-delete-btn" onclick="var w=this.closest('.asset-item-wrap'); w.remove(); calculateAll();">刪除</button></div>
-            <div class="asset-item">
-                <div><div class="static-view" onclick="editMode(this)">${name||'點擊輸入'}</div><div class="edit-container"><input type="text" class="edit-input asset-name" list="stockList" value="${name}" onblur="autoViewMode(this)"></div></div>
-                <div><div class="static-view" onclick="editMode(this)">${qD}</div><div class="edit-container"><input type="number" inputmode="numeric" class="edit-input asset-qty" value="${qty}" onblur="autoViewMode(this)"></div></div>
-                <div><div class="static-view" onclick="editMode(this)">${pD}</div><div class="edit-container"><input type="number" inputmode="decimal" step="any" class="edit-input asset-price" value="${price}" onblur="autoViewMode(this)"></div></div>
-                <div><div class="static-view" onclick="editMode(this)">${formatCurrency(value)}</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input asset-value" value="${value}" onblur="autoViewMode(this)"></div></div>
-                <div><div class="static-view" onclick="editMode(this)">${targetP}%</div><div class="edit-container suffix"><input type="number" inputmode="numeric" class="target-p-input edit-input" value="${targetP}" onblur="autoViewMode(this)"></div></div>
+            <div class="asset-item" onclick="openAssetItemEditor(this)">
+                <div><div class="static-view asset-name-display ${name ? '' : 'empty-placeholder'}">${name||'點擊輸入'}</div></div>
+                <div><div class="static-view asset-qty-display ${qD === '-' ? 'empty-placeholder' : ''}">${qD}</div></div>
+                <div><div class="static-view asset-price-display ${pD === '-' ? 'empty-placeholder' : ''}">${pD}</div></div>
+                <div><div class="static-view asset-value-display">${formatCurrency(value)}</div></div>
+                <div><div class="static-view asset-target-display">${targetP}%</div></div>
                 <div style="font-size:10px; font-weight:bold; text-align:right;"><div class="ratio-val">0%</div><div class="diff-suggestion" style="font-size:8px;"></div></div>
+                <input type="hidden" class="asset-name" value="${name}">
+                <input type="hidden" class="asset-qty" value="${qty}">
+                <input type="hidden" class="asset-price" value="${price}">
+                <input type="hidden" class="asset-value" value="${value}">
+                <input type="hidden" class="target-p-input" value="${targetP}">
             </div>
         `;
         list.appendChild(wrap);
         attachAssetItemSwipe(wrap);
+        refreshAssetItemDisplay(wrap.querySelector('.asset-item'));
         calculateAll();
     }
 
-    function addCategory() { categories.push({ id: 'cat_'+Date.now(), name: '新區域' }); renderUI(); }
+    function addCategory() {
+        var id = 'cat_'+Date.now();
+        categories.push({ id: id, name: '新區域' });
+        mainCardOrder.push(id);
+        localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder));
+        renderUI();
+    }
     function addLiquidSimpleCategory() {
-        liquidSimpleCategories.push({ id: 'liquid_'+Date.now(), name: '新流動資產', color: '', icon: 'wallet', target: 10 });
+        var id = 'liquid_'+Date.now();
+        liquidSimpleCategories.push({ id: id, name: '新流動資產', color: '', icon: 'wallet', target: 10 });
+        mainCardOrder.push(id);
+        localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder));
         renderUI();
     }
     function addLiquidAsset(catId, name, amount) {
@@ -2232,10 +2656,11 @@
         var amountDisplay = (amount === '' || amount == 0) ? '-' : formatCurrency(amount);
         var wrap = document.createElement('div');
         wrap.className = 'liquid-item-wrap';
-        wrap.innerHTML = '<div class="liab-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div><div class="liquid-item"><div><div class="static-view" onclick="editMode(this)">' + (name || '點擊輸入') + '</div><div class="edit-container"><input type="text" class="edit-input liquid-name" value="' + (name || '') + '" onblur="autoViewModeLiquid(this)"></div></div><div><div class="static-view" onclick="editMode(this)">' + amountDisplay + '</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liquid-amount" value="' + amount + '" onblur="autoViewModeLiquid(this)" oninput="calculateAll()"></div></div></div>';
+        wrap.innerHTML = '<div class="liab-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div><div class="liquid-item" onclick="openAmountItemEditor(this, \'liquid\')"><div><div class="static-view" onclick="editMode(this)">' + (name || '點擊輸入') + '</div><div class="edit-container"><input type="text" class="edit-input liquid-name" value="' + (name || '') + '" onblur="autoViewModeLiquid(this)"></div></div><div><div class="static-view" onclick="editMode(this)">' + amountDisplay + '</div><div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liquid-amount" value="' + amount + '" onblur="autoViewModeLiquid(this)" oninput="calculateAll(); forceSaveLiquidSimple()"></div></div></div>';
         list.appendChild(wrap);
         attachSwipeRevealDelete(wrap, '.liquid-item', function() { calculateAll(); });
-        forceSaveLiquidSimple();
+        // 渲染過程中可能暫時略過存檔，延後一次可避免新增列在刷新後遺失
+        setTimeout(function(){ forceSaveLiquidSimple(); }, 0);
     }
     function autoViewModeLiquid(iEl) {
         var view = iEl.parentElement.previousElementSibling;
@@ -2247,7 +2672,7 @@
             view.innerText = dV || '點擊輸入';
             view.classList.toggle('empty-placeholder', !dV);
         }
-        setTimeout(function() { iEl.parentElement.style.display = 'none'; view.style.display = 'flex'; calculateAll(); }, 150);
+        setTimeout(function() { iEl.parentElement.style.display = 'none'; view.style.display = 'flex'; calculateAll(); forceSaveLiquidSimple(); }, 150);
     }
     function toggleLiquidSimpleCategory(id) {
         var target = event.target;
@@ -2257,14 +2682,28 @@
     async function deleteLiquidSimpleCategory(id) {
         if (!await showConfirm('是否確定要刪除此流動資產？', { danger: true })) return;
         liquidSimpleCategories = liquidSimpleCategories.filter(function(c) { return c.id !== id; });
+        mainCardOrder = mainCardOrder.filter(function(x){ return x !== id; });
+        localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder));
         renderUI();
         forceSaveLiquidSimple();
         calculateAll();
     }
     function forceSaveLiquidSimple() {
+        if (isRenderingCards) {
+            if (!pendingLiquidSave) {
+                pendingLiquidSave = true;
+                setTimeout(function() {
+                    pendingLiquidSave = false;
+                    forceSaveLiquidSimple();
+                }, 0);
+            }
+            return;
+        }
         try {
             var data = {}, newCats = [];
-            document.querySelectorAll('.liquid-simple-card').forEach(function(card) {
+            liquidSimpleCategories.forEach(function(cfg) {
+                var card = document.getElementById(cfg.id);
+                if (!card) return;
                 var items = [];
                 card.querySelectorAll('.liquid-item').forEach(function(item) {
                     items.push({
@@ -2273,21 +2712,23 @@
                     });
                 });
                 var targetVal = parseFloat((card.querySelector('.target-input') || {}).value) || 10;
-                newCats.push({ id: card.id, name: (card.querySelector('.liquid-name-text') || {}).innerText || '流動資產', color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '', target: targetVal });
-                data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items, target: targetVal };
+                newCats.push({ id: cfg.id, name: (card.querySelector('.liquid-name-text') || {}).innerText || '流動資產', color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '', target: targetVal });
+                data[cfg.id] = { collapsed: card.classList.contains('collapsed'), items: items, target: targetVal };
             });
             liquidSimpleCategories = newCats;
             localStorage.setItem('myLiquidSimple_v1', JSON.stringify(data));
             localStorage.setItem('liquidSimpleConfig_v1', JSON.stringify(liquidSimpleCategories));
+            syncMainCardOrder();
         } catch (e) {}
     }
-    async function deleteCategory(id) { if (await showConfirm('是否確定要刪除此投資區域？', { danger: true })) { if (sheetCardEl && sheetCardEl.id === id) closeSheet(); categories = categories.filter(c => c.id !== id); renderUI(); forceSave(); } }
+    async function deleteCategory(id) { if (await showConfirm('是否確定要刪除此投資區域？', { danger: true })) { if (sheetCardEl && sheetCardEl.id === id) closeSheet(); categories = categories.filter(c => c.id !== id); mainCardOrder = mainCardOrder.filter(function(x){ return x !== id; }); localStorage.setItem('mainCardOrder_v1', JSON.stringify(mainCardOrder)); renderUI(); forceSave(); } }
 
     // ===== 負債頁面：UI 與資料處理 =====
     function renderLiabilitiesUI() {
+        isRenderingCards = true;
         const saved = JSON.parse(localStorage.getItem('myLiabilities_v1')) || {};
         const grid = document.getElementById('liabGrid');
-        if (!grid) return;
+        if (!grid) { isRenderingCards = false; return; }
         grid.innerHTML = '';
 
         liabCategories.forEach(cat => {
@@ -2351,9 +2792,16 @@
             group: { name: 'liab-cards', pull: true, put: ['liab-cards'] },
             draggable: '.liab-card',
             onMove: function(evt){ var g = document.getElementById('liabGrid'); return evt.related && evt.related.parentNode === g && evt.related.classList.contains('liab-card'); },
-            onEnd: function(){ var g = document.getElementById('liabGrid'); document.querySelectorAll('.liab-card').forEach(function(card){ if (card.classList.contains('in-sheet')) return; if (card.parentElement && card.parentElement !== g){ var idx = liabCategories.findIndex(function(c){ return c.id === card.id; }); var next = idx >= 0 && idx < g.children.length ? g.children[idx] : null; if (next) g.insertBefore(card, next); else g.appendChild(card); } }); calculateAllLiabilities(); }
+            onEnd: function(){
+                var g = document.getElementById('liabGrid');
+                var ids = Array.from(g.children).filter(function(el){ return el.id && el.classList && el.classList.contains('liab-card'); }).map(function(el){ return el.id; });
+                liabCategories = ids.map(function(id){ return liabCategories.find(function(c){ return c.id === id; }); }).filter(Boolean);
+                localStorage.setItem('liabConfig_v1', JSON.stringify(liabCategories));
+                calculateAllLiabilities();
+            }
         });
 
+        isRenderingCards = false;
         calculateAllLiabilities();
         refreshIcons(grid);
     }
@@ -2364,14 +2812,14 @@
         const wrap = document.createElement('div'); wrap.className = 'liab-item-wrap';
         wrap.innerHTML = `
             <div class="liab-item-delete-reveal"><button type="button" class="asset-item-delete-btn">刪除</button></div>
-            <div class="liab-item">
+            <div class="liab-item" onclick="openAmountItemEditor(this, 'liab')">
                 <div>
                     <div class="static-view" onclick="editMode(this)">${name || '點擊輸入'}</div>
                     <div class="edit-container"><input type="text" class="edit-input liab-name" value="${name}" onblur="autoViewModeLiab(this)"></div>
                 </div>
                 <div>
                     <div class="static-view" onclick="editMode(this)">${amountDisplay}</div>
-                    <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)" oninput="calculateAllLiabilities()"></div>
+                    <div class="edit-container prefix"><input type="number" inputmode="decimal" step="any" class="edit-input liab-amount" value="${amount}" onblur="autoViewModeLiab(this)" oninput="calculateAllLiabilities(); forceSaveLiab()"></div>
                 </div>
             </div>
         `;
@@ -2382,6 +2830,7 @@
 
     function addLiabCategory() {
         liabCategories.push({ id: 'debt_'+Date.now(), name: '新負債', color: '', icon: 'credit-card' });
+        localStorage.setItem('liabConfig_v1', JSON.stringify(liabCategories));
         renderLiabilitiesUI();
     }
 
@@ -2421,13 +2870,49 @@
             iEl.parentElement.style.display = 'none';
             view.style.display = 'flex';
             calculateAllLiabilities();
+            forceSaveLiab();
         }, 150);
     }
 
     function forceSaveLiab() {
+        if (isRenderingCards) {
+            if (!pendingLiabSave) {
+                pendingLiabSave = true;
+                setTimeout(function() {
+                    pendingLiabSave = false;
+                    forceSaveLiab();
+                }, 0);
+            }
+            return;
+        }
         try {
+            const oldData = JSON.parse(localStorage.getItem('myLiabilities_v1') || '{}');
+            const oldConfig = JSON.parse(localStorage.getItem('liabConfig_v1') || '[]');
             const data = {}, newCats = [];
-            document.querySelectorAll('.liab-card').forEach(card => {
+            const domCards = Array.from(document.querySelectorAll('#liabGrid .liab-card'));
+            const domMap = new Map(domCards.map(card => [card.id, card]));
+            if (sheetCardEl && sheetCardEl.classList && sheetCardEl.classList.contains('liab-card') && !sheetCardEl.classList.contains('liquid-simple-card') && sheetCardEl.id) {
+                domMap.set(sheetCardEl.id, sheetCardEl);
+            }
+            const orderedIds = (Array.isArray(liabCategories) ? liabCategories.map(c => c.id) : []).filter(Boolean);
+            domMap.forEach((_, id) => { if (!orderedIds.includes(id)) orderedIds.push(id); });
+
+            orderedIds.forEach(id => {
+                const card = domMap.get(id) || document.getElementById(id);
+                if (!card) {
+                    // 若此刻 DOM 暫時拿不到卡片，保留先前已存資料，避免把舊金額洗掉
+                    const oldCat = (Array.isArray(oldConfig) ? oldConfig : []).find(c => c && c.id === id) || {};
+                    if (oldData[id] || oldCat.id) {
+                        newCats.push({
+                            id,
+                            name: oldCat.name || '新負債',
+                            color: oldCat.color || '',
+                            icon: oldCat.icon || 'credit-card'
+                        });
+                        data[id] = oldData[id] || { collapsed: true, items: [] };
+                    }
+                    return;
+                }
                 const items = [];
                 card.querySelectorAll('.liab-item').forEach(item => {
                     items.push({
@@ -2435,8 +2920,8 @@
                         amount: parseFloat(item.querySelector('.liab-amount').value) || 0
                     });
                 });
-                newCats.push({ id: card.id, name: card.querySelector('.liab-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
-                data[card.id] = { collapsed: card.classList.contains('collapsed'), items: items };
+                newCats.push({ id: id, name: card.querySelector('.liab-name-text').innerText, color: card.getAttribute('data-color') || '', icon: card.getAttribute('data-icon') || '' });
+                data[id] = { collapsed: card.classList.contains('collapsed'), items: items };
             });
             liabCategories = newCats;
             localStorage.setItem('myLiabilities_v1', JSON.stringify(data));
@@ -2479,11 +2964,15 @@
         localStorage.removeItem('liabConfig_v1');
         localStorage.removeItem('myLiquidSimple_v1');
         localStorage.removeItem('liquidSimpleConfig_v1');
+        localStorage.removeItem('mainCardOrder_v1');
+        localStorage.removeItem('otherCardOrder_v1');
         categories = DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'wallet' }));
         liquidSimpleCategories = [];
         fixedCategories = FIXED_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'home' }));
-        recvCategories = RECV_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'file' }));
+        recvCategories = [];
         liabCategories = LIAB_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'credit-card' }));
+        mainCardOrder = categories.map(c => c.id);
+        otherCardOrder = fixedCategories.map(c => c.id);
         renderUI();
         renderFixedAssetsUI();
         renderReceivablesUI();
@@ -2532,6 +3021,30 @@
         recvCategories = recvS ? JSON.parse(recvS) : RECV_DEFAULT_CONFIG.map(d => ({ id: d.id, name: d.name, color: '', icon: 'file' }));
         const liquidS = localStorage.getItem('liquidSimpleConfig_v1');
         liquidSimpleCategories = liquidS ? JSON.parse(liquidS) : [];
+        // 既有應收資料一次性併入其他資產，之後僅維護單一類型卡片
+        if (recvCategories.length > 0) {
+            const fixedData = JSON.parse(localStorage.getItem('myFixed_v1') || '{}');
+            const recvData = JSON.parse(localStorage.getItem('myRecv_v1') || '{}');
+            recvCategories.forEach(function(c){
+                const newId = 'fixed_from_' + c.id;
+                if (!fixedCategories.find(function(fc){ return fc.id === newId; })) {
+                    fixedCategories.push({ id: newId, name: c.name, color: c.color || '', icon: c.icon || 'home' });
+                }
+                const old = recvData[c.id] || { items: [], collapsed: true };
+                fixedData[newId] = { collapsed: !!old.collapsed, items: (old.items || []).map(function(it){ return { name: it.name || '', amount: parseFloat(it.amount) || 0 }; }) };
+            });
+            recvCategories = [];
+            localStorage.setItem('myFixed_v1', JSON.stringify(fixedData));
+            localStorage.setItem('fixedConfig_v1', JSON.stringify(fixedCategories));
+            localStorage.setItem('myRecv_v1', '{}');
+            localStorage.setItem('recvConfig_v1', '[]');
+        }
+        const mainOrderS = localStorage.getItem('mainCardOrder_v1');
+        mainCardOrder = mainOrderS ? JSON.parse(mainOrderS) : [];
+        const otherOrderS = localStorage.getItem('otherCardOrder_v1');
+        otherCardOrder = otherOrderS ? JSON.parse(otherOrderS) : [];
+        syncMainCardOrder();
+        syncOtherCardOrder();
         renderUI();
         renderLiabilitiesUI();
         renderFixedAssetsUI();
